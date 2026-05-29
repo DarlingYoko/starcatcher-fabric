@@ -8,14 +8,12 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.Supplier;
 
-public class BaseMinigameModifier extends AbstractMinigameModifier
-{
+public class BaseMinigameModifier extends AbstractMinigameModifier {
 
     public static final MapCodec<AbstractMinigameModifier> CODEC = MapCodec.unit(BaseMinigameModifier::new);
 
     @Override
-    public void onMiss()
-    {
+    public void onMiss() {
         super.onMiss();
         //kimbe marker
         instance.kimbeMarkerAlpha = 1;
@@ -42,16 +40,14 @@ public class BaseMinigameModifier extends AbstractMinigameModifier
     }
 
     @Override
-    public boolean onHit(ActiveSweetSpot ass)
-    {
+    public boolean onHit(ActiveSweetSpot ass) {
         instance.kimbeMarkerAlpha = 1;
         instance.kimbeMarkerColor = 0x2ce17d;
         instance.kimbeMarkerPos = instance.getPointerPosPrecise();
 
         instance.consecutiveHits++;
 
-        if(U.r.nextFloat() > 0.98 && !instance.treasureActive && instance.treasureProgress == 0)
-        {
+        if (U.r.nextFloat() > 0.98 && !instance.treasureActive && instance.treasureProgress == 0) {
             instance.addSweetSpot(new ActiveSweetSpot(instance, FishProperties.SweetSpot.TREASURE));
         }
 

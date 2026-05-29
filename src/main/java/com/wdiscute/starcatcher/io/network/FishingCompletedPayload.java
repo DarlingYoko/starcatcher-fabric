@@ -10,8 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record FishingCompletedPayload(int time, boolean completedTreasure, boolean perfectCatch,
-                                      int hits) implements CustomPacketPayload
-{
+                                      int hits) implements CustomPacketPayload {
     public static final Type<FishingCompletedPayload> TYPE = new Type<>(Starcatcher.rl("fishing_completed"));
 
     public static final StreamCodec<ByteBuf, FishingCompletedPayload> STREAM_CODEC = StreamCodec.composite(
@@ -27,14 +26,12 @@ public record FishingCompletedPayload(int time, boolean completedTreasure, boole
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type()
-    {
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public void handle(IPayloadContext context)
-    {
-        context.enqueueWork( () -> {
+    public void handle(IPayloadContext context) {
+        context.enqueueWork(() -> {
             FishProperties.spawnFishFromPlayerFishing(((ServerPlayer) context.player()), time, completedTreasure, perfectCatch, hits);
         });
     }

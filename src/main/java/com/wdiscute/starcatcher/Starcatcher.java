@@ -1,27 +1,25 @@
 package com.wdiscute.starcatcher;
 
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Lifecycle;
-import com.wdiscute.starcatcher.registry.FishProperties.SizeAndWeight.Units;
-import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
-import com.wdiscute.starcatcher.registry.fishrestrictions.SCFishRestrictions;
-import com.wdiscute.starcatcher.registry.tackleskin.AbstractTackleSkin;
-import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
-import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
-import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
-import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
-import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
 import com.wdiscute.starcatcher.blocks.SCBlockEntities;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
 import com.wdiscute.starcatcher.guide.FishCaughtToast;
-import com.wdiscute.starcatcher.io.*;
-import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
-import com.wdiscute.starcatcher.registry.sweetspotbehaviour.AbstractSweetSpotBehaviour;
+import com.wdiscute.starcatcher.io.SCDataAttachments;
+import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.*;
+import com.wdiscute.starcatcher.registry.FishProperties.SizeAndWeight.Units;
+import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
+import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
+import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
+import com.wdiscute.starcatcher.registry.fishrestrictions.SCFishRestrictions;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
+import com.wdiscute.starcatcher.registry.sweetspotbehaviour.AbstractSweetSpotBehaviour;
+import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
+import com.wdiscute.starcatcher.registry.tackleskin.AbstractTackleSkin;
+import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import com.wdiscute.starcatcher.sellingbin.SCProcessors;
-import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -40,8 +38,7 @@ import org.slf4j.Logger;
 import java.util.function.Supplier;
 
 @Mod(Starcatcher.MOD_ID)
-public class Starcatcher
-{
+public class Starcatcher {
     public static final String MOD_ID = "starcatcher";
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -90,14 +87,12 @@ public class Starcatcher
             .defaultKey(Starcatcher.rl("pearl"))
             .create();
 
-    public static ResourceLocation rl(String s)
-    {
+    public static ResourceLocation rl(String s) {
         return ResourceLocation.fromNamespaceAndPath(Starcatcher.MOD_ID, s);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void fishCaughtToast(FishProperties fp, boolean newFish, int sizeCM, int weightCM)
-    {
+    public static void fishCaughtToast(FishProperties fp, boolean newFish, int sizeCM, int weightCM) {
         if (newFish) Minecraft.getInstance().getToasts().addToast(new FishCaughtToast(fp));
 
         Units units = SCConfig.UNIT.get();
@@ -115,8 +110,7 @@ public class Starcatcher
     }
 
 
-    public Starcatcher(IEventBus modEventBus, ModContainer modContainer)
-    {
+    public Starcatcher(IEventBus modEventBus, ModContainer modContainer) {
         SCCreativeModeTabs.register(modEventBus);
 
         SCItems.register(modEventBus);
@@ -137,6 +131,7 @@ public class Starcatcher
         SCCriterionTriggers.register(modEventBus);
         SCProcessors.register(modEventBus);
         SCLootModifiers.register(modEventBus);
+        SCAttributes.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.CLIENT, SCConfig.SPEC);
         modContainer.registerConfig(ModConfig.Type.SERVER, SCConfig.SPEC_SERVER);
@@ -145,10 +140,8 @@ public class Starcatcher
     }
 
     @Mod(value = Starcatcher.MOD_ID, dist = Dist.CLIENT)
-    public static class Client
-    {
-        public Client(ModContainer modContainer)
-        {
+    public static class Client {
+        public Client(ModContainer modContainer) {
             modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
     }

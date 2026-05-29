@@ -12,12 +12,13 @@ import com.wdiscute.starcatcher.fishentity.FishEntity;
 import com.wdiscute.starcatcher.io.*;
 import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
 import com.wdiscute.starcatcher.registry.fishrestrictions.*;
-import com.wdiscute.starcatcher.registry.minigamemodifiers.*;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.SpawnSweetSpotsModifier;
 import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import com.wdiscute.starcatcher.tournament.TournamentHandler;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
@@ -49,16 +50,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 //      <><|    <- fish
@@ -72,8 +72,7 @@ public record FishProperties(
         Difficulty dif,
         boolean skipMinigame,
         boolean hasGuideEntry
-)
-{
+) {
     public static final Codec<FishProperties> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     CatchInfo.CODEC.fieldOf("catch_info").forGetter(FishProperties::catchInfo),
@@ -103,13 +102,11 @@ public record FishProperties(
     );
 
     @Override
-    public @NotNull String toString()
-    {
-            return "[FishProperties] " + getDisplayName();
+    public @NotNull String toString() {
+        return "[FishProperties] " + getDisplayName();
     }
 
-    public Component getDisplayName()
-    {
+    public Component getDisplayName() {
         if (catchInfo.alwaysSpawnEntity)
             return Component.translatable("entity." + catchInfo.entityToSpawn.getRegisteredName().replace(":", "."));
         else
@@ -117,15 +114,14 @@ public record FishProperties(
     }
 
     //returns a new instance of FishProperties with the treasure itemstack set
-    public FishProperties loadTreasure(ServerPlayer player)
-    {
-        if(!catchInfo.treasureIs.isEmpty()) return this;
+    public FishProperties loadTreasure(ServerPlayer player) {
+        if (!catchInfo.treasureIs.isEmpty()) return this;
 
         Registry<FishProperties> fishProperties = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY);
 
         Treasure.TreasureInstance data = fishProperties.wrapAsHolder(this).getData(SCDataMaps.TREASURE);
 
-        if(data == null) return this;
+        if (data == null) return this;
 
         return new FishProperties(
                 new CatchInfo(catchInfo.fish, catchInfo.bucketedFish, catchInfo.entityToSpawn, catchInfo.alwaysSpawnEntity,
@@ -141,8 +137,7 @@ public record FishProperties(
         );
     }
 
-    public ResourceLocation toLoc(Level level)
-    {
+    public ResourceLocation toLoc(Level level) {
         return U.getRlFromFp(level, this);
     }
 
@@ -174,18 +169,15 @@ public record FishProperties(
             false
     );
 
-    public FishProperties withHideCatch()
-    {
+    public FishProperties withHideCatch() {
         return new FishProperties(this.catchInfo.withItemToOverrideWith(SCItems.UNKNOWN_FISH), this.star, this.baseChance, this.sizeWeight, this.rarity, this.restrictions, this.dif, this.skipMinigame, this.hasGuideEntry);
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder
-    {
+    public static class Builder {
         private CatchInfo.Builder catchInfo = new CatchInfo.Builder();
         private Star star = Star.DEFAULT;
         private int baseChance = 5;
@@ -197,188 +189,157 @@ public record FishProperties(
         private boolean skipMinigame = false;
         private boolean hasGuideEntry = true;
 
-        public Builder withCatchInfo(CatchInfo.Builder builder)
-        {
+        public Builder withCatchInfo(CatchInfo.Builder builder) {
             this.catchInfo = builder;
             return this;
         }
 
-        public Builder withFish(Holder<Item> fish)
-        {
+        public Builder withFish(Holder<Item> fish) {
             this.catchInfo.withFish(fish);
             return this;
         }
 
-        public Builder trophy()
-        {
+        public Builder trophy() {
             this.catchInfo.trophy();
             return this;
         }
 
-        public Builder secret()
-        {
+        public Builder secret() {
             this.catchInfo.secret();
             return this;
         }
 
-        public Builder extra()
-        {
+        public Builder extra() {
             this.catchInfo.extra();
             return this;
         }
 
-        public Builder withTreasure(ResourceLocation treasure)
-        {
+        public Builder withTreasure(ResourceLocation treasure) {
             this.catchInfo.treasure = treasure;
             return this;
         }
 
-        public Builder withTreasureHardCoded(ItemStack itemStack)
-        {
+        public Builder withTreasureHardCoded(ItemStack itemStack) {
             this.catchInfo.treasureIs = itemStack;
             return this;
         }
 
-        public Builder withBucketedFish(Holder<Item> bucketedFish)
-        {
+        public Builder withBucketedFish(Holder<Item> bucketedFish) {
             this.catchInfo.withBucketedFish(bucketedFish);
             return this;
         }
 
-        public Builder withEntityToSpawn(Holder<EntityType<?>> entity)
-        {
+        public Builder withEntityToSpawn(Holder<EntityType<?>> entity) {
             this.catchInfo.withEntityToSpawn(entity);
             return this;
         }
 
-        public Builder withSeasons(SeasonRestriction seasonRestriction)
-        {
+        public Builder withSeasons(SeasonRestriction seasonRestriction) {
             addRestrictions(seasonRestriction);
             return this;
         }
 
-        public Builder withAlwaysSpawnEntity()
-        {
+        public Builder withAlwaysSpawnEntity() {
             this.catchInfo.withAlwaysSpawnEntity(true);
             return this;
         }
 
-        public Builder withAlwaysSpawnEntity(boolean alwaysSpawnEntity)
-        {
+        public Builder withAlwaysSpawnEntity(boolean alwaysSpawnEntity) {
             this.catchInfo.withAlwaysSpawnEntity(alwaysSpawnEntity);
             return this;
         }
 
-        public Builder withItemToOverrideWith(Holder<Item> itemToOverrideWith)
-        {
+        public Builder withItemToOverrideWith(Holder<Item> itemToOverrideWith) {
             this.catchInfo.withOverrideMinigameWith(itemToOverrideWith);
             return this;
         }
 
-        public Builder withStar(Star star)
-        {
+        public Builder withStar(Star star) {
             this.star = star;
             return this;
         }
 
-        public Builder withBaseChance(int baseChance)
-        {
+        public Builder withBaseChance(int baseChance) {
             this.baseChance = baseChance;
             return this;
         }
 
-        public Builder withSizeAndWeight(SizeAndWeight sizeAndWeight)
-        {
+        public Builder withSizeAndWeight(SizeAndWeight sizeAndWeight) {
             this.sw = sizeAndWeight;
             return this;
         }
 
-        public Builder withRarity(Rarity rarity)
-        {
+        public Builder withRarity(Rarity rarity) {
             this.rarity = rarity;
             return this;
         }
 
-        public Builder withMaxLimit(int limit, String s)
-        {
+        public Builder withMaxLimit(int limit, String s) {
             this.restrictions.add(new CaughtLimitRestriction(limit, s));
             return this;
         }
 
-        public Builder withMaxLimit(int limit)
-        {
+        public Builder withMaxLimit(int limit) {
             return withMaxLimit(limit, "");
         }
 
-        public Builder addRestrictions(AbstractFishRestriction... restriction)
-        {
+        public Builder addRestrictions(AbstractFishRestriction... restriction) {
             this.restrictions.addAll(Arrays.stream(restriction).toList());
             return this;
         }
 
-        public Builder addRarityRestriction(RarityCountRestriction.RarityCount... restriction)
-        {
+        public Builder addRarityRestriction(RarityCountRestriction.RarityCount... restriction) {
             this.restrictions.add(new RarityCountRestriction(restriction));
             return this;
         }
 
-        public Builder addRestrictions(List<AbstractFishRestriction> restriction)
-        {
+        public Builder addRestrictions(List<AbstractFishRestriction> restriction) {
             this.restrictions.addAll(restriction);
             return this;
         }
 
-        public Builder withPercentageChance(float restriction)
-        {
+        public Builder withPercentageChance(float restriction) {
             this.restrictions.add(new ChancePercentageRestriction(restriction));
             return this;
         }
 
-        public Builder withDifficulty(Difficulty newDif)
-        {
+        public Builder withDifficulty(Difficulty newDif) {
             List<Supplier<Supplier<AbstractMinigameModifier>>> old = List.copyOf(this.dif.modifiers);
             this.dif = newDif.addModifiers(old);
             return this;
         }
 
-        public Builder addModifier(List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers)
-        {
+        public Builder addModifier(List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers) {
             this.dif = dif.addModifiers(modifiers);
             return this;
         }
 
-        public Builder addModifier(Supplier<Supplier<AbstractMinigameModifier>> modifier)
-        {
+        public Builder addModifier(Supplier<Supplier<AbstractMinigameModifier>> modifier) {
             this.dif = dif.addModifiers(List.of(modifier));
             return this;
         }
 
-        public Builder withDaytimeRestriction(DaytimeRestriction daytime)
-        {
+        public Builder withDaytimeRestriction(DaytimeRestriction daytime) {
             addRestrictions(daytime);
             return this;
         }
 
-        public Builder withWeather(WeatherRestriction weather)
-        {
+        public Builder withWeather(WeatherRestriction weather) {
             addRestrictions(weather);
             return this;
         }
 
-        public Builder withSkipMinigame(boolean skipMinigame)
-        {
+        public Builder withSkipMinigame(boolean skipMinigame) {
             this.skipMinigame = skipMinigame;
             return this;
         }
 
-        public Builder withHasGuideEntry(boolean hasGuideEntry)
-        {
+        public Builder withHasGuideEntry(boolean hasGuideEntry) {
             this.hasGuideEntry = hasGuideEntry;
             return this;
         }
 
-        public FishProperties build()
-        {
+        public FishProperties build() {
             return new FishProperties(
                     catchInfo.build(),
                     star,
@@ -402,10 +363,8 @@ public record FishProperties(
             Holder<Item> overrideMinigameWith,
             ItemStack treasureIs,
             FishEntryType fishEntryType
-    )
-    {
-        public enum FishEntryType implements StringRepresentable
-        {
+    ) {
+        public enum FishEntryType implements StringRepresentable {
             FISH("fish"),
             TROPHY("trophy"),
             SECRET("secret"),
@@ -415,13 +374,11 @@ public record FishProperties(
             public static final StreamCodec<RegistryFriendlyByteBuf, FishEntryType> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(FishEntryType.class);
             private final String name;
 
-            FishEntryType(String key)
-            {
+            FishEntryType(String key) {
                 this.name = key;
             }
 
-            public String getSerializedName()
-            {
+            public String getSerializedName() {
                 return this.name;
             }
         }
@@ -468,13 +425,11 @@ public record FishProperties(
                 FishEntryType.FISH
         );
 
-        public CatchInfo withItemToOverrideWith(Holder<Item> itemToOverrideWith)
-        {
+        public CatchInfo withItemToOverrideWith(Holder<Item> itemToOverrideWith) {
             return new CatchInfo(this.fish, this.bucketedFish, this.entityToSpawn, alwaysSpawnEntity, itemToOverrideWith, this.treasureIs, this.fishEntryType);
         }
 
-        public static class Builder
-        {
+        public static class Builder {
             private Holder<Item> fish = SCItems.MISSINGNO;
             private Holder<Item> bucketedFish = SCItems.MISSINGNO;
             private Holder<EntityType<?>> entityToSpawn = SCEntities.FISH;
@@ -484,74 +439,62 @@ public record FishProperties(
             private ItemStack treasureIs = ItemStack.EMPTY;
             private FishEntryType fishEntryType = FishEntryType.FISH;
 
-            public Builder withFish(Holder<Item> fish)
-            {
+            public Builder withFish(Holder<Item> fish) {
                 this.fish = fish;
                 return this;
             }
 
-            public Builder trophy()
-            {
+            public Builder trophy() {
                 this.fishEntryType = FishEntryType.TROPHY;
                 return this;
             }
 
-            public Builder secret()
-            {
+            public Builder secret() {
                 this.fishEntryType = FishEntryType.SECRET;
                 return this;
             }
 
-            public Builder extra()
-            {
+            public Builder extra() {
                 this.fishEntryType = FishEntryType.EXTRA;
                 return this;
             }
 
-            public Builder withBucketedFish(Holder<Item> bucketedFish)
-            {
+            public Builder withBucketedFish(Holder<Item> bucketedFish) {
                 this.bucketedFish = bucketedFish;
                 return this;
             }
 
-            public Builder withEntityToSpawn(Holder<EntityType<?>> entityToSpawn)
-            {
+            public Builder withEntityToSpawn(Holder<EntityType<?>> entityToSpawn) {
                 this.entityToSpawn = entityToSpawn;
                 return this;
             }
 
-            public Builder withAlwaysSpawnEntity(boolean alwaysSpawnEntity)
-            {
+            public Builder withAlwaysSpawnEntity(boolean alwaysSpawnEntity) {
                 this.alwaysSpawnEntity = alwaysSpawnEntity;
                 return this;
             }
 
-            public Builder withOverrideMinigameWith(Holder<Item> itemToOverrideWith)
-            {
+            public Builder withOverrideMinigameWith(Holder<Item> itemToOverrideWith) {
                 this.itemToOverrideWith = itemToOverrideWith;
                 return this;
             }
 
-            public Builder withFishEntryType(FishEntryType fishEntryType)
-            {
+            public Builder withFishEntryType(FishEntryType fishEntryType) {
                 this.fishEntryType = fishEntryType;
                 return this;
             }
 
-            public Builder withTreasure(ResourceLocation rl)
-            {
+            public Builder withTreasure(ResourceLocation rl) {
                 treasure = rl;
                 return this;
             }
 
-            public Builder withTreasure(ItemStack is)
-            {
+            public Builder withTreasure(ItemStack is) {
                 treasureIs = is;
                 return this;
             }
 
-            public CatchInfo build()
-            {
+            public CatchInfo build() {
                 return new CatchInfo(fish, bucketedFish, entityToSpawn, alwaysSpawnEntity, itemToOverrideWith, treasureIs, fishEntryType);
             }
         }
@@ -567,10 +510,8 @@ public record FishProperties(
             int y,
             List<String> connections,
             int debugColor
-    )
-    {
-        public static Star fromRaAndDec(String name, int degrees, float dec, int color, String... connections)
-        {
+    ) {
+        public static Star fromRaAndDec(String name, int degrees, float dec, int color, String... connections) {
             double angleX = Math.cos(Math.toRadians(degrees));
             double angleY = Math.sin(Math.toRadians(degrees));
 
@@ -585,22 +526,19 @@ public record FishProperties(
             return new Star(name, x, y, Arrays.stream(connections).filter(o -> !o.isEmpty()).toList(), color);
         }
 
-        public static float transform(float v)
-        {
+        public static float transform(float v) {
             if (v == 0f) return 0f;
 
             float abs = Math.abs(v);
 
-            if (abs > 90f)
-            {
+            if (abs > 90f) {
                 throw new IllegalArgumentException("Value must be between -90 and 90");
             }
 
             return Math.copySign(90f - abs, v);
         }
 
-        public static Star fromRaAndDec(String name, int hours, int minutes, double seconds, float dec, int color, String... connections)
-        {
+        public static Star fromRaAndDec(String name, int hours, int minutes, double seconds, float dec, int color, String... connections) {
             double decimalHours = hours + minutes / 60.0 + seconds / 3600.0;
             int deg = ((int) (decimalHours * 15.0));
 
@@ -631,8 +569,7 @@ public record FishProperties(
     //endregion Star
 
 
-    public static class WorldRestrictions
-    {
+    public static class WorldRestrictions {
         public static final List<AbstractFishRestriction> OVERWORLD =
                 List.of(
                         DimensionRestriction.OVERWORLD
@@ -975,56 +912,47 @@ public record FishProperties(
             float decay,
             List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers,
             List<SweetSpot> sweetSpots
-    )
-    {
-        public Difficulty(int hp, int speed, int penalty, float decay, List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers, SweetSpot... sweetSpots)
-        {
+    ) {
+        public Difficulty(int hp, int speed, int penalty, float decay, List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers, SweetSpot... sweetSpots) {
             this(hp, speed, penalty, decay, modifiers, Arrays.stream(sweetSpots).toList());
         }
 
-        public Difficulty(int speed, int penalty, float decay, List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers, SweetSpot... sweetSpots)
-        {
+        public Difficulty(int speed, int penalty, float decay, List<Supplier<Supplier<AbstractMinigameModifier>>> modifiers, SweetSpot... sweetSpots) {
             this(100, speed, penalty, decay, modifiers, Arrays.stream(sweetSpots).toList());
         }
 
-        public Difficulty addModifiers(List<Supplier<Supplier<AbstractMinigameModifier>>> newModifier)
-        {
+        public Difficulty addModifiers(List<Supplier<Supplier<AbstractMinigameModifier>>> newModifier) {
             List<Supplier<Supplier<AbstractMinigameModifier>>> list = new ArrayList<>();
             list.addAll(newModifier);
             list.addAll(this.modifiers);
             return new Difficulty(this.hp, this.speed, this.penalty, this.decay, list, this.sweetSpots);
         }
 
-        public Difficulty vanishing(float vanishingRate)
-        {
+        public Difficulty vanishing(float vanishingRate) {
             List<SweetSpot> sss = new ArrayList<>();
             sweetSpots.forEach(s -> sss.add(s.vanishing(vanishingRate)));
             return new Difficulty(hp, speed, penalty, decay, modifiers, sss);
         }
 
-        public Difficulty vanishing()
-        {
+        public Difficulty vanishing() {
             List<SweetSpot> sss = new ArrayList<>();
             sweetSpots.forEach(s -> sss.add(s.vanishing(0.1f)));
             return new Difficulty(hp, speed, penalty, decay, modifiers, sss);
         }
 
-        public Difficulty moving(float movingRate)
-        {
+        public Difficulty moving(float movingRate) {
             List<SweetSpot> sss = new ArrayList<>();
             sweetSpots.forEach(s -> sss.add(s.moving(movingRate)));
             return new Difficulty(hp, speed, penalty, decay, modifiers, sss);
         }
 
-        public Difficulty moving()
-        {
+        public Difficulty moving() {
             List<SweetSpot> sss = new ArrayList<>();
             sweetSpots.forEach(s -> sss.add(s.moving(1)));
             return new Difficulty(hp, speed, penalty, decay, modifiers, sss);
         }
 
-        public Difficulty flip()
-        {
+        public Difficulty flip() {
             List<SweetSpot> sss = new ArrayList<>();
             sweetSpots.forEach(s -> sss.add(s.flip()));
             return new Difficulty(hp, speed, penalty, decay, modifiers, sss);
@@ -1325,20 +1253,16 @@ public record FishProperties(
             float movingRate,
             int particleColor,
             List<Supplier<Supplier<AbstractMinigameModifier>>> onHitModifiers
-    )
-    {
-        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, int particleColor, List<Supplier<Supplier<AbstractMinigameModifier>>> onHitModifiers)
-        {
+    ) {
+        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, int particleColor, List<Supplier<Supplier<AbstractMinigameModifier>>> onHitModifiers) {
             this(sweetSpotType, texturePath, size, reward, false, 0, 0, particleColor, onHitModifiers);
         }
 
-        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, int particleColor)
-        {
+        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, int particleColor) {
             this(sweetSpotType, texturePath, size, reward, false, 0, 0, particleColor, List.of());
         }
 
-        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, boolean isFlip, float vanishingRate, float movingRate, int particleColor)
-        {
+        public SweetSpot(ResourceLocation sweetSpotType, ResourceLocation texturePath, int size, int reward, boolean isFlip, float vanishingRate, float movingRate, int particleColor) {
             this(sweetSpotType, texturePath, size, reward, isFlip, vanishingRate, movingRate, particleColor, List.of());
         }
 
@@ -1372,24 +1296,20 @@ public record FishProperties(
         private static final ResourceLocation RL_THIN_STEADY_MOSSY = Starcatcher.rl("textures/gui/minigame/spots/thin_mossy.png");
 
 
-        public SweetSpot flip()
-        {
+        public SweetSpot flip() {
             return new SweetSpot(this.sweetSpotType, this.texturePath, this.size, this.reward, true, this.vanishingRate, this.movingRate, this.particleColor, this.onHitModifiers);
         }
 
-        public SweetSpot vanishing(float vanishingRate)
-        {
+        public SweetSpot vanishing(float vanishingRate) {
             return new SweetSpot(this.sweetSpotType, this.texturePath, this.size, this.reward, this.isFlip, vanishingRate, this.movingRate, this.particleColor, this.onHitModifiers);
         }
 
-        public SweetSpot moving(float movingRate)
-        {
+        public SweetSpot moving(float movingRate) {
             return new SweetSpot(this.sweetSpotType, this.texturePath, this.size, this.reward, this.isFlip, this.vanishingRate, movingRate, this.particleColor, this.onHitModifiers);
         }
 
         @SafeVarargs
-        public final SweetSpot withModifiers(Supplier<Supplier<AbstractMinigameModifier>>... modifiers)
-        {
+        public final SweetSpot withModifiers(Supplier<Supplier<AbstractMinigameModifier>>... modifiers) {
             return new SweetSpot(this.sweetSpotType, this.texturePath, this.size, this.reward, this.isFlip, this.vanishingRate, this.movingRate, this.particleColor, Arrays.stream(modifiers).toList());
         }
 
@@ -1623,10 +1543,8 @@ public record FishProperties(
 
 
     public record SizeAndWeight(float sizeAverage, float sizeDeviation, float weightAverage, float weightDeviation,
-                                float goldenChance)
-    {
-        public enum Units
-        {
+                                float goldenChance) {
+        public enum Units {
             METRIC("gui.guide.units.metric", 1f, 1f),
             IMPERIAL("gui.guide.units.imperial", 0.3937f, 0.0352739619495804f),
             CHEESEBURGER("gui.guide.units.cheeseburger", 0.09f, 0.0087f),
@@ -1643,41 +1561,34 @@ public record FishProperties(
             private final float multiplierSize;
             private final float multiplierWeight;
 
-            Units(String translationKey, float multiplierSize, float multiplierWeight)
-            {
+            Units(String translationKey, float multiplierSize, float multiplierWeight) {
                 this.translationKey = translationKey;
                 this.multiplierSize = multiplierSize;
                 this.multiplierWeight = multiplierWeight;
             }
 
-            public String getTranslationKey()
-            {
+            public String getTranslationKey() {
                 return this.translationKey;
             }
 
-            public float getMultiplierSize()
-            {
+            public float getMultiplierSize() {
                 return this.multiplierSize;
             }
 
-            public float getMultiplierWeight()
-            {
+            public float getMultiplierWeight() {
                 return this.multiplierWeight;
             }
 
-            public Units next()
-            {
+            public Units next() {
                 return vals[(this.ordinal() + 1) % vals.length];
             }
 
-            public Units previous()
-            {
+            public Units previous() {
                 if (this.ordinal() == 0) return vals[vals.length - 1];
                 return vals[(this.ordinal() - 1) % vals.length];
             }
 
-            public String getSizeAsString(int sizeInCm)
-            {
+            public String getSizeAsString(int sizeInCm) {
                 //space whale is always infinite
                 if (this.equals(Units.SPACE_WHALE)) return "∞ space whales";
                 if (this.equals(Units.SCIENTIFIC)) return "0 AU";
@@ -1685,14 +1596,12 @@ public record FishProperties(
                 float size = sizeInCm * this.getMultiplierSize();
                 String sizeString = ((float) (int) (size * 100)) / 100 + " " + I18n.get(this.getTranslationKey() + ".size");
 
-                if (this.equals(Units.METRIC))
-                {
+                if (this.equals(Units.METRIC)) {
                     sizeString = ((int) size) + "cm";
                     if (size > 100) sizeString = (float) ((int) (size / 100 * 100)) / 100 + "m";
                 }
 
-                if (this.equals(Units.IMPERIAL))
-                {
+                if (this.equals(Units.IMPERIAL)) {
                     sizeString = ((int) size) + "''";
                     if (size > 12) sizeString = ((int) (size / 12)) + "'" + ((int) (size % 12)) + "''";
                 }
@@ -1700,8 +1609,7 @@ public record FishProperties(
                 return sizeString;
             }
 
-            public String getWeightAsString(int weightInGrams)
-            {
+            public String getWeightAsString(int weightInGrams) {
                 //space whale is always infinite
                 if (this.equals(Units.SPACE_WHALE)) return "∞ space whales";
                 if (this.equals(Units.SCIENTIFIC)) return "0 R136a1's";
@@ -1709,14 +1617,12 @@ public record FishProperties(
                 float weight = weightInGrams * this.getMultiplierWeight();
                 String weightString = ((float) (int) (weight * 100)) / 100 + " " + I18n.get(this.getTranslationKey() + ".weight");
 
-                if (this.equals(Units.METRIC))
-                {
+                if (this.equals(Units.METRIC)) {
                     if (weight <= 1000) weightString = ((int) weight) + "g";
                     if (weight > 1000) weightString = (float) ((int) (weight / 1000 * 100)) / 100 + "kg";
                 }
 
-                if (this.equals(Units.IMPERIAL))
-                {
+                if (this.equals(Units.IMPERIAL)) {
                     weightString = ((int) weight) + "oz";
                     if (weight > 12) weightString = ((int) (weight / 16)) + " lb " + ((int) (weight % 16)) + " oz";
                 }
@@ -1726,8 +1632,7 @@ public record FishProperties(
 
         }
 
-        public SizeAndWeight(float sizeAverage, float sizeDeviation, float weightAverage, float weightDeviation)
-        {
+        public SizeAndWeight(float sizeAverage, float sizeDeviation, float weightAverage, float weightDeviation) {
             this(sizeAverage, sizeDeviation, weightAverage, weightDeviation, 0.02f);
         }
 
@@ -1752,8 +1657,7 @@ public record FishProperties(
                 SizeAndWeight::new
         );
 
-        public static int getRandomSize(FishProperties fp, float percentile)
-        {
+        public static int getRandomSize(FishProperties fp, float percentile) {
             percentile = Mth.clamp(percentile, 0.01f, 99.999f);
             percentile = 100 - percentile;
             percentile = percentile / 100;
@@ -1763,8 +1667,7 @@ public record FishProperties(
             return (int) (average + percentile * dev - dev / 2);
         }
 
-        public static int getRandomWeight(FishProperties fp, float percentile)
-        {
+        public static int getRandomWeight(FishProperties fp, float percentile) {
             percentile = Mth.clamp(percentile, 0.01f, 99.999f);
             percentile = 100 - percentile;
             percentile = percentile / 100;
@@ -1776,8 +1679,7 @@ public record FishProperties(
     }
 
 
-    public enum Rarity implements StringRepresentable
-    {
+    public enum Rarity implements StringRepresentable {
         NONE("none", 0, Style.EMPTY.applyFormat(ChatFormatting.WHITE), 99),
         TRASH("trash", 0, Style.EMPTY.applyFormat(ChatFormatting.WHITE), 99),
         COMMON("common", 4, Style.EMPTY.applyFormat(ChatFormatting.WHITE), 40),
@@ -1794,8 +1696,7 @@ public record FishProperties(
         private final Style style;
         private final int stoneHookGraceTicks;
 
-        Rarity(String key, int xp, Style style, int stoneHookGraceTicks)
-        {
+        Rarity(String key, int xp, Style style, int stoneHookGraceTicks) {
             this.key = key;
             this.xp = xp;
             this.style = style;
@@ -1803,51 +1704,41 @@ public record FishProperties(
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return super.toString();
             //return key;
         }
 
-        public Component wrapWithRarityMarkdown(String s)
-        {
+        public Component wrapWithRarityMarkdown(String s) {
             return Component.literal("<sc" + getSerializedName() + ">" + s + "</sc" + getSerializedName() + ">");
         }
 
-        public String wrapWithRarityMarkdownAsString(String s)
-        {
+        public String wrapWithRarityMarkdownAsString(String s) {
             return "<sc" + getSerializedName() + ">" + s + "</sc" + getSerializedName() + ">";
         }
 
-        public String getSerializedName()
-        {
+        public String getSerializedName() {
             return this.key;
         }
 
-        public int getStoneHookGraceTicks()
-        {
+        public int getStoneHookGraceTicks() {
             return stoneHookGraceTicks;
         }
 
-        public int getId()
-        {
+        public int getId() {
             return this.ordinal();
         }
 
-        public int getXp()
-        {
+        public int getXp() {
             return xp;
         }
 
-        public Style getStyle()
-        {
+        public Style getStyle() {
             return style;
         }
 
-        public static boolean isGolden(ItemStack stack)
-        {
-            if (stack.has(SCDataComponents.CAUGHT_FISH_INFO))
-            {
+        public static boolean isGolden(ItemStack stack) {
+            if (stack.has(SCDataComponents.CAUGHT_FISH_INFO)) {
                 CaughtFishInfo caughtFishInfo = stack.get(SCDataComponents.CAUGHT_FISH_INFO);
                 return caughtFishInfo != null && caughtFishInfo.golden();
             }
@@ -1856,22 +1747,18 @@ public record FishProperties(
     }
 
 
-    public static List<ResourceLocation> getBiomesAsListFromTags(List<ResourceLocation> biomes, List<ResourceLocation> tags, Level level)
-    {
+    public static List<ResourceLocation> getBiomesAsListFromTags(List<ResourceLocation> biomes, List<ResourceLocation> tags, Level level) {
         level.registryAccess().registry(Registries.BIOME);
 
         List<ResourceLocation> rls = new ArrayList<>();
 
-        for (ResourceLocation rl : tags)
-        {
+        for (ResourceLocation rl : tags) {
             TagKey<Biome> biomeBeingChecked = TagKey.create(Registries.BIOME, rl);
 
             Optional<HolderSet.Named<Biome>> optional = level.registryAccess().lookupOrThrow(Registries.BIOME).get(biomeBeingChecked);
 
-            if (optional.isPresent())
-            {
-                for (Holder<Biome> biomeHolder : optional.get())
-                {
+            if (optional.isPresent()) {
+                for (Holder<Biome> biomeHolder : optional.get()) {
                     String biomeString = biomeHolder.getRegisteredName();
 
                     rls.add(ResourceLocation.parse(biomeString));
@@ -1879,8 +1766,7 @@ public record FishProperties(
             }
         }
 
-        for (ResourceLocation rl : biomes)
-        {
+        for (ResourceLocation rl : biomes) {
             Optional<Holder.Reference<Biome>> optional = level.registryAccess().lookupOrThrow(Registries.BIOME).get(ResourceKey.create(Registries.BIOME, rl));
             if (optional.isPresent()) if (!rls.contains(rl)) rls.add(rl);
         }
@@ -1888,22 +1774,18 @@ public record FishProperties(
         return rls;
     }
 
-    public static List<ResourceLocation> getBiomesBlacklistAsList(List<ResourceLocation> biomesBlacklist, List<ResourceLocation> biomesBlacklistTags, Level level)
-    {
+    public static List<ResourceLocation> getBiomesBlacklistAsList(List<ResourceLocation> biomesBlacklist, List<ResourceLocation> biomesBlacklistTags, Level level) {
         level.registryAccess().registry(Registries.BIOME);
 
         List<ResourceLocation> rls = new ArrayList<>();
 
-        for (ResourceLocation rl : biomesBlacklistTags)
-        {
+        for (ResourceLocation rl : biomesBlacklistTags) {
             TagKey<Biome> biomeBeingChecked = TagKey.create(Registries.BIOME, rl);
 
             Optional<HolderSet.Named<Biome>> optional = level.registryAccess().lookupOrThrow(Registries.BIOME).get(biomeBeingChecked);
 
-            if (optional.isPresent())
-            {
-                for (Holder<Biome> biomeHolder : optional.get())
-                {
+            if (optional.isPresent()) {
+                for (Holder<Biome> biomeHolder : optional.get()) {
                     String biomeString = biomeHolder.getRegisteredName();
 
                     rls.add(ResourceLocation.parse(biomeString));
@@ -1911,8 +1793,7 @@ public record FishProperties(
             }
         }
 
-        for (ResourceLocation rl : biomesBlacklist)
-        {
+        for (ResourceLocation rl : biomesBlacklist) {
             Optional<Holder.Reference<Biome>> optional = level.registryAccess().lookupOrThrow(Registries.BIOME).get(ResourceKey.create(Registries.BIOME, rl));
             if (optional.isPresent()) if (!rls.contains(rl)) rls.add(rl);
         }
@@ -1920,8 +1801,7 @@ public record FishProperties(
         return rls;
     }
 
-    public int calculateChance(Entity entity, Level level, ItemStack rod, AbstractFishRestriction.Context context)
-    {
+    public int calculateChance(Entity entity, Level level, ItemStack rod, AbstractFishRestriction.Context context) {
         //if dev worm return base chance
         if (SCDataComponents.getOrDefault(rod, SCDataComponents.BAIT, new SingleStackContainer(ItemStack.EMPTY)).stack().is(SCItems.DEV_WORM) && catchInfo.fishEntryType.equals(CatchInfo.FishEntryType.FISH))
             return 1;
@@ -1934,21 +1814,18 @@ public record FishProperties(
         return chance;
     }
 
-    public static SizeAndWeight sizeWeight(float sizeAvg, float sizeDev, float weightAvg, float weightDev)
-    {
+    public static SizeAndWeight sizeWeight(float sizeAvg, float sizeDev, float weightAvg, float weightDev) {
         return new SizeAndWeight(sizeAvg, sizeDev, weightAvg, weightDev);
     }
 
-    public static ItemStack makeItemStack(ItemStack rod, FishProperties fp, int size, int weight, float percentile, boolean golden, Player player, boolean perfectCatch)
-    {
+    public static ItemStack makeItemStack(ItemStack rod, FishProperties fp, int size, int weight, float percentile, boolean golden, Player player, boolean perfectCatch) {
         ItemStack bait = SCDataComponents.getOrDefault(rod, SCDataComponents.BAIT, SingleStackContainer.empty()).stack();
         boolean isStarcaught = fp.catchInfo().bucketedFish().is(SCItems.STARCAUGHT_BUCKET.getKey()) && bait.is(Items.BUCKET);
         boolean isBucketed = !fp.catchInfo().bucketedFish().is(SCItems.MISSINGNO.getKey()) && !isStarcaught && bait.is(Items.BUCKET);
         CaughtFishInfo caughtFishInfo = new CaughtFishInfo(size, weight, percentile, fp.rarity(), golden);
 
         //starcaught bucketed fish
-        if (isStarcaught)
-        {
+        if (isStarcaught) {
             ItemStack fish = new ItemStack(fp.catchInfo().fish());
             //quality food compat
             if (ModList.get().isLoaded("quality_food"))
@@ -1977,17 +1854,14 @@ public record FishProperties(
         return fish;
     }
 
-    public static void spawnFishFromPlayerFishing(ServerPlayer player, int time, boolean completedTreasure, boolean perfectCatch, int hits)
-    {
+    public static void spawnFishFromPlayerFishing(ServerPlayer player, int time, boolean completedTreasure, boolean perfectCatch, int hits) {
         ServerLevel level = ((ServerLevel) player.level());
 
         if (SCDataAttachments.get(player, SCDataAttachments.FISHING_BOB).isEmpty()) return;
 
         Entity levelEntity = level.getEntity(SCDataAttachments.get(player, SCDataAttachments.FISHING_BOB).getUuid());
-        if (levelEntity instanceof FishingBobEntity fbe)
-        {
-            if (time != -1)
-            {
+        if (levelEntity instanceof FishingBobEntity fbe) {
+            if (time != -1) {
                 FishProperties fp = fbe.fpToFish;
 
                 SCCriterionTriggers.MINIGAME_COMPLETED.get().trigger(player, hits, perfectCatch, completedTreasure, time, fp.catchInfo().fish());
@@ -2029,8 +1903,7 @@ public record FishProperties(
                 //if should spawn entity
                 if (fp.catchInfo().alwaysSpawnEntity() ||
                         ModList.get().isLoaded("fishingreal") ||
-                        fbe.modifiers.stream().anyMatch(AbstractCatchModifier::forceSpawnEntity))
-                {
+                        fbe.modifiers.stream().anyMatch(AbstractCatchModifier::forceSpawnEntity)) {
                     Vec3 objPos = player.position().subtract(fbe.position());
 
                     double x = objPos.x / 25;
@@ -2047,8 +1920,7 @@ public record FishProperties(
 
                     Entity entity = fp.catchInfo().entityToSpawn().value().create(level);
 
-                    if (entity == null)
-                    {
+                    if (entity == null) {
                         LogUtils.getLogger().warn("starcatcher doesnt like when the flag or whatever is not enabled");
                         return;
                     }
@@ -2064,8 +1936,7 @@ public record FishProperties(
                     level.addFreshEntity(entity);
                 }
                 //if not entity then add base item stack
-                else
-                {
+                else {
                     ItemStack is = makeItemStack(fbe.rod, fbe.fpToFish, size, weight, percentile, golden, player, perfectCatch);
                     items.add(is);
 
@@ -2078,14 +1949,12 @@ public record FishProperties(
                     items.addAll(acm.addToFishedItems(time, perfectCatch, hits, completedTreasure, player));
 
                 //add treasure
-                if (completedTreasure || fbe.modifiers.stream().anyMatch(acm -> acm.forceAwardTreasure(fbe, time, completedTreasure, perfectCatch, hits)))
-                {
+                if (completedTreasure || fbe.modifiers.stream().anyMatch(acm -> acm.forceAwardTreasure(fbe, time, completedTreasure, perfectCatch, hits))) {
                     items.add(fp.loadTreasure(player).catchInfo.treasureIs);
                 }
 
                 //spawn items from list
-                for (ItemStack itemStackToSpawn : items)
-                {
+                for (ItemStack itemStackToSpawn : items) {
                     //make ItemEntities for fish item stack
                     ItemEntity itemFished = new ItemEntity(level, fbe.position().x, fbe.position().y + 1.2f, fbe.position().z, itemStackToSpawn);
 
@@ -2100,9 +1969,7 @@ public record FishProperties(
                     level.addFreshEntity(itemFished);
                 }
 
-            }
-            else
-            {
+            } else {
                 //if fish minigame failed/canceled
                 fbe.modifiers.forEach(AbstractCatchModifier::onFailedMinigame);
 
@@ -2112,14 +1979,12 @@ public record FishProperties(
 
             //consume bait
             ItemStack bait = SCDataComponents.getOrDefault(fbe.rod, SCDataComponents.BAIT, SingleStackContainer.empty()).stack();
-            if (!bait.is(Items.BUCKET))
-            {
+            if (!bait.is(Items.BUCKET)) {
                 bait.shrink(1);
                 SCDataComponents.set(fbe.rod, SCDataComponents.BAIT, new SingleStackContainer(bait));
             }
 
-            if (bait.is(Items.BUCKET) && !fbe.fpToFish.catchInfo().bucketedFish().is(SCItems.MISSINGNO.getKey()) && time != -1)
-            {
+            if (bait.is(Items.BUCKET) && !fbe.fpToFish.catchInfo().bucketedFish().is(SCItems.MISSINGNO.getKey()) && time != -1) {
                 bait.shrink(1);
                 SCDataComponents.set(fbe.rod, SCDataComponents.BAIT, new SingleStackContainer(bait));
             }
@@ -2130,85 +1995,70 @@ public record FishProperties(
         SCDataAttachments.remove(player, SCDataAttachments.FISHING_BOB.get());
     }
 
-    private static ItemStack getFishedItemStackFromFPForStarcatcherFishEntitySpecifically(FishProperties fp, int size, int weight, float percentile, boolean golden)
-    {
+    private static ItemStack getFishedItemStackFromFPForStarcatcherFishEntitySpecifically(FishProperties fp, int size, int weight, float percentile, boolean golden) {
         ItemStack is = new ItemStack(fp.catchInfo().fish());
         if (fp.hasGuideEntry() && SCConfig.SAVE_DATA_TO_ITEMS.get())
             SCDataComponents.set(is, SCDataComponents.CAUGHT_FISH_INFO, new CaughtFishInfo(size, weight, percentile, fp.rarity(), golden));
         return is;
     }
 
-    public static ResourceLocation getKey(Level level, FishProperties fp)
-    {
+    public static ResourceLocation getKey(Level level, FishProperties fp) {
         return level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).getKey(fp);
     }
 
-    public static List<FishProperties> getFishes(RegistryAccess registryAccess)
-    {
+    public static List<FishProperties> getFishes(RegistryAccess registryAccess) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).stream()
                 .filter(o -> o.catchInfo().fishEntryType().equals(FishProperties.CatchInfo.FishEntryType.FISH)).toList();
     }
 
-    public static List<FishProperties> getFishes(Level level)
-    {
+    public static List<FishProperties> getFishes(Level level) {
         return getFishes(level.registryAccess());
     }
 
-    public static Registry<FishProperties> getRegistry(Level level)
-    {
+    public static Registry<FishProperties> getRegistry(Level level) {
         return level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY);
     }
 
-    public static FishProperties getFP(RegistryAccess registryAccess, ResourceLocation rl)
-    {
+    public static FishProperties getFP(RegistryAccess registryAccess, ResourceLocation rl) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).get(rl);
     }
 
-    public static FishProperties getFP(Level level, ResourceLocation rl)
-    {
+    public static FishProperties getFP(Level level, ResourceLocation rl) {
         return getFP(level.registryAccess(), rl);
     }
 
 
-    public static List<FishProperties> getNonFishes(RegistryAccess registryAccess)
-    {
+    public static List<FishProperties> getNonFishes(RegistryAccess registryAccess) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).stream()
                 .filter(o -> !o.catchInfo().fishEntryType().equals(FishProperties.CatchInfo.FishEntryType.FISH)).toList();
     }
 
-    public static List<FishProperties> getNonFishes(Level level)
-    {
+    public static List<FishProperties> getNonFishes(Level level) {
         return getNonFishes(level.registryAccess());
     }
 
 
-    public static List<FishProperties> getAllFPs(Level level)
-    {
+    public static List<FishProperties> getAllFPs(Level level) {
         return getAllFPs(level.registryAccess());
     }
 
-    public static List<FishProperties> getAllFPs(RegistryAccess registryAccess)
-    {
+    public static List<FishProperties> getAllFPs(RegistryAccess registryAccess) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).stream().toList();
     }
 
-    public static List<FishProperties> getTrophies(Level level)
-    {
+    public static List<FishProperties> getTrophies(Level level) {
         return getTrophies(level.registryAccess());
     }
 
-    public static List<FishProperties> getTrophies(RegistryAccess registryAccess)
-    {
+    public static List<FishProperties> getTrophies(RegistryAccess registryAccess) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).stream().filter(o -> o.catchInfo.fishEntryType.equals(CatchInfo.FishEntryType.TROPHY)).toList();
     }
 
-    public static List<FishProperties> getSecrets(Level level)
-    {
+    public static List<FishProperties> getSecrets(Level level) {
         return getSecrets(level.registryAccess());
     }
 
-    public static List<FishProperties> getSecrets(RegistryAccess registryAccess)
-    {
+    public static List<FishProperties> getSecrets(RegistryAccess registryAccess) {
         return registryAccess.registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).stream().filter(o -> o.catchInfo.fishEntryType.equals(CatchInfo.FishEntryType.SECRET)).toList();
     }
 }
