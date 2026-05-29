@@ -7,21 +7,18 @@ import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
 import net.minecraft.client.gui.GuiGraphics;
 
-public abstract class AbstractSweetSpotBehaviour
-{
+public abstract class AbstractSweetSpotBehaviour {
     public int ticksActive;
     protected FishingMinigameScreen instance;
     protected ActiveSweetSpot ass;
 
-    public void onAdd(FishingMinigameScreen instance, ActiveSweetSpot ass)
-    {
+    public void onAdd(FishingMinigameScreen instance, ActiveSweetSpot ass) {
         this.instance = instance;
         this.ass = ass;
         ass.pos = instance.getRandomFreePosition(ass.thickness);
     }
 
-    public void tick()
-    {
+    public void tick() {
         ticksActive++;
 
         ass.pos += ass.movingRate * ass.currentRotation;
@@ -33,8 +30,7 @@ public abstract class AbstractSweetSpotBehaviour
         if (ass.shouldSudokuOnVanish && ass.alpha <= 0) ass.removed = true;
     }
 
-    public void onHit()
-    {
+    public void onHit() {
         ass.onHitModifiers.forEach(mod -> {
             AbstractMinigameModifier modifier = mod.get();
             modifier.tickCount = 0;
@@ -43,16 +39,13 @@ public abstract class AbstractSweetSpotBehaviour
         });
     }
 
-    public void onRemove()
-    {
+    public void onRemove() {
     }
 
-    public void renderForeground(GuiGraphics guiGraphics, float partialTick, int width, int height)
-    {
+    public void renderForeground(GuiGraphics guiGraphics, float partialTick, int width, int height) {
     }
 
-    public void render(GuiGraphics guiGraphics, PoseStack poseStack, float partialTick)
-    {
+    public void render(GuiGraphics guiGraphics, PoseStack poseStack, float partialTick) {
         if (ass.removed) return;
 
         // allows modifier to change color

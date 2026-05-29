@@ -183,7 +183,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener {
 
         //add every sweet spot from fp json which is registered
         for (FishProperties.SweetSpot ss : fp.dif().sweetSpots()) {
-            var newSweetSpot = new ActiveSweetSpot(this, ss, bobber, bait, hook);
+            var newSweetSpot = new ActiveSweetSpot(this, ss, bobber, bait, hook, player.getAttributeValue(SCAttributes.VANISHING_RATE_MULTIPLIER));
             addSweetSpot(newSweetSpot);
         }
     }
@@ -533,15 +533,13 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener {
         activeSweetSpots.forEach(s -> s.behaviour.tick());
 
         //remove activeSweetSpots marked for removal
-        activeSweetSpots.removeIf(s ->
-        {
+        activeSweetSpots.removeIf(s -> {
             if (s.removed) s.behaviour.onRemove();
             return s.removed;
         });
 
         //remove modifiers marked for removal
-        modifiers.removeIf(m ->
-        {
+        modifiers.removeIf(m -> {
             if (m.removed) m.onRemove();
             return m.removed;
         });

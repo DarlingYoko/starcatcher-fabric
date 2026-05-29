@@ -15,7 +15,8 @@ public interface SCAttributes {
     Holder<Attribute> HANDLE_ROTATION_SPEED = register("handle_rotation_speed", 1, 0, 10);
     Holder<Attribute> PENALTY_MULTIPLIER = registerNegative("penalty_multiplier", 1, 0, 10);
     Holder<Attribute> BASE_DECAY_MULTIPLIER = registerNegative("base_decay_multiplier", 1, 0, 10);
-    Holder<Attribute> REQUIRED_SCORE_MULTIPLIER = register("required_score", 1, 0, 10);
+    Holder<Attribute> REQUIRED_SCORE_MULTIPLIER = register("required_score_multiplier", 1, 0, 10);
+    Holder<Attribute> VANISHING_RATE_MULTIPLIER = register("vanishing_rate_multiplier", 1, 0, 10);
 
     private static Holder<Attribute> register(String name, double defaultVal, double min, double max) {
         return REGISTRY.register(name, () -> new RangedAttribute(name, defaultVal, min, max).setSyncable(true));
