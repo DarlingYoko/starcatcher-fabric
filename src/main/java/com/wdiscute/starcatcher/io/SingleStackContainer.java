@@ -1,8 +1,8 @@
 package com.wdiscute.starcatcher.io;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
 
@@ -29,13 +29,13 @@ public record SingleStackContainer(@Deprecated ItemStack stackDoNotUse)
 
     public static final StreamCodec<List<SingleStackContainer>> STREAM_CODEC_LIST = STREAM_CODEC.apply(ByteBufCodecs.list());
 
-    public static List<SingleStackContainer> fromItemStackHandler(ItemStackHandler prizePool)
+    public static List<SingleStackContainer> fromContainer(Container prizePool)
     {
         List<SingleStackContainer> list = new ArrayList<>();
 
-        for (int i = 0; i < prizePool.getSlots(); i++)
+        for (int i = 0; i < prizePool.getContainerSize(); i++)
         {
-            list.add(new SingleStackContainer(prizePool.getStackInSlot(i)));
+            list.add(new SingleStackContainer(prizePool.getItem(i)));
         }
 
         return list;

@@ -13,7 +13,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class StandMenu extends AbstractContainerMenu
         for (int i = 0; i < 9; i++)
         {
             int slotid = i;
-            this.addSlot(new SlotItemHandler(sbe.entryCost, slotid, 210 + slotid * 16, 157)
+            this.addSlot(new Slot(sbe.entryCost, slotid, 210 + slotid * 16, 157)
             {
 
                 @Override
@@ -41,8 +40,8 @@ public class StandMenu extends AbstractContainerMenu
                 {
                     if (level.isClientSide) return false;
 
-                    sbe.entryCost.setStackInSlot(slotid, ItemStack.EMPTY);
-                    sbe.tournament.settings.entryCost = SingleStackContainer.fromItemStackHandler(sbe.entryCost);
+                    sbe.entryCost.setItem(slotid, ItemStack.EMPTY);
+                    sbe.tournament.settings.entryCost = SingleStackContainer.fromContainer(sbe.entryCost);
                     return false;
                 }
 
@@ -51,8 +50,8 @@ public class StandMenu extends AbstractContainerMenu
                 {
                     if (level.isClientSide) return false;
 
-                    sbe.entryCost.setStackInSlot(slotid, stackInHand.copy());
-                    sbe.tournament.settings.entryCost = SingleStackContainer.fromItemStackHandler(sbe.entryCost);
+                    sbe.entryCost.setItem(slotid, stackInHand.copy());
+                    sbe.tournament.settings.entryCost = SingleStackContainer.fromContainer(sbe.entryCost);
                     return false;
                 }
             });

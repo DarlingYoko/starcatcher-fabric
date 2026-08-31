@@ -22,10 +22,9 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
 import net.nikdo53.tinymultiblocklib.blockentities.AbstractMultiBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,14 +36,13 @@ public class StandBlockEntity extends AbstractMultiBlockEntity implements MenuPr
     public Map<UUID, String> profiles;
     private UUID uuid;
 
-    public final ItemStackHandler entryCost = new ItemStackHandler(9)
+    public final SimpleContainer entryCost = new SimpleContainer(9)
     {
         @Override
-        protected int getStackLimit(int slot, ItemStack stack)
+        public int getMaxStackSize()
         {
             return 64;
         }
-
     };
 
     public StandBlockEntity(BlockPos pos, BlockState blockState)

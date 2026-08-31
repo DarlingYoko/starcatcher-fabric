@@ -2,10 +2,12 @@ package com.wdiscute.starcatcher;
 
 import com.wdiscute.starcatcher.blocks.SCBlockEntities;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
+import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SCCreativeModeTabs;
 import com.wdiscute.starcatcher.registry.SCCriterionTriggers;
 import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
+import com.wdiscute.starcatcher.registry.SCLootModifiers;
 import com.wdiscute.starcatcher.registry.SCMenuTypes;
 import com.wdiscute.starcatcher.registry.SCParticles;
 import com.wdiscute.starcatcher.registry.SCRecipes;
@@ -29,6 +31,7 @@ public class StarcatcherFabric implements ModInitializer
         // (see FABRIC_PORT_PLAN.md §5.1), and several of these reference the previous ones'
         // DeferredHolder.get() inside their own registration suppliers (e.g. block items need
         // the block already bound, block entities need their block already bound).
+        SCDataComponents.register(bus);
         SCBlocks.register(bus);
         SCItems.register(bus);
         SCBlockEntities.register(bus);
@@ -39,10 +42,10 @@ public class StarcatcherFabric implements ModInitializer
         SCCreativeModeTabs.register(bus);
         SCCriterionTriggers.register(bus);
         SCRecipes.register(bus);
+        SCLootModifiers.register(bus);
 
-        // Remaining subsystems (DataComponents, custom registries, attachments, payloads,
-        // data maps, loot modifiers, recipes, selling-bin processors, creative tabs data,
-        // criterion triggers) come in P2-P4 as their shim layers land.
+        // Remaining subsystems (custom registries, attachments, payloads, data maps,
+        // selling-bin processors) come in P3-P4 as their shim layers land.
         LOGGER.info("Starcatcher (Fabric) loading");
     }
 }

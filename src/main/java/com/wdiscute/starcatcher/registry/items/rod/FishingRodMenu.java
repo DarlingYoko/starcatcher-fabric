@@ -9,6 +9,7 @@ import com.wdiscute.starcatcher.io.SingleStackContainer;
 import com.wdiscute.starcatcher.registry.SCMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -16,8 +17,6 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class FishingRodMenu extends AbstractContainerMenu
@@ -26,14 +25,13 @@ public class FishingRodMenu extends AbstractContainerMenu
     private static final ResourceLocation BACKGROUND_BAIT = Starcatcher.rl("item/background/bait");
     private static final ResourceLocation BACKGROUND_HOOK = Starcatcher.rl("item/background/hook");
 
-    public final ItemStackHandler inventory = new ItemStackHandler(3)
+    public final SimpleContainer inventory = new SimpleContainer(3)
     {
         @Override
-        protected int getStackLimit(int slot, ItemStack stack)
+        public int getMaxStackSize()
         {
             return 64;
         }
-
     };
 
     public final ItemStack is;
@@ -64,12 +62,12 @@ public class FishingRodMenu extends AbstractContainerMenu
             this.addSlot(new Slot(inv, i, 8 + i * 18, 142));
         }
 
-        inventory.setStackInSlot(0, SCDataComponents.getOrDefault(is, SCDataComponents.BOBBER, SingleStackContainer.empty()).stack());
-        inventory.setStackInSlot(1, SCDataComponents.getOrDefault(is, SCDataComponents.BAIT, SingleStackContainer.empty()).stack());
-        inventory.setStackInSlot(2, SCDataComponents.getOrDefault(is, SCDataComponents.HOOK, SingleStackContainer.empty()).stack());
+        inventory.setItem(0, SCDataComponents.getOrDefault(is, SCDataComponents.BOBBER, SingleStackContainer.empty()).stack());
+        inventory.setItem(1, SCDataComponents.getOrDefault(is, SCDataComponents.BAIT, SingleStackContainer.empty()).stack());
+        inventory.setItem(2, SCDataComponents.getOrDefault(is, SCDataComponents.HOOK, SingleStackContainer.empty()).stack());
 
         //bobbers first slot
-        this.addSlot(new SlotItemHandler(inventory, 0, 50, 35)
+        this.addSlot(new Slot(inventory, 0, 50, 35)
         {
             @Override
             public boolean mayPlace(ItemStack stack)
@@ -85,7 +83,7 @@ public class FishingRodMenu extends AbstractContainerMenu
         });
 
         //baits second slot
-        this.addSlot(new SlotItemHandler(inventory, 1, 80, 35)
+        this.addSlot(new Slot(inventory, 1, 80, 35)
         {
             @Override
             public boolean mayPlace(ItemStack stack)
@@ -101,7 +99,7 @@ public class FishingRodMenu extends AbstractContainerMenu
         });
 
         //hooks third slot
-        this.addSlot(new SlotItemHandler(inventory, 2, 110, 35)
+        this.addSlot(new Slot(inventory, 2, 110, 35)
         {
             @Override
             public boolean mayPlace(ItemStack stack)
@@ -148,9 +146,9 @@ public class FishingRodMenu extends AbstractContainerMenu
 
         if (!player.level().isClientSide)
         {
-            SCDataComponents.set(is, SCDataComponents.BOBBER, new SingleStackContainer(inventory.getStackInSlot(0)));
-            SCDataComponents.set(is, SCDataComponents.BAIT, new SingleStackContainer(inventory.getStackInSlot(1)));
-            SCDataComponents.set(is, SCDataComponents.HOOK, new SingleStackContainer(inventory.getStackInSlot(2)));
+            SCDataComponents.set(is, SCDataComponents.BOBBER, new SingleStackContainer(inventory.getItem(0)));
+            SCDataComponents.set(is, SCDataComponents.BAIT, new SingleStackContainer(inventory.getItem(1)));
+            SCDataComponents.set(is, SCDataComponents.HOOK, new SingleStackContainer(inventory.getItem(2)));
         }
 
     }

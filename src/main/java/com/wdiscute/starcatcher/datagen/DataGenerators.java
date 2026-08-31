@@ -64,10 +64,6 @@ public class DataGenerators
         //advancements
         gen.addProvider(event.includeServer(), new DGSCAdvancementProvider(output, lookupProvider, existingFileHelper));
 
-        //advancements
-        gen.addProvider(event.includeServer(), new DGSCLootModifiers(output));
-
-
         //biome tags
         gen.addProvider(event.includeServer(), new DGSCBiomeTagsProvider(output, lookupProvider, existingFileHelper));
 
