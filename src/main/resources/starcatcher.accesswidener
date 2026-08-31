@@ -1,0 +1,15 @@
+accessWidener v2 named
+
+# Gui.overlayMessageTime
+accessible field net/minecraft/client/gui/Gui overlayMessageTime I
+
+# ShapedRecipe.result / ShapelessRecipe.result
+accessible field net/minecraft/world/item/crafting/ShapedRecipe result Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/item/crafting/ShapelessRecipe result Lnet/minecraft/world/item/ItemStack;
+
+# RegistriesDatapackGenerator.dumpValue(...) — used by SC datagen providers, see FABRIC_PORT_PLAN.md §9
+accessible method net/minecraft/data/registries/RegistriesDatapackGenerator dumpValue (Ljava/nio/file/Path;Lnet/minecraft/data/CachedOutput;Lcom/mojang/serialization/DynamicOps;Lcom/mojang/serialization/Encoder;Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;
+
+# RegistryOps.<init> / RegistryOps.lookupProvider
+accessible method net/minecraft/resources/RegistryOps <init> (Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;)V
+accessible field net/minecraft/resources/RegistryOps lookupProvider Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;

@@ -3,9 +3,7 @@
   "package": "com.wdiscute.starcatcher.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "GetNameMixin",
-    "LecternReturnMixin",
-    "RemoveFishSizeAndWeightWhenStacking"
+    "RenderTypeHelperMixin"
   ],
   "injectors": {
     "defaultRequire": 1

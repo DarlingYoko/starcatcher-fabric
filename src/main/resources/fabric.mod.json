@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${version}",
+	"name": "${mod_name}",
+	"description": "A fishing mod with lots of fishes to collect!\n\nCredits:\nwdiscute - Main Developer\nKapitenft, DuckXYZ, Nikdo53, Quarris & more - Coding support and fixing my mess\nNikdo53 - Fishing minigame art & miscellaneous texture tweeks\nScribbleDemon - Guide book, Fish radar and \"Fish Caught!\" notification art\nDayTheMagpie - Trophy Models, Tournament UI & models, Secret Notes art, Fisherman's Hats, Selling Bin UI, Bobbers Models, & various other Items and UI art\nSpring - 3D Fish models and some item sprite tweaks\nRedeix - Selling Bin model, Tackle Box model and animations, Farmer's delight food sprites, and several item textures\nIdentidade470 - Conches & Clams textures and models\nBurning Sulphur - Aiding in adding compatibility with mods\nAxtro - Help with Farmer's Delight Addon, and Curios support.\nHappyMeek - Miscellaneous Bobbers & Hooks Sprites\n\nThank you to all the translators who contribuited their time to make the mod accessible to everyone! If you'd like to translate reach out to me on discord!\n\nThank you everyone who stopped by my streams as I developed the mod and followed along the journey ♥",
+	"authors": [
+		"${mod_authors}"
+	],
+	"contact": {
+		"homepage": "http://curseforge.com/minecraft/mc-mods/starcatcher",
+		"issues": "https://discord.gg/WsuFsGSegD"
+	},
+	"license": "${mod_license}",
+	"icon": "icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.wdiscute.starcatcher.StarcatcherFabric"
+		],
+		"client": [
+			"com.wdiscute.starcatcher.StarcatcherFabricClient"
+		]
+	},
+	"mixins": [
+		"starcatcher.mixins.json",
+		{
+			"config": "starcatcher.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"accessWidener": "starcatcher.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"fabric-api": "*",
+		"minecraft": "~1.20.1",
+		"java": ">=17"
+	}
+}

@@ -1,25 +1,33 @@
 plugins {
     id 'idea'
-    id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev.legacyforge' version '2.0.115'
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 }
 
 tasks.named('wrapper', Wrapper).configure {
-    // Define wrapper values here so as to not have to always do so when updating gradlew.properties.
-    // Switching this to Wrapper.DistributionType.ALL will download the full gradle sources that comes with
-    // documentation attached on cursor hover of gradle classes and methods. However, this comes with increased
-    // file size for Gradle. If you do switch this to ALL, run the Gradle wrapper task twice afterwards.
-    // (Verify by checking gradle/wrapper/gradle-wrapper.properties to see if distributionUrl now points to `-all`)
     distributionType = Wrapper.DistributionType.BIN
 }
 
 version = mod_version
 group = mod_group_id
 
+base {
+    archivesName = mod_id
+}
+
 repositories {
     mavenLocal()
     flatDir { dir '.libs' }
+
+    maven {
+        name = "Parchment"
+        url = "https://maven.parchmentmc.org"
+    }
+
+    maven {
+        name = "Ladysnake"
+        url = "https://maven.ladysnake.org/releases"
+    }
 
     maven {
         name = "TerraformersMC"
@@ -28,230 +36,120 @@ repositories {
 
     //jei
     maven {
-        url = "https://dvs1.progwml6.com/files/maven/"
+        url = "https://maven.blamejared.com/"
     }
 
-    //jei
-    maven {
-        url = "https://modmaven.dev"
-    }
-
-    //curios
-    maven {
-        name = "Illusive Soulworks maven"
-        url = "https://maven.theillusivec4.top/"
-    }
-
-    //modrinth
+    //modrinth (tiny-multiblock-lib, trinkets, forge-config-api-port, cardinal-components, etc.)
     maven {
         url = "https://api.modrinth.com/maven"
     }
 
-    //tyson the ember
-    repositories {
-        maven { url = 'https://maven.tysontheember.dev' }
-    }
+    //tyson the ember (libtooltips facade dependency, see FABRIC_PORT_PLAN.md §7bis.1)
+    maven { url = 'https://maven.tysontheember.dev' }
 
-    repositories {
-        exclusiveContent {
-            forRepository {
-                maven {
-                    url "https://cursemaven.com"
-                }
-            }
-            filter {
-                includeGroup "curse.maven"
-            }
+    exclusiveContent {
+        forRepository {
+            maven { url = "https://cursemaven.com" }
         }
-    }
-
-
-    maven {
-        url = 'https://nikdo53.github.io/NeoBackports'
+        filter { includeGroup "curse.maven" }
     }
 }
 
 dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft_version}:${parchment_mappings_version}@zip")
+    }
 
-    //tiny multiblock lib
-    jarJar(modImplementation("maven.modrinth:tiny-multiblock-lib:forge-1.20.1-${tiny_multiblock_lib_version}"))
-    jarJar(implementation("maven.modrinth:tiny-multiblock-lib:forge-1.20.1-${tiny_multiblock_lib_version}"))
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
-    //NeoBackports
-    jarJar(modImplementation("net.nikdo53:NeoBackports:${neobackports_version}"))
-    interfaceInjectionData("net.nikdo53:NeoBackports:${neobackports_version}")
+    //attachments (replaces NeoBackports AttachmentType/Capability shim, see FABRIC_PORT_PLAN.md §5.5)
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
 
-    //selling bin
-    jarJar(modImplementation("maven.modrinth:wds-selling-bin:1.4.3-FORGE-1.20.1"))
+    //config (keeps SCConfig's ForgeConfigSpec builder code unchanged, see FABRIC_PORT_PLAN.md §1 D3)
+    modImplementation "maven.modrinth:forge-config-api-port:${forge_config_api_port_version}"
 
-    //tooltips
-    jarJar(modImplementation("maven.modrinth:libtooltips:2.1-FORGE-1.20.1"))
+    //curios replacement, see FABRIC_PORT_PLAN.md §1 D5
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
 
-    //EMI
-    modCompileOnly("dev.emi:emi-forge:${emi_version}:api")
-    //modRuntimeOnly("dev.emi:emi-forge:${emi_version}")
-
-    //JEI
-    modCompileOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
-    modRuntimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
-
-    //Serene Seasons
-    modCompileOnly("maven.modrinth:serene-seasons:9.1.0.2")
-    modCompileOnly("maven.modrinth:glitchcore:0.0.1.1")
+    //tiny multiblock lib (official Fabric build, drop-in — FABRIC_PORT_PLAN.md §7bis.2)
+    modImplementation(include("maven.modrinth:tiny-multiblock-lib:${tiny_multiblock_lib_version}"))
 
     //mixin
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    implementation("io.github.llamalad7:mixinextras-forge:[0.5.0,)")
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
-
-
-    //runtimeOnly "maven.modrinth:serene-seasons:9.1.0.2"
-    //runtimeOnly "maven.modrinth:glitchcore:0.0.1.1"
-
-    //modImplementation("maven.modrinth:serene-seasons:9.1.0.2")
-    //modImplementation("maven.modrinth:glitchcore:0.0.1.1")
-
-    modCompileOnly("curse.maven:terrafirmacraft-302973:6990923")
-
-
-    //Ecliptic Seasons
-    modCompileOnly("curse.maven:ecliptic-seasons-1118306:7304569")
-
-    modCompileOnly("curse.maven:ftb-teams-forge-404468:6130786")
-
-
-    modCompileOnly("maven.modrinth:quality-food:2.3.0-1.20.1")
-    modCompileOnly("maven.modrinth:relics-mod:0.8.0.13")
-    modCompileOnly("top.theillusivec4.curios:curios-forge:${curios_version}:api")
-
-    modCompileOnly("curse.maven:oculus-581495:6020952")
+    modImplementation("io.github.llamalad7:mixinextras-fabric:${mixinextras_version}")
+    include("io.github.llamalad7:mixinextras-fabric:${mixinextras_version}")
+    annotationProcessor "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
 }
 
-java{
+java {
     withSourcesJar()
-    withJavadocJar()
-}
-
-base {
-    archivesName = mod_id
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 // Mojang ships Java 17 to end users in 1.20.1, so mods should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-legacyForge {
-    // Specify the version of MinecraftForge to use.
-    version = project.minecraft_version + '-' + project.forge_version
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 17
+    options.encoding = 'UTF-8'
+}
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
+loom {
+    accessWidenerPath = file("src/main/resources/starcatcher.accesswidener")
 
-    // This line is optional. Access Transformers are automatically detected
-    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
-
-    // interfaceInjectionData.from "src/main/resources/starcatcher.interfaces.json"
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
             client()
-
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-
-
         }
         server {
             server()
-            programArgument '--nogui'
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            programArg '--nogui'
         }
-
-        gameTestServer {
-            type = "gameTestServer"
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        }
-
         data {
-            data()
+            client()
+            configName = "Data Generation"
+            source sourceSets.main
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            vmArg "-Dfabric-api.datagen.modid=${mod_id}"
 
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        // applies to all the run configs above
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-
-            logLevel = org.slf4j.event.Level.WARN
+            runDir "build/datagen"
         }
     }
+}
 
-    mods {
-        "${mod_id}" {
-            sourceSet(sourceSets.main)
-        }
+fabricApi {
+    configureDataGeneration {
+        client = true
     }
 }
 
 // Include resources generated by data generators.
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-// Sets up a dependency configuration called 'localRuntime' and a deobfuscating one called 'modLocalRuntime'
-// These configurations should be used instead of 'runtimeOnly' to declare
-// a dependency that will be present for runtime testing but that is
-// "optional", meaning it will not be pulled by dependents of this mod.
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
-}
-obfuscation {
-    createRemappingConfiguration(configurations.localRuntime)
-}
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mod_id", mod_id
+    inputs.property "mod_name", mod_name
+    inputs.property "mod_license", mod_license
+    inputs.property "mod_authors", mod_authors
+    inputs.property "mod_description", mod_description
 
-// Uncomment the lines below if you wish to configure mixin. The mixin file should be named modid.mixins.json.
-mixin {
-    add sourceSets.main, "starcatcher.mixins.refmap.json"
-    config "starcatcher.mixins.json"
+    filesMatching("fabric.mod.json") {
+        expand(
+                version: project.version,
+                mod_id: mod_id,
+                mod_name: mod_name,
+                mod_license: mod_license,
+                mod_authors: mod_authors,
+                mod_description: mod_description,
+        )
+    }
 }
-
-jar {
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json"
-    ])
-
-    finalizedBy('reobfJar')
-}
-
-
-// This block of code expands all declared replace properties
-// in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
-    var replaceProperties = [
-            minecraft_version      : minecraft_version,
-            minecraft_version_range: minecraft_version_range,
-            forge_version          : forge_version,
-            forge_version_range    : forge_version_range,
-            loader_version_range   : loader_version_range,
-            mod_id                 : mod_id,
-            mod_name               : mod_name,
-            mod_license            : mod_license,
-            mod_version            : mod_version,
-            mod_authors            : mod_authors,
-            mod_description        : mod_description,
-    ]
-    inputs.properties replaceProperties
-    expand replaceProperties
-    from "src/main/templates"
-    into "build/generated/sources/modMetadata"
-}
-// Include the output of "generateModMetadata" as an input directory for the build
-// this works with both building through Gradle and the IDE.
-sourceSets.main.resources.srcDir generateModMetadata
-// To avoid having to run "generateModMetadata" manually, make it run on every project reload
-legacyForge.ideSyncTask generateModMetadata
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
@@ -267,11 +165,6 @@ publishing {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
     module {
         downloadSources = true
