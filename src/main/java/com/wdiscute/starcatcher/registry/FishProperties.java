@@ -434,11 +434,11 @@ public record FishProperties(
 
         public static final Codec<CatchInfo> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
-                        BuiltInRegistries.ITEM.holderByNameCodecNeo().fieldOf("item").forGetter(CatchInfo::fish),
-                        BuiltInRegistries.ITEM.holderByNameCodecNeo().optionalFieldOf("fish_bucket", SCItems.MISSINGNO).forGetter(CatchInfo::bucketedFish),
-                        BuiltInRegistries.ENTITY_TYPE.holderByNameCodecNeo().optionalFieldOf("entity", (Holder<EntityType<?>>) (Object) SCEntities.FISH).forGetter(CatchInfo::entityToSpawn),
+                        BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("item").forGetter(CatchInfo::fish),
+                        BuiltInRegistries.ITEM.holderByNameCodec().optionalFieldOf("fish_bucket", SCItems.MISSINGNO).forGetter(CatchInfo::bucketedFish),
+                        BuiltInRegistries.ENTITY_TYPE.holderByNameCodec().optionalFieldOf("entity", (Holder<EntityType<?>>) (Object) SCEntities.FISH).forGetter(CatchInfo::entityToSpawn),
                         Codec.BOOL.optionalFieldOf("always_spawn_entity", false).forGetter(CatchInfo::alwaysSpawnEntity),
-                        BuiltInRegistries.ITEM.holderByNameCodecNeo().optionalFieldOf("override_minigame_item", SCItems.MISSINGNO).forGetter(CatchInfo::overrideMinigameWith),
+                        BuiltInRegistries.ITEM.holderByNameCodec().optionalFieldOf("override_minigame_item", SCItems.MISSINGNO).forGetter(CatchInfo::overrideMinigameWith),
                         ItemStack.CODEC.optionalFieldOf("treasure_item", ItemStack.EMPTY).forGetter(CatchInfo::treasureIs),
                         FishEntryType.CODEC.optionalFieldOf("type", FishEntryType.FISH).forGetter(CatchInfo::fishEntryType)
                 ).apply(instance, CatchInfo::new));
@@ -449,7 +449,7 @@ public record FishProperties(
                 ByteBufCodecs.holderRegistry(Registries.ENTITY_TYPE), CatchInfo::entityToSpawn,
                 ByteBufCodecs.BOOL, CatchInfo::alwaysSpawnEntity,
                 ByteBufCodecs.holderRegistry(Registries.ITEM), CatchInfo::overrideMinigameWith,
-                ItemStack.OPTIONAL_STREAM_CODEC, CatchInfo::treasureIs,
+                ByteBufCodecs.ITEM_STACK, CatchInfo::treasureIs,
                 FishEntryType.STREAM_CODEC, CatchInfo::fishEntryType,
                 CatchInfo::new
         );

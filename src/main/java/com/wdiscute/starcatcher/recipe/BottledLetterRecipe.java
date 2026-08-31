@@ -18,6 +18,7 @@ import net.minecraftforge.common.util.RecipeMatcher;
 import net.nikdo53.neobackports.extensions.IngredientExtension;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.BackportCodecs;
+import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
 import net.nikdo53.neobackports.utils.recipe.CraftingRecipeNeo;
 import net.nikdo53.neobackports.utils.recipe.RecipeSerializerNeo;
 import net.nikdo53.neobackports.utils.recipe.holder.CraftingRecipeHolder;
@@ -176,7 +177,7 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
             int i = buffer.readVarInt();
             NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
             nonnulllist.replaceAll(p_319735_ -> IngredientExtension.CONTENTS_STREAM_CODEC.decode(buffer));
-            ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buffer);
+            ItemStack itemstack = ByteBufCodecs.ITEM_STACK.decode(buffer);
             return new BottledLetterRecipe(s, craftingbookcategory, itemstack, nonnulllist);
         }
 
@@ -191,7 +192,7 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
                 IngredientExtension.CONTENTS_STREAM_CODEC.encode(buffer, ingredient);
             }
 
-            ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
+            ByteBufCodecs.ITEM_STACK.encode(buffer, recipe.result);
         }
     }
 
