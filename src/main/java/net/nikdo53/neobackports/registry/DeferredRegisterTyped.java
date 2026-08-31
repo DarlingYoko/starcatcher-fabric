@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Fabric shim for NeoBackports' {@code DeferredRegisterTyped} — see FABRIC_PORT_PLAN.md §5.1.
@@ -53,6 +54,11 @@ public class DeferredRegisterTyped<T>
     public static Blocks createBlocks(String modid)
     {
         return new Blocks(modid);
+    }
+
+    public static DataComponents createDataComponents(String modid)
+    {
+        return new DataComponents(modid);
     }
 
     protected ResourceKey<T> keyFor(String name)
@@ -122,6 +128,38 @@ public class DeferredRegisterTyped<T>
             DeferredBlock<I> holder = new DeferredBlock<>(keyFor(name), supplier);
             entries.add(holder);
             return holder;
+        }
+    }
+
+    /**
+     * NeoBackports' {@code DeferredRegister.DataComponents}. Unlike {@link Items}/{@link Blocks}
+     * there is no real vanilla registry backing this in 1.20.1 (see FABRIC_PORT_PLAN.md §5.2) —
+     * each {@code net.nikdo53.neobackports.io.components.DataComponentType} is constructed and
+     * bound immediately, so {@link #register(IEventBus)} is a no-op.
+     */
+    public static class DataComponents
+    {
+        private static final ResourceKey<Registry<net.nikdo53.neobackports.io.components.DataComponentType<?>>> REGISTRY_KEY =
+                ResourceKey.createRegistryKey(new ResourceLocation("neobackports", "data_component_type"));
+
+        private final String modid;
+
+        private DataComponents(String modid)
+        {
+            this.modid = modid;
+        }
+
+        public <T> DeferredHolder<net.nikdo53.neobackports.io.components.DataComponentType<?>, net.nikdo53.neobackports.io.components.DataComponentType<T>> registerComponentType(
+                String name, UnaryOperator<net.nikdo53.neobackports.io.components.DataComponentType.Builder<T>> builderOperator)
+        {
+            ResourceLocation id = new ResourceLocation(modid, name);
+            net.nikdo53.neobackports.io.components.DataComponentType<T> type =
+                    builderOperator.apply(net.nikdo53.neobackports.io.components.DataComponentType.<T>builder()).build(id);
+            return DeferredHolder.bound(ResourceKey.create(REGISTRY_KEY, id), type);
+        }
+
+        public void register(IEventBus bus)
+        {
         }
     }
 }

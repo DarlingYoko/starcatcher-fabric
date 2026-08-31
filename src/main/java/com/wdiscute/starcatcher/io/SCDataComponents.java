@@ -9,11 +9,14 @@ import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import com.wdiscute.starcatcher.secretnotes.LetterItem;
 import com.wdiscute.starcatcher.secretnotes.SecretNote;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.io.components.DataComponentType;
+import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;
 
@@ -83,31 +86,48 @@ public class SCDataComponents
             "tackle_box_fishes",
             builder -> builder.persistent(ItemStack.CODEC.listOf()));
 
+    //tackle box contents (no vanilla equivalent in 1.20.1 — see FABRIC_PORT_PLAN.md §5.2)
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemContainerContents>> CONTAINER = register(
+            "container", builder -> builder.persistent(ItemContainerContents.CODEC));
+
+    private static final String STORAGE_KEY = "StarcatcherComponents";
+
     public static <T> void set(ItemStack stack, Supplier<DataComponentType<T>> component, T data)
     {
-        stack.set(component.get(), data);
+        DataComponentType<T> type = component.get();
+        CompoundTag components = stack.getOrCreateTagElement(STORAGE_KEY);
+        components.put(type.id().toString(), type.codec().encodeStart(NbtOps.INSTANCE, data).getOrThrow(false, s -> {}));
     }
 
     @Nullable
     public static <T> T get(ItemStack stack, Supplier<DataComponentType<T>> component)
     {
-        return stack.get(component.get());
+        DataComponentType<T> type = component.get();
+        CompoundTag components = stack.getTagElement(STORAGE_KEY);
+        String key = type.id().toString();
+        if (components == null || !components.contains(key))
+            return null;
+        return type.codec().parse(NbtOps.INSTANCE, components.get(key)).result().orElse(null);
     }
 
     public static <T> boolean has(ItemStack stack, Supplier<DataComponentType<T>> component)
     {
-        return stack.has(component.get());
+        CompoundTag components = stack.getTagElement(STORAGE_KEY);
+        return components != null && components.contains(component.get().id().toString());
     }
 
     public static <T> void remove(ItemStack stack, Supplier<DataComponentType<T>> component)
     {
-        stack.remove(component.get());
+        CompoundTag components = stack.getTagElement(STORAGE_KEY);
+        if (components != null)
+            components.remove(component.get().id().toString());
     }
 
     @Nonnull
     public static <T> T getOrDefault(ItemStack stack, Supplier<DataComponentType<T>> component, T defaultValue)
     {
-        return stack.getOrDefault(component.get(), defaultValue);
+        T value = get(stack, component);
+        return value != null ? value : defaultValue;
     }
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name,

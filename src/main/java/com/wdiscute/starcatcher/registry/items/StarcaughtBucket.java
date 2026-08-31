@@ -21,7 +21,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
-import net.nikdo53.neobackports.io.components.DataComponents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -84,19 +83,9 @@ public class StarcaughtBucket extends BucketItem
             return super.getName(stack);
         else
         {
-            Component baseName;
-            Component customName = ssc.stack().get(DataComponents.CUSTOM_NAME.get());
-            Component itemName = ssc.stack().get(DataComponents.ITEM_NAME.get());
-
-            if (customName != null)
-            {
-                baseName = customName;
-            }
-            else if (itemName != null)
-            {
-                baseName = itemName;
-            }
-            else baseName = Component.translatable(ssc.stack().getDescriptionId());
+            // getHoverName() already falls back custom name -> item's own display name, matching
+            // the NeoForge CUSTOM_NAME/ITEM_NAME/description-id fallback chain this used to spell out.
+            Component baseName = ssc.stack().getHoverName();
 
             CaughtFishInfo sw = SCDataComponents.get(ssc.stack(), SCDataComponents.CAUGHT_FISH_INFO);
             if (sw != null)

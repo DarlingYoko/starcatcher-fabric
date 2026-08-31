@@ -35,7 +35,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
-import net.nikdo53.neobackports.io.components.DataComponents;
 import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import org.jetbrains.annotations.NotNull;
 
@@ -238,17 +237,17 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
 
     public void applyImplicitComponents(ItemStack componentInput)
     {
-        componentInput.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItems());
-        fishes = new ArrayList<>(componentInput.getOrDefault(SCDataComponents.TACKLE_BOX_FISHES, List.of()));
-        this.name = componentInput.get(DataComponents.CUSTOM_NAME.get());
+        SCDataComponents.getOrDefault(componentInput, SCDataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItems());
+        fishes = new ArrayList<>(SCDataComponents.getOrDefault(componentInput, SCDataComponents.TACKLE_BOX_FISHES, List.of()));
+        this.name = componentInput.hasCustomHoverName() ? componentInput.getHoverName() : null;
     }
 
     @Override
     public void saveToItem(ItemStack stack) {
         super.saveToItem(stack);
-        stack.set(DataComponents.CUSTOM_NAME, this.name);
-        stack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
-        stack.set(SCDataComponents.TACKLE_BOX_FISHES, fishes);
+        stack.setHoverName(this.name);
+        SCDataComponents.set(stack, SCDataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
+        SCDataComponents.set(stack, SCDataComponents.TACKLE_BOX_FISHES, fishes);
     }
 
     @Override

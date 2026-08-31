@@ -41,7 +41,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.nikdo53.neobackports.io.components.DataComponents;
+import com.wdiscute.starcatcher.io.SCDataComponents;
 import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import net.nikdo53.neobackports.registry.DeferredBlock;
 
@@ -193,7 +193,7 @@ public class TackleBoxBlock extends BaseEntityBlock implements SimpleWaterlogged
     {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
-        if (stack.has(DataComponents.CONTAINER.get()))
+        if (SCDataComponents.has(stack, SCDataComponents.CONTAINER))
         {
            // tooltipComponents.add(UNKNOWN_CONTENTS);
         }
@@ -201,7 +201,7 @@ public class TackleBoxBlock extends BaseEntityBlock implements SimpleWaterlogged
         int i = 0;
         int j = 0;
 
-        for (ItemStack itemstack : stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).nonEmptyItems())
+        for (ItemStack itemstack : SCDataComponents.getOrDefault(stack, SCDataComponents.CONTAINER, ItemContainerContents.EMPTY).nonEmptyItems())
         {
             ++j;
             if (i <= 4)

@@ -65,6 +65,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
+    //javax.annotation.Nullable/Nonnull (JSR-305) — used pervasively by the original Forge source,
+    //no longer pulled in transitively now that the real Forge/NeoForge dependency is gone
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+
     //attachments (replaces NeoBackports AttachmentType/Capability shim, see FABRIC_PORT_PLAN.md §5.5)
     modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
     modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"

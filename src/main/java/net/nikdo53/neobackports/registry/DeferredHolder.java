@@ -25,6 +25,18 @@ public class DeferredHolder<R, T extends R> implements Supplier<T>
         this.factory = factory;
     }
 
+    /**
+     * For types with no real vanilla {@link Registry} to bind against (e.g.
+     * {@code DataComponentType}, see FABRIC_PORT_PLAN.md §5.2) — the value is already known,
+     * so this returns an already-bound holder with no {@link #bind} call needed.
+     */
+    static <R, T extends R> DeferredHolder<R, T> bound(ResourceKey<R> key, T value)
+    {
+        DeferredHolder<R, T> holder = new DeferredHolder<>(key, () -> value);
+        holder.value = value;
+        return holder;
+    }
+
     T bind(Registry<R> registry)
     {
         value = factory.get();
