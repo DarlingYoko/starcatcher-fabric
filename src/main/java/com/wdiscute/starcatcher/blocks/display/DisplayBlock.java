@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +36,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.nikdo53.neobackports.utils.ItemInteractionResult;
 
 import javax.annotation.Nullable;
 
@@ -131,7 +131,9 @@ public class DisplayBlock extends BaseEntityBlock implements SimpleWaterloggedBl
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        ItemStack stack = player.getItemInHand(hand);
+
         //if has book, open screen
         if (state.getValue(HAS_ITEM) && !player.isCrouching()) {
             if (level.isClientSide && level.getBlockEntity(pos) instanceof DisplayBlockEntity dbe) {
@@ -147,30 +149,30 @@ public class DisplayBlock extends BaseEntityBlock implements SimpleWaterloggedBl
 
 
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         //remove item if crouching
         if (state.getValue(HAS_ITEM) && player.isCrouching() && level.getBlockEntity(pos) instanceof DisplayBlockEntity dbe) {
-            if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+            if (level.isClientSide) return InteractionResult.SUCCESS;
             player.addItem(dbe.getItem().copy());
             dbe.clearContent();
             dbe.sync();
             level.setBlockAndUpdate(pos, state.setValue(HAS_ITEM, false));
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         //place book
         if (stack.is(SCTags.PLACEABLE_IN_DISPLAY) && !state.getValue(HAS_ITEM) && level.getBlockEntity(pos) instanceof DisplayBlockEntity dbe) {
-            if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+            if (level.isClientSide) return InteractionResult.SUCCESS;
             dbe.setItem(stack.copyWithCount(1));
             stack.shrink(1);
             level.setBlock(pos, state.setValue(HAS_ITEM, true), 0);
             dbe.sync();
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
 

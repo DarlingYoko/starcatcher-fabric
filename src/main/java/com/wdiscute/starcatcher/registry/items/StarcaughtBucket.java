@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.nikdo53.neobackports.io.components.DataComponents;
-import net.nikdo53.neobackports.utils.TooltipContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -65,7 +64,7 @@ public class StarcaughtBucket extends BucketItem
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+    public void appendHoverText(ItemStack stack, Level context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
     {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         ItemStack fish = getFish(stack);

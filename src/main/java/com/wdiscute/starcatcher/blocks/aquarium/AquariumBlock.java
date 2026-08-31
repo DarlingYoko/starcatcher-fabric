@@ -46,7 +46,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
-import net.nikdo53.neobackports.utils.ItemInteractionResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -207,28 +206,25 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
+        ItemStack stack = player.getItemInHand(hand);
+
         if (stack.getItem() instanceof BucketItem bucket && !stack.is(SCItems.STARCAUGHT_BUCKET.get()) && !stack.is(Items.BUCKET))
         {
             bucket.checkExtraContent(player, level, stack, pos);
             player.setItemInHand(hand, BucketItem.getEmptySuccessItem(stack, player));
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         Interaction interaction = SCDataMaps.getOrDefault(stack, SCDataMaps.AQUARIUM_INTERACTION, Interaction.NOTHING);
         if (interaction.executePlace(level, pos, state, stack, player))
         {
             if (interaction.sound != null) player.playSound(interaction.sound);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-    }
-
-    @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        return super.use(state, level, pos, player, hand, hit);
+        return super.use(state, level, pos, player, hand, hitResult);
     }
 
     @Override

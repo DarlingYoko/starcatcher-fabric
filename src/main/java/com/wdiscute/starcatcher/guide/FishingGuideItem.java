@@ -28,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.nikdo53.neobackports.utils.TooltipContext;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +66,7 @@ public class FishingGuideItem extends Item
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+    public void appendHoverText(ItemStack stack, Level context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
     {
         if (SCDataComponents.has(stack, SCDataComponents.SIGNED_GUIDE))
         {

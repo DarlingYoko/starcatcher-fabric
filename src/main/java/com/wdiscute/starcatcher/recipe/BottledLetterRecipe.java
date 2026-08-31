@@ -1,32 +1,29 @@
 package com.wdiscute.starcatcher.recipe;
 
+import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SCRecipes;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.RecipeMatcher;
-import net.nikdo53.neobackports.extensions.IngredientExtension;
-import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.BackportCodecs;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
-import net.nikdo53.neobackports.utils.recipe.CraftingRecipeNeo;
-import net.nikdo53.neobackports.utils.recipe.RecipeSerializerNeo;
-import net.nikdo53.neobackports.utils.recipe.holder.CraftingRecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.holder.RecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.input.CraftingInput;
 
-public class BottledLetterRecipe implements CraftingRecipeNeo
+public class BottledLetterRecipe implements CraftingRecipe
 {
+    private ResourceLocation id;
     final String group;
     final CraftingBookCategory category;
     final ItemStack result;
@@ -40,6 +37,12 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
         this.result = result;
         this.ingredients = ingredients;
         this.isSimple = ingredients.stream().allMatch(Ingredient::isSimple);
+    }
+
+    @Override
+    public ResourceLocation getId()
+    {
+        return this.id;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries)
+    public ItemStack getResultItem(RegistryAccess registries)
     {
         return this.result;
     }
@@ -73,36 +76,40 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
         return this.ingredients;
     }
 
-    public boolean matches(CraftingInput input, Level level)
+    public boolean matches(CraftingContainer container, Level level)
     {
-        if (input.ingredientCount() != this.ingredients.size())
+        var nonEmptyItems = new java.util.ArrayList<ItemStack>();
+        StackedContents stackedContents = new StackedContents();
+        int nonEmptyCount = 0;
+        for (int i = 0; i < container.getContainerSize(); i++)
         {
-            return false;
-        }
-        else if (!isSimple)
-        {
-            var nonEmptyItems = new java.util.ArrayList<ItemStack>(input.ingredientCount());
-            for (var item : input.items())
-                if (!item.isEmpty())
+            ItemStack item = container.getItem(i);
+            if (!item.isEmpty())
+            {
+                nonEmptyCount++;
+                if (isSimple)
+                    stackedContents.accountStack(item, 1);
+                else
                     nonEmptyItems.add(item);
-            return RecipeMatcher.findMatches(nonEmptyItems, this.ingredients) != null;
+            }
         }
-        else
-        {
-            return input.size() == 1 && this.ingredients.size() == 1
-                    ? this.ingredients.get(0).test(input.getItem(0))
-                    : input.stackedContents().canCraft(this, null);
-        }
+
+        if (nonEmptyCount != this.ingredients.size())
+            return false;
+
+        return isSimple
+                ? stackedContents.canCraft(this, null)
+                : RecipeMatcher.findMatches(nonEmptyItems, this.ingredients) != null;
     }
 
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries)
+    public ItemStack assemble(CraftingContainer container, RegistryAccess registries)
     {
         ItemStack is = this.result.copy();
-        for (int i = 0; i < input.size(); i++)
+        for (int i = 0; i < container.getContainerSize(); i++)
         {
-            if(SCDataComponents.has(input.getItem(i), SCDataComponents.MESSAGE))
+            if(SCDataComponents.has(container.getItem(i), SCDataComponents.MESSAGE))
             {
-                SCDataComponents.set(is, SCDataComponents.MESSAGE, SCDataComponents.get(input.getItem(i), SCDataComponents.MESSAGE));
+                SCDataComponents.set(is, SCDataComponents.MESSAGE, SCDataComponents.get(container.getItem(i), SCDataComponents.MESSAGE));
                 break;
             }
         }
@@ -118,20 +125,20 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
         return width * height >= this.ingredients.size();
     }
 
-    public static class Serializer implements RecipeSerializerNeo<BottledLetterRecipe>
+    public static class Serializer implements RecipeSerializer<BottledLetterRecipe>
     {
         private static final MapCodec<BottledLetterRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 p_340779_ -> p_340779_.group(
                                 Codec.STRING.optionalFieldOf("group", "").forGetter(p_301127_ -> p_301127_.group),
                                 CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(p_301133_ -> p_301133_.category),
                                 BackportCodecs.ITEM_STACK_RECIPE.fieldOf("result").forGetter(p_301142_ -> p_301142_.result),
-                                IngredientExtension.CODEC_NONEMPTY
+                                BackportCodecs.IngredientCodecs.CODEC
                                         .listOf()
                                         .fieldOf("ingredients")
                                         .flatXmap(
                                                 p_301021_ ->
                                                 {
-                                                    Ingredient[] aingredient = p_301021_.toArray(Ingredient[]::new); // Neo skip the empty check and immediately create the array.
+                                                    Ingredient[] aingredient = p_301021_.toArray(Ingredient[]::new);
                                                     if (aingredient.length == 0)
                                                     {
                                                         return DataResult.error(() -> "No ingredients for shapeless recipe");
@@ -149,25 +156,27 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
                         )
                         .apply(p_340779_, BottledLetterRecipe::new)
         );
-        public static final StreamCodec< BottledLetterRecipe> STREAM_CODEC = StreamCodec.of(
-                BottledLetterRecipe.Serializer::toNetwork1, BottledLetterRecipe.Serializer::fromNetwork1
-        );
 
         @Override
-        public MapCodec<BottledLetterRecipe> codec()
+        public BottledLetterRecipe fromJson(ResourceLocation id, JsonObject json)
         {
-            return CODEC;
+            BottledLetterRecipe recipe = CODEC.codec().parse(JsonOps.INSTANCE, json).getOrThrow(false, s -> {});
+            recipe.id = id;
+            return recipe;
         }
 
         @Override
-        public StreamCodec< BottledLetterRecipe> streamCodec()
+        public BottledLetterRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer)
         {
-            return STREAM_CODEC;
+            BottledLetterRecipe recipe = fromNetwork1(buffer);
+            recipe.id = id;
+            return recipe;
         }
 
         @Override
-        public RecipeHolder<? extends Container, ? extends Recipe<? extends Container>> recipeHolderFactory(BottledLetterRecipe bottledLetterRecipe, ResourceLocation resourceLocation) {
-            return new CraftingRecipeHolder(bottledLetterRecipe, resourceLocation);
+        public void toNetwork(FriendlyByteBuf buffer, BottledLetterRecipe recipe)
+        {
+            toNetwork1(buffer, recipe);
         }
 
         private static BottledLetterRecipe fromNetwork1(FriendlyByteBuf buffer)
@@ -176,7 +185,7 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
             CraftingBookCategory craftingbookcategory = buffer.readEnum(CraftingBookCategory.class);
             int i = buffer.readVarInt();
             NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
-            nonnulllist.replaceAll(p_319735_ -> IngredientExtension.CONTENTS_STREAM_CODEC.decode(buffer));
+            nonnulllist.replaceAll(p_319735_ -> ByteBufCodecs.INGREDIENT.decode(buffer));
             ItemStack itemstack = ByteBufCodecs.ITEM_STACK.decode(buffer);
             return new BottledLetterRecipe(s, craftingbookcategory, itemstack, nonnulllist);
         }
@@ -189,12 +198,10 @@ public class BottledLetterRecipe implements CraftingRecipeNeo
 
             for (Ingredient ingredient : recipe.ingredients)
             {
-                IngredientExtension.CONTENTS_STREAM_CODEC.encode(buffer, ingredient);
+                ByteBufCodecs.INGREDIENT.encode(buffer, ingredient);
             }
 
             ByteBufCodecs.ITEM_STACK.encode(buffer, recipe.result);
         }
     }
-
-
 }

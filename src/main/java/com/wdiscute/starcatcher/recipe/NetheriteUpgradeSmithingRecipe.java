@@ -1,5 +1,7 @@
 package com.wdiscute.starcatcher.recipe;
 
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.io.SCDataComponents;
@@ -7,50 +9,45 @@ import com.wdiscute.starcatcher.registry.SCDataMaps;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.SCRecipes;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.BackportCodecs;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
-import net.nikdo53.neobackports.utils.recipe.RecipeSerializerNeo;
-import net.nikdo53.neobackports.utils.recipe.SmithingRecipeNeo;
-import net.nikdo53.neobackports.utils.recipe.holder.RecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.holder.SmithingRecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.input.SmithingRecipeInput;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
-public record NetheriteUpgradeSmithingRecipe(Ingredient template, Ingredient base, Ingredient addition) implements SmithingRecipeNeo
+public record NetheriteUpgradeSmithingRecipe(ResourceLocation id, Ingredient template, Ingredient base, Ingredient addition) implements SmithingRecipe
 {
-    public boolean matches(SmithingRecipeInput input, Level level)
+    public boolean matches(Container input, Level level)
     {
-        boolean b = this.template.test(input.template())
-                && this.base.test(input.base())
-                && this.addition.test(input.addition())
-                && !SCDataComponents.getOrDefault(input.base(), SCDataComponents.NETHERITE_UPGRADE, false);
+        boolean b = this.template.test(input.getItem(0))
+                && this.base.test(input.getItem(1))
+                && this.addition.test(input.getItem(2))
+                && !SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.NETHERITE_UPGRADE, false);
         return b;
     }
 
-    public ItemStack assemble(SmithingRecipeInput input, HolderLookup.Provider registries)
+    public ItemStack assemble(Container input, RegistryAccess registries)
     {
-        ItemStack resultRod = input.base().copy();
+        ItemStack resultRod = input.getItem(1).copy();
 
-        List<ResourceLocation> catchModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.base(), SCDataComponents.CATCH_MODIFIERS, List.of()));
-        catchModifiers.addAll(SCDataComponents.getOrDefault(input.template(), SCDataComponents.CATCH_MODIFIERS, List.of()));
-        catchModifiers.addAll(SCDataMaps.getOrDefault(input.template(), SCDataMaps.CATCH_MODIFIERS, List.of()));
+        List<ResourceLocation> catchModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.CATCH_MODIFIERS, List.of()));
+        catchModifiers.addAll(SCDataComponents.getOrDefault(input.getItem(0), SCDataComponents.CATCH_MODIFIERS, List.of()));
+        catchModifiers.addAll(SCDataMaps.getOrDefault(input.getItem(0), SCDataMaps.CATCH_MODIFIERS, List.of()));
 
-        List<ResourceLocation> minigameModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.base(), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
-        minigameModifiers.addAll(SCDataComponents.getOrDefault(input.template(), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
-        minigameModifiers.addAll(SCDataMaps.getOrDefault(input.template(), SCDataMaps.MINIGAME_MODIFIERS, List.of()));
+        List<ResourceLocation> minigameModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
+        minigameModifiers.addAll(SCDataComponents.getOrDefault(input.getItem(0), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
+        minigameModifiers.addAll(SCDataMaps.getOrDefault(input.getItem(0), SCDataMaps.MINIGAME_MODIFIERS, List.of()));
 
-        ResourceLocation tackleSkin = SCTackleSkins.getTackleSkin(input.template());
+        ResourceLocation tackleSkin = SCTackleSkins.getTackleSkin(input.getItem(0));
         if (!tackleSkin.equals(SCTackleSkins.BASE_TACKLE_SKIN))
             SCDataComponents.set(resultRod, SCDataComponents.TACKLE_SKIN, tackleSkin);
 
@@ -79,7 +76,13 @@ public record NetheriteUpgradeSmithingRecipe(Ingredient template, Ingredient bas
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries)
+    public ResourceLocation getId()
+    {
+        return this.id;
+    }
+
+    @Override
+    public ItemStack getResultItem(RegistryAccess registries)
     {
         ItemStack itemstack = new ItemStack(SCItems.ROD.get());
         SCDataComponents.set(itemstack, SCDataComponents.NETHERITE_UPGRADE, true);
@@ -104,44 +107,31 @@ public record NetheriteUpgradeSmithingRecipe(Ingredient template, Ingredient bas
         return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::hasNoItems);
     }
 
-    public static class Serializer implements RecipeSerializerNeo<NetheriteUpgradeSmithingRecipe>
+    public static class Serializer implements RecipeSerializer<NetheriteUpgradeSmithingRecipe>
     {
-        public static final MapCodec<NetheriteUpgradeSmithingRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-                BackportCodecs.IngredientCodecs.CODEC.fieldOf("template").forGetter((o) -> o.template),
-                BackportCodecs.IngredientCodecs.CODEC.fieldOf("base").forGetter((o) -> o.base),
-                BackportCodecs.IngredientCodecs.CODEC.fieldOf("addition").forGetter((o) -> o.addition)
-        ).apply(instance, NetheriteUpgradeSmithingRecipe::new));
-
-        public static final StreamCodec<NetheriteUpgradeSmithingRecipe> STREAM_CODEC = StreamCodec.of(
-                Serializer::toNetwork1, Serializer::fromNetwork
-        );
+        public static final MapCodec<Function<ResourceLocation, NetheriteUpgradeSmithingRecipe>> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
+                BackportCodecs.IngredientCodecs.CODEC.fieldOf("template").forGetter((o) -> o.apply(null).template()),
+                BackportCodecs.IngredientCodecs.CODEC.fieldOf("base").forGetter((o) -> o.apply(null).base()),
+                BackportCodecs.IngredientCodecs.CODEC.fieldOf("addition").forGetter((o) -> o.apply(null).addition())
+        ).apply(instance, (template, base, addition) -> id -> new NetheriteUpgradeSmithingRecipe(id, template, base, addition)));
 
         @Override
-        public MapCodec<NetheriteUpgradeSmithingRecipe> codec()
+        public NetheriteUpgradeSmithingRecipe fromJson(ResourceLocation id, JsonObject json)
         {
-            return CODEC;
+            return CODEC.codec().parse(JsonOps.INSTANCE, json).getOrThrow(false, s -> {}).apply(id);
         }
 
         @Override
-        public StreamCodec<NetheriteUpgradeSmithingRecipe> streamCodec()
-        {
-            return STREAM_CODEC;
-        }
-
-        @Override
-        public RecipeHolder<? extends Container, ? extends Recipe<Container>> recipeHolderFactory(NetheriteUpgradeSmithingRecipe netheriteUpgradeSmithingRecipe, ResourceLocation resourceLocation) {
-            return new SmithingRecipeHolder(netheriteUpgradeSmithingRecipe, resourceLocation);
-        }
-
-        private static NetheriteUpgradeSmithingRecipe fromNetwork(FriendlyByteBuf buffer)
+        public NetheriteUpgradeSmithingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer)
         {
             Ingredient template = ByteBufCodecs.INGREDIENT.decode(buffer);
             Ingredient base = ByteBufCodecs.INGREDIENT.decode(buffer);
             Ingredient addition = ByteBufCodecs.INGREDIENT.decode(buffer);
-            return new NetheriteUpgradeSmithingRecipe(template, base, addition);
+            return new NetheriteUpgradeSmithingRecipe(id, template, base, addition);
         }
 
-        private static void toNetwork1(FriendlyByteBuf buffer, NetheriteUpgradeSmithingRecipe recipe)
+        @Override
+        public void toNetwork(FriendlyByteBuf buffer, NetheriteUpgradeSmithingRecipe recipe)
         {
             ByteBufCodecs.INGREDIENT.encode(buffer, recipe.template);
             ByteBufCodecs.INGREDIENT.encode(buffer, recipe.base);

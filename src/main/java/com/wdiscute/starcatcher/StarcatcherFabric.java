@@ -8,6 +8,7 @@ import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.SCMenuTypes;
 import com.wdiscute.starcatcher.registry.SCParticles;
+import com.wdiscute.starcatcher.registry.SCRecipes;
 import com.wdiscute.starcatcher.registry.SCSounds;
 import net.fabricmc.api.ModInitializer;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -37,6 +38,7 @@ public class StarcatcherFabric implements ModInitializer
         SCMenuTypes.register(bus);
         SCCreativeModeTabs.register(bus);
         SCCriterionTriggers.register(bus);
+        SCRecipes.register(bus);
 
         // Remaining subsystems (DataComponents, custom registries, attachments, payloads,
         // data maps, loot modifiers, recipes, selling-bin processors, creative tabs data,

@@ -1,34 +1,30 @@
 package com.wdiscute.starcatcher.recipe;
 
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SCDataMaps;
 import com.wdiscute.starcatcher.registry.SCRecipes;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.BackportCodecs;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
-import net.nikdo53.neobackports.utils.recipe.RecipeSerializerNeo;
-import net.nikdo53.neobackports.utils.recipe.SmithingRecipeNeo;
-import net.nikdo53.neobackports.utils.recipe.holder.RecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.holder.SmithingRecipeHolder;
-import net.nikdo53.neobackports.utils.recipe.input.SmithingRecipeInput;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class FishingRodSkinSmithingRecipe implements SmithingRecipeNeo
+public class FishingRodSkinSmithingRecipe implements SmithingRecipe
 {
-
+    private ResourceLocation id;
     public final Ingredient template;
     public final Ingredient base;
     public final Ingredient addition;
@@ -42,24 +38,30 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipeNeo
         this.result = result;
     }
 
-    public boolean matches(SmithingRecipeInput input, Level level)
+    @Override
+    public ResourceLocation getId()
     {
-        return this.template.test(input.template()) && this.base.test(input.base()) && this.addition.test(input.addition());
+        return this.id;
     }
 
-    public ItemStack assemble(SmithingRecipeInput input, HolderLookup.Provider registries)
+    public boolean matches(Container input, Level level)
     {
-        ItemStack resultRod = input.base().transmuteCopy(this.result.getItem(), this.result.getCount());
+        return this.template.test(input.getItem(0)) && this.base.test(input.getItem(1)) && this.addition.test(input.getItem(2));
+    }
 
-        List<ResourceLocation> catchModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.base(), SCDataComponents.CATCH_MODIFIERS, List.of()));
-        catchModifiers.addAll(SCDataComponents.getOrDefault(input.template(), SCDataComponents.CATCH_MODIFIERS, List.of()));
-        catchModifiers.addAll(SCDataMaps.getOrDefault(input.template(), SCDataMaps.CATCH_MODIFIERS, List.of()));
+    public ItemStack assemble(Container input, RegistryAccess registries)
+    {
+        ItemStack resultRod = input.getItem(1).transmuteCopy(this.result.getItem(), this.result.getCount());
 
-        List<ResourceLocation> minigameModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.base(), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
-        minigameModifiers.addAll(SCDataComponents.getOrDefault(input.template(), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
-        minigameModifiers.addAll(SCDataMaps.getOrDefault(input.template(), SCDataMaps.MINIGAME_MODIFIERS, List.of()));
+        List<ResourceLocation> catchModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.CATCH_MODIFIERS, List.of()));
+        catchModifiers.addAll(SCDataComponents.getOrDefault(input.getItem(0), SCDataComponents.CATCH_MODIFIERS, List.of()));
+        catchModifiers.addAll(SCDataMaps.getOrDefault(input.getItem(0), SCDataMaps.CATCH_MODIFIERS, List.of()));
 
-        ResourceLocation tackleSkin = SCTackleSkins.getTackleSkin(input.template());
+        List<ResourceLocation> minigameModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
+        minigameModifiers.addAll(SCDataComponents.getOrDefault(input.getItem(0), SCDataComponents.MINIGAME_MODIFIERS, List.of()));
+        minigameModifiers.addAll(SCDataMaps.getOrDefault(input.getItem(0), SCDataMaps.MINIGAME_MODIFIERS, List.of()));
+
+        ResourceLocation tackleSkin = SCTackleSkins.getTackleSkin(input.getItem(0));
         if (!tackleSkin.equals(SCTackleSkins.BASE_TACKLE_SKIN))
             SCDataComponents.set(resultRod, SCDataComponents.TACKLE_SKIN, tackleSkin);
 
@@ -87,7 +89,7 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipeNeo
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries)
+    public ItemStack getResultItem(RegistryAccess registries)
     {
         return result;
     }
@@ -110,7 +112,7 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipeNeo
         return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::hasNoItems);
     }
 
-    public static class Serializer implements RecipeSerializerNeo<FishingRodSkinSmithingRecipe>
+    public static class Serializer implements RecipeSerializer<FishingRodSkinSmithingRecipe>
     {
         public static final MapCodec<FishingRodSkinSmithingRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
                 BackportCodecs.IngredientCodecs.CODEC.fieldOf("template").forGetter((o) -> o.template),
@@ -119,26 +121,26 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipeNeo
                 BackportCodecs.ITEM_STACK_RECIPE.fieldOf("result").forGetter(o -> o.result)
         ).apply(instance, FishingRodSkinSmithingRecipe::new));
 
-        public static final StreamCodec<FishingRodSkinSmithingRecipe> STREAM_CODEC = StreamCodec.of(
-                FishingRodSkinSmithingRecipe.Serializer::toNetworkA, FishingRodSkinSmithingRecipe.Serializer::fromNetwork
-        );
-
-
         @Override
-        public MapCodec<FishingRodSkinSmithingRecipe> codec()
+        public FishingRodSkinSmithingRecipe fromJson(ResourceLocation id, JsonObject json)
         {
-            return CODEC;
+            FishingRodSkinSmithingRecipe recipe = CODEC.codec().parse(JsonOps.INSTANCE, json).getOrThrow(false, s -> {});
+            recipe.id = id;
+            return recipe;
         }
 
         @Override
-        public StreamCodec<FishingRodSkinSmithingRecipe> streamCodec()
+        public FishingRodSkinSmithingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer)
         {
-            return STREAM_CODEC;
+            FishingRodSkinSmithingRecipe recipe = fromNetwork(buffer);
+            recipe.id = id;
+            return recipe;
         }
 
         @Override
-        public RecipeHolder<? extends Container, ? extends Recipe<Container>> recipeHolderFactory(FishingRodSkinSmithingRecipe fishingRodSkinSmithingRecipe, ResourceLocation resourceLocation) {
-            return new SmithingRecipeHolder(fishingRodSkinSmithingRecipe, resourceLocation);
+        public void toNetwork(FriendlyByteBuf buffer, FishingRodSkinSmithingRecipe recipe)
+        {
+            toNetworkA(buffer, recipe);
         }
 
         private static FishingRodSkinSmithingRecipe fromNetwork(FriendlyByteBuf buffer)
