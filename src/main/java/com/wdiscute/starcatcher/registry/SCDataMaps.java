@@ -2,6 +2,8 @@ package com.wdiscute.starcatcher.registry;
 
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.blocks.aquarium.AquariumBlock;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -32,12 +34,27 @@ public class SCDataMaps
             Starcatcher.rl("treasures"), Starcatcher.FISH_REGISTRY_KEY, Treasure.TREASURE_CODEC
     ).synced(Treasure.TREASURE_CODEC, true).build();
 
-
-
+    /**
+     * Forces this class's static initializers (registering all 5 {@link DataMapType}s and their
+     * reload listeners, see {@code DataMapRegistry}) to run — merely calling a static method
+     * triggers {@code <clinit>} regardless of the method body, so nothing else is needed here.
+     * Replaces {@code SCModEvents.registerAttributed(RegisterDataMapTypesEvent)}.
+     */
+    public static void register()
+    {
+    }
 
     public static <T> T getOrDefault(ItemStack stack, DataMapType<Item, T> dataMap, T d)
     {
-        T data = stack.getItemHolder().getData(dataMap);
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        T data = dataMap.get(id);
+        if (data == null) return d;
+        return data;
+    }
+
+    public static <R, T> T getOrDefault(Holder<R> holder, DataMapType<R, T> dataMap, T d)
+    {
+        T data = holder.unwrapKey().map(key -> dataMap.get(key.location())).orElse(null);
         if (data == null) return d;
         return data;
     }

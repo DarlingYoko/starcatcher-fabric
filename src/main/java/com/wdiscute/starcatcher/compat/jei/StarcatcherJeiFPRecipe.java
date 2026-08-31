@@ -131,7 +131,7 @@ public class StarcatcherJeiFPRecipe extends AbstractRecipeCategory<StarcatcherJe
 
 
             Holder<FishProperties> holder = Minecraft.getInstance().level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).wrapAsHolder(fp);
-            Treasure.TreasureInstance data = holder.getData(SCDataMaps.TREASURE);
+            Treasure.TreasureInstance data = SCDataMaps.getOrDefault(holder, SCDataMaps.TREASURE, null);
             if(fp.catchInfo().treasureIs().isEmpty())
             {
                 if (data == null)

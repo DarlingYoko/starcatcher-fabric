@@ -129,7 +129,7 @@ public record FishProperties(
 
         Registry<FishProperties> fishProperties = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY);
 
-        Treasure.TreasureInstance data = fishProperties.wrapAsHolder(this).getData(SCDataMaps.TREASURE);
+        Treasure.TreasureInstance data = SCDataMaps.getOrDefault(fishProperties.wrapAsHolder(this), SCDataMaps.TREASURE, null);
 
         if(data == null) return this;
 

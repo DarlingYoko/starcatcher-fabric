@@ -46,7 +46,7 @@ public class StarcatcherEmiFPRecipe implements EmiRecipe
         this.is = new ItemStack(fp.catchInfo().fish());
 
         Holder<FishProperties> holder = Minecraft.getInstance().level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).wrapAsHolder(fp);
-        Treasure.TreasureInstance data = holder.getData(SCDataMaps.TREASURE);
+        Treasure.TreasureInstance data = SCDataMaps.getOrDefault(holder, SCDataMaps.TREASURE, null);
         if(fp.catchInfo().treasureIs().isEmpty())
         {
             if (data == null)

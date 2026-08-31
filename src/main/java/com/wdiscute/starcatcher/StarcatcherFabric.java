@@ -7,6 +7,7 @@ import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SCCreativeModeTabs;
 import com.wdiscute.starcatcher.registry.SCCriterionTriggers;
 import com.wdiscute.starcatcher.registry.SCCustomRegistries;
+import com.wdiscute.starcatcher.registry.SCDataMaps;
 import com.wdiscute.starcatcher.registry.SCDynamicRegistries;
 import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
@@ -68,13 +69,15 @@ public class StarcatcherFabric implements ModInitializer
         // Dynamic (datapack-driven) fish registry, §5.7.
         SCDynamicRegistries.register(bus);
 
+        // Data maps (§5.6) — reload listeners registered as each DataMapType is built.
+        SCDataMaps.register();
+
         // Server-side events, §6.
         SCEvents.register();
 
         // Attachments (§5.5) register themselves via the cardinal-components-entity
         // entrypoint (SCEntityComponents), not through this bus.
-        // Remaining subsystems (data maps, selling-bin processors) come in P4+ as their
-        // shim layers land.
+        // Remaining subsystems (selling-bin processors) come in P4+ as their shim layers land.
         LOGGER.info("Starcatcher (Fabric) loading");
     }
 }
