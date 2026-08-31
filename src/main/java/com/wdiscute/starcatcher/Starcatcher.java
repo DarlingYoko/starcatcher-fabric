@@ -45,7 +45,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 
@@ -77,15 +76,15 @@ public class Starcatcher
             ResourceKey.createRegistryKey(Starcatcher.rl("bobber_skin"));
 
     //registry
-    public static IForgeRegistry<AbstractFishRestriction> FISH_RESTRICTIONS_REGISTRY;
+    public static Registry<AbstractFishRestriction> FISH_RESTRICTIONS_REGISTRY;
 
-    public static IForgeRegistry<Supplier<AbstractMinigameModifier>> MINIGAME_MODIFIERS_REGISTRY;
+    public static Registry<Supplier<AbstractMinigameModifier>> MINIGAME_MODIFIERS_REGISTRY;
 
-    public static IForgeRegistry<Supplier<? extends AbstractSweetSpotBehaviour>> SWEET_SPOT_BEHAVIOUR_REGISTRY;
+    public static Registry<Supplier<? extends AbstractSweetSpotBehaviour>> SWEET_SPOT_BEHAVIOUR_REGISTRY;
 
-    public static IForgeRegistry<Supplier<AbstractCatchModifier>> CATCH_MODIFIERS_REGISTRY;
+    public static Registry<Supplier<AbstractCatchModifier>> CATCH_MODIFIERS_REGISTRY;
 
-    public static IForgeRegistry<Supplier<AbstractTackleSkin>> TACKLE_SKIN_REGISTRY;
+    public static Registry<Supplier<AbstractTackleSkin>> TACKLE_SKIN_REGISTRY;
 
     public static ResourceLocation rl(String s)
     {

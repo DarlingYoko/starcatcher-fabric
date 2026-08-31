@@ -7,37 +7,46 @@ import com.wdiscute.starcatcher.registry.SCCommands;
 import com.wdiscute.starcatcher.io.SCDataAttachments;
 import com.wdiscute.starcatcher.io.TournamentSavedData;
 import com.wdiscute.starcatcher.io.attachments.FishingGuideAttachment;
-import com.wdiscute.starcatcher.io.network.*;
 import com.wdiscute.starcatcher.registry.SCDataMaps;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.tournament.TournamentHandler;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+/**
+ * Rewritten from a {@code @Mod.EventBusSubscriber(bus = FORGE)} class to plain methods called
+ * from a {@link #register()} wired into {@code StarcatcherFabric.onInitialize()} — see
+ * FABRIC_PORT_PLAN.md §6. {@code modifyItemAttribute} is the one exception: it's genuinely
+ * data-map-dependent (§5.6, not started) and Forge's {@code ItemAttributeModifierEvent} has no
+ * Fabric equivalent at all (per the plan, the fix has to move this logic to stack-build time, a
+ * tick, or resolve data-map values on demand in {@code SCDataComponents.get} instead) — left
+ * broken and unconverted, not this phase's job.
+ */
 public class SCEvents
 {
-
     @SubscribeEvent
     public static void modifyItemAttribute(ItemAttributeModifierEvent event)
     {
@@ -66,64 +75,52 @@ public class SCEvents
 
     }
 
-
-    @SubscribeEvent
-    public static void serverStarted(ServerStartedEvent event)
+    public static void register()
     {
-        TournamentHandler.setAll(TournamentSavedData.get(event.getServer().overworld()).getTournaments());
+        ServerLifecycleEvents.SERVER_STARTED.register(SCEvents::serverStarted);
+        ServerLifecycleEvents.SERVER_STOPPING.register(SCEvents::serverStopping);
+        ServerTickEvents.END_SERVER_TICK.register(TournamentHandler::tick);
+        CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> SCCommands.register(dispatcher, buildContext));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerLoggedIn(handler.player));
+        UseBlockCallback.EVENT.register(SCEvents::dropWormsWhenBonemealing);
     }
 
-    @SubscribeEvent
-    public static void serverStopping(ServerStoppingEvent event)
+    public static void serverStarted(net.minecraft.server.MinecraftServer server)
     {
-        TournamentSavedData.get(event.getServer().overworld()).setTournaments(TournamentHandler.getAll());
+        TournamentHandler.setAll(TournamentSavedData.get(server.overworld()).getTournaments());
     }
 
-    @SubscribeEvent
-    public static void levelTick(TickEvent.ServerTickEvent event)
+    public static void serverStopping(net.minecraft.server.MinecraftServer server)
     {
-        if (event.phase == TickEvent.Phase.END) {
-            TournamentHandler.tick(event);
-        }
+        TournamentSavedData.get(server.overworld()).setTournaments(TournamentHandler.getAll());
     }
 
-    @SubscribeEvent
-    public static void addCommand(RegisterCommandsEvent event)
+    public static void onPlayerLoggedIn(ServerPlayer sp)
     {
-        SCCommands.register(event.getDispatcher(), event.getBuildContext());
-    }
+        //tournament
+        var tournament = TournamentHandler.getTournamentForPlayer(sp);
+        if (tournament != null)
+            TournamentHandler.sendActiveTournamentUpdateToClient(sp, tournament);
+        else
+            TournamentHandler.clearTournamentToClient(sp);
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
-    {
-        if (event.getEntity() instanceof ServerPlayer sp)
+        //guide
+        FishingGuideAttachment fishingGuideAttachment = SCDataAttachments.get(sp, SCDataAttachments.FISHING_GUIDE);
+
+        if (SCConfig.GIVE_GUIDE.get() && !FishingGuideAttachment.getReceivedGuide(sp))
         {
-            //tournament
-            var tournament = TournamentHandler.getTournamentForPlayer(sp);
-            if (tournament != null)
-                TournamentHandler.sendActiveTournamentUpdateToClient(sp, tournament);
-            else
-                TournamentHandler.clearTournamentToClient(sp);
-
-            //guide
-            FishingGuideAttachment fishingGuideAttachment = SCDataAttachments.get(sp, SCDataAttachments.FISHING_GUIDE);
-
-            if (SCConfig.GIVE_GUIDE.get() && !FishingGuideAttachment.getReceivedGuide(sp))
-            {
-                sp.addItem(new ItemStack(SCItems.GUIDE.get()));
-                fishingGuideAttachment.setReceivedGuide(sp, true);
-            }
+            sp.addItem(new ItemStack(SCItems.GUIDE.get()));
+            fishingGuideAttachment.setReceivedGuide(sp, true);
         }
     }
 
 
-    @SubscribeEvent
-    public static void dropWormsWhenBonemealing(PlayerInteractEvent.RightClickBlock event)
+    public static InteractionResult dropWormsWhenBonemealing(Player player, Level level, InteractionHand hand, BlockHitResult hitResult)
     {
-        Level level = event.getLevel();
-        BlockPos pos = event.getPos();
+        BlockPos pos = hitResult.getBlockPos();
+        ItemStack heldItem = player.getItemInHand(hand);
 
-        if (event.getItemStack().is(Items.BONE_MEAL) && level.getBlockState(event.getPos()).getBlock() instanceof FarmBlock)
+        if (heldItem.is(Items.BONE_MEAL) && level.getBlockState(pos).getBlock() instanceof FarmBlock)
         {
             if (!level.isClientSide && SCConfig.ENABLE_BONE_MEAL_ON_FARMLAND_FOR_WORMS.get())
             {
@@ -143,14 +140,16 @@ public class SCEvents
 
                 level.playSound(null, pos, SoundEvents.COMPOSTER_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-                if (event.getEntity() instanceof ServerPlayer player)
+                if (player instanceof ServerPlayer sp)
                 {
-                    player.swing(event.getHand(), true);
-                    if (!player.isCreative())
-                        event.getItemStack().shrink(1);
+                    sp.swing(hand, true);
+                    if (!sp.isCreative())
+                        heldItem.shrink(1);
                 }
             }
         }
+
+        return InteractionResult.PASS;
     }
 
 

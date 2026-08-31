@@ -13,3 +13,8 @@ accessible method net/minecraft/data/registries/RegistriesDatapackGenerator dump
 # RegistryOps.<init> / RegistryOps.lookupProvider
 accessible method net/minecraft/resources/RegistryOps <init> (Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;)V
 accessible field net/minecraft/resources/RegistryOps lookupProvider Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;
+
+# SpawnPlacements.register(...) — private in vanilla; Forge's SpawnPlacementRegisterEvent
+# used to work around this, see FABRIC_PORT_PLAN.md §6. No Fabric API equivalent exists
+# (confirmed absent from every fabric-api module jar), so widen the vanilla method directly.
+accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V

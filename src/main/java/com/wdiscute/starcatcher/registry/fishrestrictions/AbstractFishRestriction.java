@@ -22,7 +22,7 @@ public abstract class AbstractFishRestriction
     public static final Codec<AbstractFishRestriction> ABSTRACT_PROCESSOR_CODEC = ResourceLocation.CODEC
             .dispatch(processor -> processor.getRegistryHolderOrThrow().getId(),
                     loc -> {
-                        AbstractFishRestriction fr = Starcatcher.FISH_RESTRICTIONS_REGISTRY.getValue(loc);
+                        AbstractFishRestriction fr = Starcatcher.FISH_RESTRICTIONS_REGISTRY.get(loc);
                         if (fr == null)
                         {
                             LogUtils.getLogger().error("Fish Restriction {} is not registered! " +

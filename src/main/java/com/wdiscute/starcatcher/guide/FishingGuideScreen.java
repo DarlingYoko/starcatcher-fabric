@@ -51,7 +51,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.utils.FastColorNeo;
 import net.nikdo53.neobackports.utils.ListReverser;
@@ -1540,7 +1540,7 @@ public class FishingGuideScreen extends Screen
         public Sort previous()
         {
             int lenght = vals.length - 2;
-            if (ModList.get().isLoaded("sereneseasons") || ModList.get().isLoaded("eclipticseasons")) lenght += 2;
+            if (FabricLoader.getInstance().isModLoaded("sereneseasons") || FabricLoader.getInstance().isModLoaded("eclipticseasons")) lenght += 2;
 
             if (this.ordinal() == 0) return vals[lenght - 1];
             return vals[(this.ordinal() - 1) % lenght];
@@ -1549,7 +1549,7 @@ public class FishingGuideScreen extends Screen
         public Sort next()
         {
             int lenght = vals.length - 2;
-            if (ModList.get().isLoaded("sereneseasons") || ModList.get().isLoaded("eclipticseasons")) lenght += 2;
+            if (FabricLoader.getInstance().isModLoaded("sereneseasons") || FabricLoader.getInstance().isModLoaded("eclipticseasons")) lenght += 2;
 
             return vals[(this.ordinal() + 1) % lenght];
         }
@@ -2042,9 +2042,9 @@ public class FishingGuideScreen extends Screen
 
     private void displayRecipe(ItemStack stack)
     {
-        if (ModList.get().isLoaded("emi"))
+        if (FabricLoader.getInstance().isModLoaded("emi"))
             StarcatcherEmiPlugin.displayRecipes(stack);
-        else if (ModList.get().isLoaded("jei"))
+        else if (FabricLoader.getInstance().isModLoaded("jei"))
             StarcatcherJeiPlugin.displayRecipes(stack);
     }
 

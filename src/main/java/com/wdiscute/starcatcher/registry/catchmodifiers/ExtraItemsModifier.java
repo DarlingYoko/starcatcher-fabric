@@ -4,7 +4,7 @@ import com.wdiscute.starcatcher.U;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class ExtraItemsModifier extends AbstractCatchModifier
     {
         if(!instance.fpToFish.catchInfo().fishEntryType().equals(FishProperties.CatchInfo.FishEntryType.FISH)) return List.of();
         if (instance.fpToFish.catchInfo().alwaysSpawnEntity() ||
-                ModList.get().isLoaded("fishingreal") ||
+                FabricLoader.getInstance().isModLoaded("fishingreal") ||
                 instance.modifiers.stream().anyMatch(AbstractCatchModifier::forceSpawnEntity) ||
                 !instance.fpToFish.hasGuideEntry()) return List.of();
 

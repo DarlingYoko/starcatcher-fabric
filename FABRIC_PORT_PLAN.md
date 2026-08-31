@@ -1,6 +1,6 @@
 # Starcatcher — Forge 1.20.1 → Fabric 1.20.1 Backport Plan
 
-Status: **P0, P1, P2, and P3 done** — see §13. In progress on branch `fabric-port-1.20.1`. Next: P4 (Events & world systems, §6).
+Status: **P0-P3 done; P4 in progress** — see §13. In progress on branch `fabric-port-1.20.1`. P4's custom registries (§5.1), dynamic registry (§5.7), and server-side events (§6) are done; §5.6 Data Maps is the remaining P4 item.
 Target: Minecraft **1.20.1**, loader **Fabric**
 Source branch: `v2.3-1.20.1` (Forge, MinecraftForge 47.4.0, LegacyForge ModDev)
 Scope: 335 Java files, 719 resource files, 9 lang files, 13 datagen providers, 9 network payloads, 9 screen/menu files.
@@ -99,8 +99,9 @@ Deliverable **met**: `./gradlew tasks` and `./gradlew dependencies --configurati
   - [x] `net.minecraftforge.registries.DeferredRegister<T>` kept as a separate class (thin subclass of `DeferredRegisterTyped<T>`) purely so that import path still resolves — Forge 47.x's own `DeferredRegister` and NeoBackports' `DeferredRegisterTyped` have identical shape in this codebase's actual usage.
   - [x] **`IEventBus` is a deliberate no-op token** ([IEventBus.java](src/main/java/net/minecraftforge/eventbus/api/IEventBus.java)) — Fabric's `ModInitializer` has no staged lifecycle, so `DeferredRegisterTyped.register(bus)` ignores the bus and flushes **synchronously**. This means **call order in `StarcatcherFabric.onInitialize()` now encodes the dependency graph** that Forge's staged `RegisterEvent` firing order used to handle implicitly (blocks before block-items/block-entities, since their suppliers call `SCBlocks.X.get()`). Verified order: Blocks → Items → BlockEntities → Entities → Sounds → Particles → MenuTypes → CreativeModeTabs → CriterionTriggers. `IEventBus.addListener(Consumer)` is a true no-op; the one real call site (`SCCriterionTriggers`, `FMLCommonSetupEvent`) was rewritten to call its logic directly instead (see §6 — this is the only source file P1 had to actually edit, not just shim around).
 - [x] **Verified against the real compiler**, not just by inspection: `./gradlew compileJava` (with `-Xmaxerrs 10000` now set in `build.gradle` for future debugging) shows **zero errors** in `SCBlocks`, `SCItems`, `SCBlockEntities`, `SCEntities`, `SCSounds`, `SCParticles`, `SCMenuTypes`, `SCCreativeModeTabs`, `SCCriterionTriggers`, or `StarcatcherFabric` — confirming `Registry.register(Registry<? super T>, ResourceLocation, T)`, `Registry<T>.wrapAsHolder(T)`, `Registry<T>.key()`, and `BuiltInRegistries.REGISTRY.get(ResourceLocation)` all resolve exactly as assumed against real Mojmap 1.20.1 + Parchment.
-- [ ] **Custom registries** (`FISH_RESTRICTIONS`, `MINIGAME_MODIFIERS`, `SWEET_SPOT_BEHAVIOUR`, `CATCH_MODIFIERS`, `TACKLE_SKIN`) — **not yet wired into `onInitialize`** (deferred to P4 as planned). They already compile fine against the same `DeferredRegisterTyped` shim (it tolerates a `ResourceKey` that doesn't resolve to a real registry *until* `.register(bus)` is actually called) — remaining work is only: replace `ForgeRegistryHelper.create(NewRegistryEvent, …)` with `FabricRegistryBuilder.createSimple(key).buildAndRegister()` at init, drop `IForgeRegistry` fields to `Registry<>`, and call these registries' `.register(bus)` (and the `FabricRegistryBuilder` calls) *before* the `SCXxx` classes that populate them. Rewrite `SCModEvents.addRegistry`.
-- [ ] `ForgeRegistries`/`NeoForgeRegistries` lookups → vanilla `BuiltInRegistries` / `Registries` keys.
+- [x] **Custom registries** (`FISH_RESTRICTIONS`, `MINIGAME_MODIFIERS`, `SWEET_SPOT_BEHAVIOUR`, `CATCH_MODIFIERS`, `TACKLE_SKIN`) — ✅ DONE (2026-09-01, P4). New [SCCustomRegistries.java](src/main/java/com/wdiscute/starcatcher/registry/SCCustomRegistries.java) replaces `SCModEvents.addRegistry` (`NewRegistryEvent`): `FabricRegistryBuilder.createSimple(key).buildAndRegister()` for each of the 5, assigned to `Starcatcher`'s static `_REGISTRY` fields (unavoidably touched — see below). Must run **before** `SCFishRestrictions`/`SCMinigameModifiers`/`SCSweetSpotsBehaviour`/`SCCatchModifiers`/`SCTackleSkins`' own `.register(bus)` calls, since `DeferredRegisterTyped.resolveRegistry()` looks the registry up from `BuiltInRegistries.REGISTRY` by the key's location and throws if it isn't there yet — confirmed by reading that method's actual source rather than assuming. `FabricRegistryBuilder.createSimple(...).buildAndRegister()` registers into `BuiltInRegistries.REGISTRY` early enough (mod init, long before any `RegistryAccess` snapshot at world/server bootstrap) for `level.registryAccess().registryOrThrow(key)` call sites elsewhere to pick the registry up automatically — no changes needed at any of those sites.
+  - **`Starcatcher.java` turned out not to be 100% out-of-scope after all**: its 5 `IForgeRegistry<T>` static fields (`FISH_RESTRICTIONS_REGISTRY` etc.) are genuinely read by 2 in-scope files (`AbstractFishRestriction.getCodecOrThrow`, `AbstractMinigameModifier`'s dispatch codec) — real Forge type `IForgeRegistry` doesn't exist as a shim at all, so those field *declarations* had to change to vanilla `Registry<T>` (and the 2 read sites' `.getValue(loc)` → `.get(loc)`) even though the rest of that file (constructor, `@Mod` annotation, FML imports) stays untouched and broken, same as before. A useful lesson: "leave this whole file alone" calls should be re-checked once a symbol declared in that file turns out to be read from somewhere in-scope — grep the field name project-wide before assuming a file is fully inert.
+- [x] `ForgeRegistries`/`NeoForgeRegistries` lookups → vanilla `BuiltInRegistries` / `Registries` keys — confirmed via grep this was **already done** (no live `ForgeRegistries`/`NeoForgeRegistries` references remain anywhere in the 335-file tree outside the untouched `Starcatcher.java`/datagen files), nothing left to do here.
 
 ### 5.2 Data Components (D1) — ✅ DONE (2026-08-31)
 - [x] **Root problem discovered, not assumed**: `SCDataComponents.set/get/has/remove/getOrDefault` (and a handful of call sites elsewhere) call `stack.set(component.get(), data)` / `stack.get(...)` etc. **as instance methods directly on `ItemStack`** — real NeoForge 1.20.5+/NeoBackports patches vanilla's `ItemStack` class itself to add these. That's fundamentally impossible to reproduce in a Fabric Loom mod: Mixin can inject real bytecode into `ItemStack.class` at runtime, but **javac compiles our source against the unmodified real Mojmap `ItemStack` jar**, entirely before any Mixin transformer runs — there is no mechanism to make `stack.set(...)` compile in arbitrary call-site source files no matter what shim/duck-interface trick is used. So this had to be a **call-site rewrite of the accessor style**, not a shimmed method.
@@ -154,8 +155,8 @@ Deliverable **met**: `./gradlew tasks` and `./gradlew dependencies --configurati
 - [ ] Fallback only if the lib proves insufficient: a datapack-driven reload listener via `ResourceManagerHelper.registerReloadListener`.
 - [ ] The `ItemAttributeModifierEvent` handler (in `SCEvents`) that lazily copies data-map values onto stacks has **no Fabric event** → move this logic to where stacks are built / a tick or an ItemStack mixin, or resolve data-map values on demand in `SCDataComponents.get`.
 
-### 5.7 Datapack registry (`FISH_REGISTRY_KEY`, FishProperties codec)
-- [ ] Replace `DataPackRegistryEvent.NewRegistry` with Fabric **Dynamic Registries**: `DynamicRegistries.register(FISH_REGISTRY_KEY, FishProperties.CODEC)` (+ network codec) at init. Verify client sync of the dynamic registry.
+### 5.7 Datapack registry (`FISH_REGISTRY_KEY`, FishProperties codec) — ✅ DONE (2026-09-01, P4)
+- [x] Replaced `DataPackRegistryEvent.NewRegistry`/`SCModEvents.addDatapackRegistry` with new [SCDynamicRegistries.java](src/main/java/com/wdiscute/starcatcher/registry/SCDynamicRegistries.java): `DynamicRegistries.registerSynced(Starcatcher.FISH_REGISTRY_KEY, FishProperties.CODEC)` (Fabric's single-codec overload — the original Forge call used the same `FishProperties.CODEC` for both the data and network codec slots, so this covers both). Every real call site already reaches `FISH_REGISTRY_KEY` through vanilla `RegistryAccess.registryOrThrow(...)`, so nothing downstream needed to change — confirmed via `javap` on the actual `fabric-registry-sync-v0` module jar (`net.fabricmc.fabric.api.event.registry.DynamicRegistries`), not guessed.
 
 ### 5.8 Misc NeoBackports utils — ✅ DONE (2026-08-31)
 - [x] `FastColorNeo` ([FastColorNeo.java](src/main/java/net/nikdo53/neobackports/utils/FastColorNeo.java)) — delegates red/green/blue/alpha to vanilla `FastColor.ARGB32` (exists natively); adds the one NeoForge-only 2-arg `color(alpha, rgb)` overload vanilla lacks.
@@ -182,22 +183,29 @@ Deliverable **met**: `./gradlew tasks` and `./gradlew dependencies --configurati
 
 ## 6. Events: Forge bus → Fabric callbacks (7 `@SubscribeEvent` files)
 
-Rewrite `event/*` and the two client event classes:
+Server-side/common events (`SCModEvents`, `SCEvents`) — ✅ DONE (2026-09-01, P4), converted to plain methods called from `StarcatcherFabric.onInitialize()` (`SCEntities.registerAttributes/registerSpawnPlacements`, `SCEvents.register()`) instead of a Forge event bus:
+
+| Forge event | Fabric replacement | Status |
+|---|---|---|
+| `SpawnPlacementRegisterEvent` | vanilla `SpawnPlacements.register(...)` at init, widened via **access widener** (`starcatcher.accesswidener`) since it's `private` and — confirmed via full `unzip -l` scan of every fabric-api module jar — **no Fabric API equivalent exists at all** (unlike `FabricDefaultAttributeRegistry`, there's no `FabricSpawnPlacementRegistry`) | ✅ done |
+| `EntityAttributeCreationEvent` | `FabricDefaultAttributeRegistry.register(FISH, FishEntity.createAttributes())` — its `AttributeSupplier.Builder` overload means the original's `.build()` call isn't even needed | ✅ done |
+| `RegisterCommandsEvent` | `CommandRegistrationCallback.EVENT` | ✅ done |
+| `ServerStartedEvent` / `ServerStoppingEvent` | `ServerLifecycleEvents.SERVER_STARTED` / `SERVER_STOPPING` | ✅ done |
+| `TickEvent.ServerTickEvent` (END) | `ServerTickEvents.END_SERVER_TICK` — `TournamentHandler.tick(TickEvent.ServerTickEvent)` flattened to `tick(MinecraftServer)` since `event.getServer()` was the only thing it ever read off the event | ✅ done |
+| `PlayerEvent.PlayerLoggedInEvent` | `ServerPlayConnectionEvents.JOIN` (`handler.player` field for the `ServerPlayer`) | ✅ done |
+| `PlayerInteractEvent.RightClickBlock` (bonemeal→worms) | `UseBlockCallback.EVENT` — returns `InteractionResult.PASS` unconditionally (the original Forge handler never cancelled the event either, purely additive side effects) | ✅ done |
+| `NewRegistryEvent` | §5.1 custom registries, `SCCustomRegistries` | ✅ done |
+| `DataPackRegistryEvent` | §5.7 `SCDynamicRegistries` | ✅ done |
+| `AddPackFindersEvent` (2 built-in datapacks) | `ResourceManagerHelper.registerBuiltinResourcePack(id, container, ...)` | ❌ **blocked, not by a missing shim**: `SCModEvents.addPackFinders` references `com.wdiscute.sellingbin.event.SBevents`, and the entire `com.wdiscute.sellingbin` package **does not exist anywhere in this Fabric port's source tree** — it's the companion Selling-Bin mod, not yet downported (§7bis.3/P8, its own separate task). Nothing to do here until that lands. |
+| `ItemAttributeModifierEvent` | see §5.6 (no direct event) | ❌ not started — §5.6 Data Maps |
+| `RegisterDataMapTypesEvent` | §5.6 custom loader | ❌ not started — §5.6 Data Maps |
+| `RegisterPayloadHandlersEvent` | §5.4 shim registrar at init | ✅ done (P3) |
+| `ModList.get().isLoaded(id)` (16 files, not 14 as originally estimated) | `FabricLoader.getInstance().isModLoaded(id)` | ✅ done (P4) — no mod-id remapping needed anywhere (`"curios"` checks left as literal `"curios"` for now; remapping to `"trinkets"` is part of the separate §8/D5 Curios→Trinkets compat work, not this mechanical API swap) |
+
+Client-side rendering/registration events — **P5 scope, not started** (`SCClientEvents`, `SCClientForgeEvents`, `TooltipEvents` — confirmed by reading all 3 files fully: every method in them registers a renderer/screen/layer/particle-factory/keybind/tooltip-component-factory or reads/writes client-only state; none belong in "events & world systems"):
 
 | Forge event | Fabric replacement |
 |---|---|
-| `SpawnPlacementRegisterEvent` | `SpawnPlacements.register(...)` at init |
-| `EntityAttributeCreationEvent` | `FabricDefaultAttributeRegistry.register(FISH, …)` |
-| `AddPackFindersEvent` (2 built-in datapacks) | `ResourceManagerHelper.registerBuiltinResourcePack(id, container, ...)` |
-| `RegisterCommandsEvent` | `CommandRegistrationCallback.EVENT` |
-| `ServerStartedEvent` / `ServerStoppingEvent` | `ServerLifecycleEvents.SERVER_STARTED` / `SERVER_STOPPING` |
-| `TickEvent.ServerTickEvent` (END) | `ServerTickEvents.END_SERVER_TICK` |
-| `PlayerEvent.PlayerLoggedInEvent` | `ServerPlayConnectionEvents.JOIN` |
-| `PlayerInteractEvent.RightClickBlock` (bonemeal→worms) | `UseBlockCallback.EVENT` |
-| `ItemAttributeModifierEvent` | see §5.6 (no direct event) |
-| `RegisterDataMapTypesEvent` | §5.6 custom loader |
-| `RegisterPayloadHandlersEvent` | §5.4 shim registrar at init |
-| `NewRegistryEvent` / `DataPackRegistryEvent` | §5.1 / §5.7 |
 | Client `EntityRenderersEvent.RegisterRenderers` | `EntityRendererRegistry.register`, `BlockEntityRendererFactories.register` |
 | `RegisterMenuScreensEvent` | `HandledScreens.register` (a.k.a. `MenuScreens`) |
 | `EntityRenderersEvent.RegisterLayerDefinitions` | `EntityModelLayerRegistry.registerModelLayer` |
@@ -205,8 +213,10 @@ Rewrite `event/*` and the two client event classes:
 | Particle providers (`SCParticles`) | `ParticleFactoryRegistry.getInstance().register` |
 | Item properties (`SCItemProperties`) | `ItemProperties.register` in client init |
 | Block/render layers, color handlers (`SCRenderTypes`, `SCColors`) | `BlockRenderLayerMap.INSTANCE.putBlock`, `ColorProviderRegistry` |
+| `RegisterGuiOverlaysEvent` (fish radar, tournament overlay) | `HudRenderCallback` |
+| `InputEvent.Key` | Fabric's key-binding tick/press hooks |
+| `ItemTooltipEvent` | `ItemTooltipCallback` |
 | `DistExecutor`/`@OnlyIn`/`Dist` (12 files) | `@Environment(EnvType.CLIENT)`, `FabricLoader.getEnvironmentType()`, or Porting Lib `EnvExecutor` |
-| `ModList.get().isLoaded(id)` (14 files) | `FabricLoader.getInstance().isModLoaded(id)` (map mod-ids where they differ, e.g. `oculus`→`iris`) |
 
 ---
 
@@ -329,7 +339,7 @@ Note: much of `src/generated/resources` (fish JSON, tags, models) is **loader-ne
 2. **P1 Shim core** — ✅ done (2026-08-31). §5.1 registries/Deferred*, §5.3 codecs, §5.8 misc utils all done and verified against the real compiler (full-project error count 3554→682→619 lines of output across the three sub-phases). `SCItems`/`SCBlocks`/`SCBlockEntities`/`SCEntities`/`SCSounds`/`SCParticles`/`SCMenuTypes`/`SCCreativeModeTabs`/`SCCriterionTriggers`/`SCRecipes` wired into `StarcatcherFabric.onInitialize()`. Custom registries and `ForgeRegistries`/`NeoForgeRegistries` lookups (§5.1's two remaining unchecked boxes) stay deferred to P4 as planned.
 3. **P2 Components & stacks** — ✅ done (2026-09-01). §5.2 (D1) done 2026-08-31 (error count 619→555 including a bundled jsr305 fix); §7 recipes/menus done in §5.8; §7 creative tabs (needed no changes), loot modifiers (`LootTableEvents.MODIFY`), and the self-contained inventory sites (`SimpleContainer`/`Slot`) done 2026-09-01 (error count 555→535). Two inventory sites deliberately deferred — `TackleBoxBlockEntity`'s Forge Capability (needs Fabric Transfer API, not a 1:1 swap) and `CuriosCompat` (needs the Curios→Trinkets swap, §8/D5) — neither blocks anything else. Mixins (§10) not yet reviewed.
 4. **P3 Networking & attachments** — ✅ done (2026-09-01). §5.4 (D4) payload registrar/distributor over Fabric Networking API v1; §5.5 (D2) attachments over Cardinal Components. Error count 535→423 (−112). Mixins (§10) not yet reviewed.
-5. **P4 Events & world systems** — §6, custom registries (§5.1), dynamic registry (§5.7), data maps (§5.6), loot (§7).
+5. **P4 Events & world systems** — 🟡 in progress (2026-09-01). Custom registries (§5.1, `SCCustomRegistries`), dynamic registry (§5.7, `SCDynamicRegistries`), and server-side/common events (§6, `SCModEvents`/`SCEvents`) all done; also flattened `ModList.get().isLoaded(id)` → `FabricLoader.getInstance().isModLoaded(id)` across 16 files (§6's own table item). Error count 423→368 (ModList: 423→403, registries+events: 403→368). Still open: §5.6 Data Maps (needs vendoring Datamaps Refabricated from source, see §5.6/§7bis) and the `ItemAttributeModifierEvent`/`RegisterDataMapTypesEvent`/`AddPackFindersEvent` handlers that depend on it or on the not-yet-downported selling-bin companion mod.
 6. **P5 Client** — renderers, screens, layers, particles, keymaps, item props, colors, tooltips (§4/§6).
 7. **P6 Datagen** — §9 (regenerate & diff data).
 8. **P7 Compat** — §8 modules one by one, gated.

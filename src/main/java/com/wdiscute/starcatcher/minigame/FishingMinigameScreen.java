@@ -32,7 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import org.joml.Quaternionf;
 import org.joml.Vector2d;
@@ -703,7 +703,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 
     public static boolean hasDistantHorizons()
     {
-        return ModList.get().isLoaded("distanthorizons");
+        return FabricLoader.getInstance().isModLoaded("distanthorizons");
     }
 
     public boolean isSettingsScreen()

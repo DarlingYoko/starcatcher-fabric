@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.TickEvent;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.utils.CommonColorsNeo;
 import org.slf4j.Logger;
@@ -112,9 +111,8 @@ public class TournamentHandler
         }
     }
 
-    public static void tick(TickEvent.ServerTickEvent event)
+    public static void tick(MinecraftServer server)
     {
-        MinecraftServer server = event.getServer();
         long levelTicks = server.getTickCount();
         if (levelTicks % 20 != 0) return;
 

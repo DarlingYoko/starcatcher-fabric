@@ -56,7 +56,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemFishedEvent;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
 import net.nikdo53.neobackports.io.utils.NeoForgeStreamCodecs;
@@ -1995,7 +1995,7 @@ public record FishProperties(
         {
             ItemStack fish = new ItemStack(fp.catchInfo().fish());
             //quality food compat
-            if (ModList.get().isLoaded("quality_food"))
+            if (FabricLoader.getInstance().isModLoaded("quality_food"))
                 QualityFoodCompat.addQuality(fish, player, player.level(), golden, perfectCatch, percentile);
             ItemStack bucket = new ItemStack(SCItems.STARCAUGHT_BUCKET.get());
             SCDataComponents.set(fish, SCDataComponents.CAUGHT_FISH_INFO, caughtFishInfo);
@@ -2015,7 +2015,7 @@ public record FishProperties(
             SCDataComponents.set(fish, SCDataComponents.CAUGHT_FISH_INFO, caughtFishInfo);
 
         //quality food compat
-        if (ModList.get().isLoaded("quality_food"))
+        if (FabricLoader.getInstance().isModLoaded("quality_food"))
             QualityFoodCompat.addQuality(fish, player, player.level(), golden, perfectCatch, percentile);
 
         return fish;
@@ -2088,7 +2088,7 @@ public record FishProperties(
                     (
                             fp.catchInfo().alwaysSpawnEntity()
                             || fbe.modifiers.stream().anyMatch(AbstractCatchModifier::forceSpawnEntity)
-                            || ModList.get().isLoaded("fishingreal")
+                            || FabricLoader.getInstance().isModLoaded("fishingreal")
                     )
                 )
                 {

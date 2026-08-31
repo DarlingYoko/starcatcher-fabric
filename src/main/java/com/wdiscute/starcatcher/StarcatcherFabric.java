@@ -2,9 +2,12 @@ package com.wdiscute.starcatcher;
 
 import com.wdiscute.starcatcher.blocks.SCBlockEntities;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
+import com.wdiscute.starcatcher.event.SCEvents;
 import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SCCreativeModeTabs;
 import com.wdiscute.starcatcher.registry.SCCriterionTriggers;
+import com.wdiscute.starcatcher.registry.SCCustomRegistries;
+import com.wdiscute.starcatcher.registry.SCDynamicRegistries;
 import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.SCLootModifiers;
@@ -13,6 +16,11 @@ import com.wdiscute.starcatcher.registry.SCNetworking;
 import com.wdiscute.starcatcher.registry.SCParticles;
 import com.wdiscute.starcatcher.registry.SCRecipes;
 import com.wdiscute.starcatcher.registry.SCSounds;
+import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
+import com.wdiscute.starcatcher.registry.fishrestrictions.SCFishRestrictions;
+import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
+import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
+import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import net.fabricmc.api.ModInitializer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import org.slf4j.Logger;
@@ -37,6 +45,8 @@ public class StarcatcherFabric implements ModInitializer
         SCItems.register(bus);
         SCBlockEntities.register(bus);
         SCEntities.register(bus);
+        SCEntities.registerAttributes();
+        SCEntities.registerSpawnPlacements();
         SCSounds.register(bus);
         SCParticles.register(bus);
         SCMenuTypes.register(bus);
@@ -46,10 +56,25 @@ public class StarcatcherFabric implements ModInitializer
         SCLootModifiers.register(bus);
         SCNetworking.register(bus);
 
+        // Custom registries (§5.1) must exist (FabricRegistryBuilder) before the
+        // DeferredRegisterTyped-backed registries below try to resolve them.
+        SCCustomRegistries.register(bus);
+        SCFishRestrictions.register(bus);
+        SCMinigameModifiers.register(bus);
+        SCSweetSpotsBehaviour.register(bus);
+        SCCatchModifiers.register(bus);
+        SCTackleSkins.register(bus);
+
+        // Dynamic (datapack-driven) fish registry, §5.7.
+        SCDynamicRegistries.register(bus);
+
+        // Server-side events, §6.
+        SCEvents.register();
+
         // Attachments (§5.5) register themselves via the cardinal-components-entity
         // entrypoint (SCEntityComponents), not through this bus.
-        // Remaining subsystems (custom registries, data maps, selling-bin processors)
-        // come in P4+ as their shim layers land.
+        // Remaining subsystems (data maps, selling-bin processors) come in P4+ as their
+        // shim layers land.
         LOGGER.info("Starcatcher (Fabric) loading");
     }
 }

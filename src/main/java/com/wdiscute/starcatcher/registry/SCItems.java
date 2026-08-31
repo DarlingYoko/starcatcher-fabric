@@ -13,7 +13,7 @@ import com.wdiscute.starcatcher.secretnotes.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredItem;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;
@@ -24,7 +24,7 @@ public interface SCItems
     static void registerExtra()
     {
         //this works!
-        if (ModList.get().isLoaded("create"))
+        if (FabricLoader.getInstance().isModLoaded("create"))
         {
             //DeferredItem<Item> FISH = ITEMS_REGISTRY.register("fish", FishItem::new);
         }

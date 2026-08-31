@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.nikdo53.neobackports.event.RegisterMenuScreensEvent;
@@ -54,7 +54,7 @@ public class SCClientEvents
         EntityRenderers.register(SCEntities.FISH.get(), FishRenderer::new);
         event.enqueueWork(SCItemProperties::addCustomItemProperties);
 
-        if (ModList.get().isLoaded("curios"))
+        if (FabricLoader.getInstance().isModLoaded("curios"))
         {
             CuriosEvents.registerRenderers();
         }

@@ -10,7 +10,7 @@ import net.irisshaders.iris.pipeline.WorldRenderingPipeline;
 import net.irisshaders.iris.pipeline.programs.ShaderKey;
 import net.irisshaders.iris.shadows.ShadowRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -87,7 +87,7 @@ public class IrisShadersCompat {
     }
 
     public static boolean isLoaded() {
-        return ModList.get().isLoaded("iris");
+        return FabricLoader.getInstance().isModLoaded("iris");
     }
 
 }

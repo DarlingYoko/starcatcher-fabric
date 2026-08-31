@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class CuriosCompat
 {
     public static boolean isLoaded() {
-        return ModList.get().isLoaded("curios");
+        return FabricLoader.getInstance().isModLoaded("curios");
     }
 
     public static List<ItemStack> getItems(Player player) {

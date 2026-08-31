@@ -16,7 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,7 +74,7 @@ public class SeasonRestriction extends AbstractFishRestriction
     public boolean isEnabled()
     {
         return SCConfig.ENABLE_SEASONS.get() && (
-                ModList.get().isLoaded("sereneseasons") || ModList.get().isLoaded("eclipticseasons"));
+                FabricLoader.getInstance().isModLoaded("sereneseasons") || FabricLoader.getInstance().isModLoaded("eclipticseasons"));
     }
 
     @Override
@@ -83,19 +83,19 @@ public class SeasonRestriction extends AbstractFishRestriction
         Seasons currentSeason = Seasons.ALL;
 
         //Serene Seasons check
-        if (ModList.get().isLoaded("sereneseasons") && SCConfig.ENABLE_SEASONS.get())
+        if (FabricLoader.getInstance().isModLoaded("sereneseasons") && SCConfig.ENABLE_SEASONS.get())
         {
             currentSeason = SereneSeasonsCompat.getSeason(level);
         }
 
         //Ecliptic Seasons check
-        if (ModList.get().isLoaded("eclipticseasons") && SCConfig.ENABLE_SEASONS.get())
+        if (FabricLoader.getInstance().isModLoaded("eclipticseasons") && SCConfig.ENABLE_SEASONS.get())
         {
             currentSeason = EclipticSeasonsCompat.getSeason(level);
         }
 
         //TerraFirmaCraft Seasons check
-        if (ModList.get().isLoaded("tfc") && SCConfig.ENABLE_SEASONS.get())
+        if (FabricLoader.getInstance().isModLoaded("tfc") && SCConfig.ENABLE_SEASONS.get())
         {
             currentSeason = TerraFirmaCraftSeasonsCompat.getSeason(level);
         }

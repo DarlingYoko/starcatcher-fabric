@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.*;
@@ -126,7 +126,7 @@ public interface SCCatchModifiers
         player.getInventory().armor.forEach(o -> rls.addAll(getCatchModifiersRLs(o)));
 
         //curios
-        if (ModList.get().isLoaded("curios"))
+        if (FabricLoader.getInstance().isModLoaded("curios"))
         {
             CuriosCompat.getItems(player).forEach(o -> rls.addAll(getCatchModifiersRLs(o)));
         }

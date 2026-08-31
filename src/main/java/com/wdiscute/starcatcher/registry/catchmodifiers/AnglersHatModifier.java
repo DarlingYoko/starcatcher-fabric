@@ -5,7 +5,7 @@ import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
     public boolean forceAwardTreasure(com.wdiscute.starcatcher.bobberentity.FishingBobEntity fbe, int time, boolean completedTreasure, boolean perfectCatch, int hits)
     {
         if (completedTreasure) return false;
-        if (ModList.get().isLoaded("reliquified_artifacts"))
+        if (FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
         {
             return ReliquifiedArtifactsCompat.shouldAwardBonusTreasure(instance.player);
         }
@@ -30,7 +30,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
                 !instance.fpToFish.hasGuideEntry() || instance.fpToFish.catchInfo().fishEntryType()
                 .equals(FishProperties.CatchInfo.FishEntryType.FISH)) return List.of();
 
-        if (ModList.get().isLoaded("reliquified_artifacts"))
+        if (FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
         {
             return ReliquifiedArtifactsCompat.getBonusCatchItems(player, instance);
         }
@@ -40,7 +40,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
     @Override
     public void onSuccessfulMinigameCompletion(ServerPlayer player, int time, boolean completedTreasure, boolean perfectCatch, int hits)
     {
-        if (ModList.get().isLoaded("reliquified_artifacts"))
+        if (FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
         {
             ReliquifiedArtifactsCompat.awardRelicXP(player, completedTreasure);
         }
@@ -50,7 +50,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
 //    @Override
 //    public int adjustMinTicksToFish(int minTicksToFish)
 //    {
-//        if (!ModList.get().isLoaded("reliquified_artifacts"))
+//        if (!FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
 //        {
 //            return (int) (minTicksToFish * 0.8f);
 //        }
@@ -60,7 +60,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
 //    @Override
 //    public int adjustMaxTicksToFish(int maxTicksToFish)
 //    {
-//        if (!ModList.get().isLoaded("reliquified_artifacts"))
+//        if (!FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
 //        {
 //            return (int) (maxTicksToFish * 0.8f);
 //        }
@@ -70,7 +70,7 @@ public class AnglersHatModifier extends AbstractCatchModifier
 //    @Override
 //    public float adjustChanceToFishEachTick(float chanceToFishEachTick)
 //    {
-//        if (!ModList.get().isLoaded("reliquified_artifacts"))
+//        if (!FabricLoader.getInstance().isModLoaded("reliquified_artifacts"))
 //        {
 //            return chanceToFishEachTick * 1.2f;
 //        }

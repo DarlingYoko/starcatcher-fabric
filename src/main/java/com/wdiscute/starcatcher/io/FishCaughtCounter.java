@@ -12,7 +12,7 @@ import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
@@ -139,7 +139,7 @@ public record FishCaughtCounter(
     public static void awardFishCaughtCounter(FishProperties fpCaught, ResourceLocation rl, Player player, int ticks, int size, int weight, float percentile, boolean perfectCatch, boolean awardToTeam, boolean golden)
     {
         //ftb teams compat to share fishes caught to team, does not share size and weight
-        if (ModList.get().isLoaded("ftbteams") && awardToTeam && SCConfig.ENABLE_FTB_TEAM_SHARING.get())
+        if (FabricLoader.getInstance().isModLoaded("ftbteams") && awardToTeam && SCConfig.ENABLE_FTB_TEAM_SHARING.get())
         {
             FTBTeamsCompat.awardToTeam(player, fpCaught);
             return;
