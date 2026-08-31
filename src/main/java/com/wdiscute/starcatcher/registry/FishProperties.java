@@ -2199,7 +2199,7 @@ public record FishProperties(
             fbe.kill();
         }
 
-        SCDataAttachments.remove(player, SCDataAttachments.FISHING_BOB.get());
+        SCDataAttachments.remove(player, SCDataAttachments.FISHING_BOB);
     }
 
     private static ItemStack getFishedItemStackFromFPForStarcatcherFishEntitySpecifically(FishProperties fp, int size, int weight, float percentile, boolean golden)

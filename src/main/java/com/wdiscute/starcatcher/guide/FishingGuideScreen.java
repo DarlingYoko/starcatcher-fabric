@@ -52,7 +52,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.utils.FastColorNeo;
 import net.nikdo53.neobackports.utils.ListReverser;

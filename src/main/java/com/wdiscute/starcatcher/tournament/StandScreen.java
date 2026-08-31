@@ -12,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.screen.BlurScreenBackports;
 import net.nikdo53.neobackports.screen.BlurShaderLoader;

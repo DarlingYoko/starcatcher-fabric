@@ -59,7 +59,7 @@ public class StarcatcherFishingRodItem extends Item implements MenuProvider
             return InteractionResultHolder.fail(is);
         }
 
-        FishingBobAttachment fishingBobAttachment = SCDataAttachments.get(player, SCDataAttachments.FISHING_BOB.get());
+        FishingBobAttachment fishingBobAttachment = SCDataAttachments.get(player, SCDataAttachments.FISHING_BOB);
         if (player.isCrouching() && fishingBobAttachment.isEmpty() && SCConfig.ENABLE_ROD_MENU.get())
         {
             player.openMenu(this);
@@ -83,7 +83,7 @@ public class StarcatcherFishingRodItem extends Item implements MenuProvider
 
                 fishingBobAttachment.setUuid(player, entity.getUUID());
                 if(SCDataComponents.has(is, SCDataComponents.TACKLE_SKIN))
-                    SCDataAttachments.set(entity, SCDataAttachments.TACKLE_SKIN.get(), SCDataComponents.get(is, SCDataComponents.TACKLE_SKIN));
+                    SCDataAttachments.set(entity, SCDataAttachments.TACKLE_SKIN, SCDataComponents.get(is, SCDataComponents.TACKLE_SKIN));
             }
         }
         else
@@ -100,7 +100,7 @@ public class StarcatcherFishingRodItem extends Item implements MenuProvider
                         SCTackleSkins.get(player.level(), player.getItemInHand(hand)).onRetrieve(player);
 
                         fbe.kill();
-                        SCDataAttachments.remove(player, SCDataAttachments.FISHING_BOB.get());
+                        SCDataAttachments.remove(player, SCDataAttachments.FISHING_BOB);
                         break;
                     }
                 }

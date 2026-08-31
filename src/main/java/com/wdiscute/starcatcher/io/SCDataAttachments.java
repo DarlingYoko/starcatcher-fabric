@@ -3,105 +3,62 @@ package com.wdiscute.starcatcher.io;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.io.attachments.FishingBobAttachment;
 import com.wdiscute.starcatcher.io.attachments.FishingGuideAttachment;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.nikdo53.neobackports.io.attachment.AdvancedCapabilityType;
-import net.nikdo53.neobackports.io.attachment.AttachmentType;
-import net.nikdo53.neobackports.io.attachment.DataAttachment;
-import net.nikdo53.neobackports.io.attachment.DataAttachmentRegistry;
-import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
-import net.nikdo53.neobackports.registry.NeoForgeRegistries;
+import net.nikdo53.neobackports.io.attachment.AttachmentComponent;
 
-import java.util.function.Supplier;
-
+/**
+ * Rewritten on top of Cardinal Components (real per-holder component storage + auto-sync) — see
+ * FABRIC_PORT_PLAN.md §5.5. There is no Fabric equivalent of NeoForge's vanilla-patched
+ * {@code Entity.getData/setData/removeData} instance methods (same javac-vs-Mixin-timing
+ * impossibility as §5.2's {@code ItemStack} data components), so every call site is flattened
+ * to this static facade instead. The actual factories (default values, codecs) are registered in
+ * {@link com.wdiscute.starcatcher.io.attachments.SCEntityComponents}, a Cardinal Components
+ * {@code EntityComponentInitializer} entrypoint — CCA registration doesn't go through the mod's
+ * own {@code IEventBus} token at all, so there is no {@code register(IEventBus)} method here
+ * (the original had one for {@code DeferredRegister}, called only from the untouched, already
+ * out-of-scope Forge {@code Starcatcher} class).
+ */
 public class SCDataAttachments
 {
-    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(
-            NeoForgeRegistries.ATTACHMENT_TYPES, Starcatcher.MOD_ID);
+    @SuppressWarnings("unchecked")
+    public static final ComponentKey<AttachmentComponent<FishingBobAttachment>> FISHING_BOB =
+            ComponentRegistry.getOrCreate(Starcatcher.rl("fishing_bob"), (Class<AttachmentComponent<FishingBobAttachment>>) (Class<?>) AttachmentComponent.class);
 
+    @SuppressWarnings("unchecked")
+    public static final ComponentKey<AttachmentComponent<FishingGuideAttachment>> FISHING_GUIDE =
+            ComponentRegistry.getOrCreate(Starcatcher.rl("fishing_guide"), (Class<AttachmentComponent<FishingGuideAttachment>>) (Class<?>) AttachmentComponent.class);
 
-    public static class FishingBobAttachmentCap extends DataAttachment<FishingBobAttachment>{}
-    public static final Capability<FishingBobAttachmentCap> FISHING_BOB_CAP = CapabilityManager.get(new CapabilityToken<>() {});
+    @SuppressWarnings("unchecked")
+    public static final ComponentKey<AttachmentComponent<ResourceLocation>> TACKLE_SKIN =
+            ComponentRegistry.getOrCreate(Starcatcher.rl("tackle_skin"), (Class<AttachmentComponent<ResourceLocation>>) (Class<?>) AttachmentComponent.class);
 
-    public static final Supplier<AttachmentType<FishingBobAttachment>> FISHING_BOB = ATTACHMENT_TYPES.register(
-            "fishing_bob", () -> AttachmentType.builder(FISHING_BOB_CAP, () -> new FishingBobAttachment(""))
-                    .sync(FishingBobAttachment.STREAM_CODEC)
-                    .canAttachTo(AdvancedCapabilityType.NON_LIVING_ENTITY, AdvancedCapabilityType.PLAYER)
-                    .build()
-    );
-
-
-    public static class FishingGuideAttachmentCap extends DataAttachment<FishingGuideAttachment>{}
-    public static final Capability<FishingGuideAttachmentCap> FISHING_GUIDE_CAP = CapabilityManager.get(new CapabilityToken<>() {});
-
-    public static final Supplier<AttachmentType<FishingGuideAttachment>> FISHING_GUIDE = ATTACHMENT_TYPES.register(
-            "fishing_guide", () -> AttachmentType.builder(FISHING_GUIDE_CAP, FishingGuideAttachment::createDefault)
-                    .serialize(FishingGuideAttachment.CODEC)
-                    .sync(FishingGuideAttachment.STREAM_CODEC)
-                    .canAttachTo(AdvancedCapabilityType.PLAYER)
-                    .copyOnDeath()
-                    .build()
-    );
-
-    public static class TackleSkinAttachmentCap extends DataAttachment<ResourceLocation>{}
-    public static final Capability<TackleSkinAttachmentCap> TACKLE_SKIN_CAP = CapabilityManager.get(new CapabilityToken<>() {});
-
-    public static final Supplier<AttachmentType<ResourceLocation>> TACKLE_SKIN = ATTACHMENT_TYPES.register(
-            "tackle_skin", () ->
-                    AttachmentType.builder(TACKLE_SKIN_CAP, () -> Starcatcher.rl("base"))
-                            .serialize(ResourceLocation.CODEC)
-                            .canAttachTo(AdvancedCapabilityType.NON_LIVING_ENTITY)
-                            .sync(ByteBufCodecs.RESOURCE_LOCATION)
-                            .build()
-    );
-
-
-    // sets the value to default
-    public static <T> void remove(Entity holder, Supplier<AttachmentType<T>> attachmentType)
+    public static <T> T get(Entity holder, ComponentKey<AttachmentComponent<T>> key)
     {
-        if(holder == null) return;
-        holder.removeData(attachmentType);
+        if (holder == null) throw new RuntimeException("Called Starcatcher DataAttachments Get() with a null entity");
+        return key.get(holder).get();
     }
 
-    // sets the value to default
-    public static <T> void remove(Entity holder, AttachmentType<T> attachmentType)
+    // resets the value to default
+    public static <T> void remove(Entity holder, ComponentKey<AttachmentComponent<T>> key)
     {
-        if(holder == null) return;
-        holder.removeData(attachmentType);
+        if (holder == null) return;
+        key.get(holder).reset();
+        key.sync(holder);
     }
 
-    public static <T> void set(Entity holder, Supplier<AttachmentType<T>> attachmentType, T data)
+    public static <T> void set(Entity holder, ComponentKey<AttachmentComponent<T>> key, T data)
     {
-        if(holder == null) return;
-        holder.setData(attachmentType, data);
+        if (holder == null) return;
+        key.get(holder).set(data);
+        key.sync(holder);
     }
 
-    public static <T> void set(Entity holder, AttachmentType<T> attachmentType, T data)
+    public static void sync(Entity holder, ComponentKey<? extends AutoSyncedComponent> key)
     {
-        if(holder == null) return;
-        holder.setData(attachmentType, data);
+        key.sync(holder);
     }
-
-    public static <T> T get(Entity holder, Supplier<AttachmentType<T>> attachmentType)
-    {
-        if(holder == null) throw new RuntimeException("Called Starcatcher DataAttachments Get() with a null entity");
-        return holder.getData(attachmentType);
-    }
-
-    public static <T> T get(Entity holder, AttachmentType<T> attachmentType)
-    {
-        if(holder == null) throw new RuntimeException("Called Starcatcher DataAttachments Get() with a null entity");
-        return holder.getData(attachmentType);
-    }
-
-    public static void register(IEventBus eventBus)
-    {
-        ATTACHMENT_TYPES.register(eventBus);
-    }
-
 }

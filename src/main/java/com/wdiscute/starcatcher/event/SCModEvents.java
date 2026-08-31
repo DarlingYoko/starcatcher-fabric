@@ -3,10 +3,6 @@ package com.wdiscute.starcatcher.event;
 import com.wdiscute.sellingbin.event.SBevents;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
-import com.wdiscute.starcatcher.io.network.*;
-import com.wdiscute.starcatcher.io.network.tournament.CBActiveTournamentUpdatePayload;
-import com.wdiscute.starcatcher.io.network.tournament.CBClearTournamentPayload;
-import com.wdiscute.starcatcher.io.network.tournament.SBStandTournamentNameChangePayload;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import com.wdiscute.starcatcher.registry.SCDataMaps;
 import com.wdiscute.starcatcher.registry.SCEntities;
@@ -24,8 +20,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.nikdo53.neobackports.event.RegisterDataMapTypesEvent;
-import net.nikdo53.neobackports.event.RegisterPayloadHandlersEvent;
-import net.nikdo53.neobackports.io.networking.PayloadRegistrar;
 import net.nikdo53.neobackports.registry.ForgeRegistryHelper;
 
 @Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -88,65 +82,6 @@ public class SCModEvents {
         ForgeRegistryHelper.getInstance(Starcatcher.FISH_RESTRICTIONS)
                 .create(event, reg -> Starcatcher.FISH_RESTRICTIONS_REGISTRY = reg);
 
-    }
-
-    @SubscribeEvent
-    public static void registerPayloads(final RegisterPayloadHandlersEvent event)
-    {
-        final PayloadRegistrar registrar = event.registrar("1", Starcatcher.MOD_ID);
-        registrar.playToClient(
-                FishingStartedPayload.TYPE,
-                FishingStartedPayload.STREAM_CODEC,
-                FishingStartedPayload::handle
-        );
-
-        registrar.playToServer(
-                FishingCompletedPayload.TYPE,
-                FishingCompletedPayload.STREAM_CODEC,
-                FishingCompletedPayload::handle
-        );
-
-        registrar.playToClient(
-                FishCaughtPayload.TYPE,
-                FishCaughtPayload.STREAM_CODEC,
-                FishCaughtPayload::handle
-        );
-
-        registrar.playToServer(
-                FPsSeenPayload.TYPE,
-                FPsSeenPayload.STREAM_CODEC,
-                FPsSeenPayload::handle
-        );
-
-        registrar.playToServer(
-                SBStandTournamentNameChangePayload.TYPE,
-                SBStandTournamentNameChangePayload.STREAM_CODEC,
-                SBStandTournamentNameChangePayload::handle
-        );
-
-        registrar.playToClient(
-                CBActiveTournamentUpdatePayload.TYPE,
-                CBActiveTournamentUpdatePayload.STREAM_CODEC,
-                CBActiveTournamentUpdatePayload::handle
-        );
-
-        registrar.playToClient(
-                CBClearTournamentPayload.TYPE,
-                CBClearTournamentPayload.STREAM_CODEC,
-                CBClearTournamentPayload::handle
-        );
-
-        registrar.playToServer(
-                SetMessagePayload.TYPE,
-                SetMessagePayload.STREAM_CODEC,
-                SetMessagePayload::handle
-        );
-
-        registrar.playToServer(
-                SignGuidePayload.TYPE,
-                SignGuidePayload.STREAM_CODEC,
-                SignGuidePayload::handle
-        );
     }
 
     @SubscribeEvent

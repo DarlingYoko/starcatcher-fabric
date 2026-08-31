@@ -9,7 +9,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 
 import java.util.ArrayList;

@@ -10,7 +10,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.utils.CommonColorsNeo;
 import org.slf4j.Logger;

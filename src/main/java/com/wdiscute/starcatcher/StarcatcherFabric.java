@@ -9,6 +9,7 @@ import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.SCLootModifiers;
 import com.wdiscute.starcatcher.registry.SCMenuTypes;
+import com.wdiscute.starcatcher.registry.SCNetworking;
 import com.wdiscute.starcatcher.registry.SCParticles;
 import com.wdiscute.starcatcher.registry.SCRecipes;
 import com.wdiscute.starcatcher.registry.SCSounds;
@@ -43,9 +44,12 @@ public class StarcatcherFabric implements ModInitializer
         SCCriterionTriggers.register(bus);
         SCRecipes.register(bus);
         SCLootModifiers.register(bus);
+        SCNetworking.register(bus);
 
-        // Remaining subsystems (custom registries, attachments, payloads, data maps,
-        // selling-bin processors) come in P3-P4 as their shim layers land.
+        // Attachments (§5.5) register themselves via the cardinal-components-entity
+        // entrypoint (SCEntityComponents), not through this bus.
+        // Remaining subsystems (custom registries, data maps, selling-bin processors)
+        // come in P4+ as their shim layers land.
         LOGGER.info("Starcatcher (Fabric) loading");
     }
 }

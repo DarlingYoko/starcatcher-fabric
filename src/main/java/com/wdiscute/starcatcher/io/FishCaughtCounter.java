@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;

@@ -41,9 +41,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PacketDistributor;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
-import org.antlr.v4.codegen.model.Sync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

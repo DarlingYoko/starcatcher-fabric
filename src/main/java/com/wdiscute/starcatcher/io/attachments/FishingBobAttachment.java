@@ -3,8 +3,7 @@ package com.wdiscute.starcatcher.io.attachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.io.SCDataAttachments;
-import net.minecraftforge.common.capabilities.CapabilityProvider;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraft.world.entity.Entity;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
 
@@ -35,10 +34,9 @@ public class FishingBobAttachment
         return uuid.isEmpty();
     }
 
-    public void setUuid(CapabilityProvider holder, UUID uuid) {
+    public void setUuid(Entity holder, UUID uuid) {
         this.uuid = uuid.toString();
-        holder.setData(SCDataAttachments.FISHING_BOB, new FishingBobAttachment(this.uuid));
-    //    holder.syncData(SCDataAttachments.FISHING_BOB);
+        SCDataAttachments.set(holder, SCDataAttachments.FISHING_BOB, new FishingBobAttachment(this.uuid));
     }
 
     public UUID getUuid()

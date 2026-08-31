@@ -50,7 +50,7 @@ public class FishingGuideAttachment {
     public static void setFishesCaught(Player player, Map<ResourceLocation, FishCaughtCounter> fishesCaught) {
         FishingGuideAttachment fishingGuideAttachment = get(player);
         fishingGuideAttachment.fishesCaught = fishesCaught;
-        player.setData(SCDataAttachments.FISHING_GUIDE, fishingGuideAttachment);
+        SCDataAttachments.set(player, SCDataAttachments.FISHING_GUIDE, fishingGuideAttachment);
     }
 
     public static boolean getReceivedGuide(Player player) {
@@ -59,15 +59,15 @@ public class FishingGuideAttachment {
 
     public void setReceivedGuide(Player player, boolean receivedGuide) {
         this.receivedGuide = receivedGuide;
-        player.setData(SCDataAttachments.FISHING_GUIDE, this);;
+        SCDataAttachments.set(player, SCDataAttachments.FISHING_GUIDE, this);
     }
 
     public static FishingGuideAttachment get(Entity holder){
-        return holder.getData(SCDataAttachments.FISHING_GUIDE);
+        return SCDataAttachments.get(holder, SCDataAttachments.FISHING_GUIDE);
     }
 
     public static void sync(Player player){
-        player.syncData(SCDataAttachments.FISHING_GUIDE);
+        SCDataAttachments.sync(player, SCDataAttachments.FISHING_GUIDE);
     }
 
 }

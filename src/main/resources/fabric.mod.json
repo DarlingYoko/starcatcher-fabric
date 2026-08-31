@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"com.wdiscute.starcatcher.StarcatcherFabricClient"
+		],
+		"cardinal-components-entity": [
+			"com.wdiscute.starcatcher.io.attachments.SCEntityComponents"
 		]
 	},
 	"mixins": [
