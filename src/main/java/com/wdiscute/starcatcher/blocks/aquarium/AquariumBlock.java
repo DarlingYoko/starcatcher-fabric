@@ -254,14 +254,14 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
         bs = bs.setValue(WATERLOGGED, true);
         bs = bs.setValue(DECORATION, Decoration.NOTHING);
         bs = bs.setValue(GROUND, Ground.NOTHING);
-        if (!level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM)) bs = bs.setValue(GROUND, Ground.SAND);
+        if (!level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM.get())) bs = bs.setValue(GROUND, Ground.SAND);
 
-        bs = bs.setValue(BOTTOM, level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM));
-        bs = bs.setValue(TOP, level.getBlockState(pos.above()).is(SCBlocks.AQUARIUM));
-        bs = bs.setValue(EAST, level.getBlockState(pos.east()).is(SCBlocks.AQUARIUM));
-        bs = bs.setValue(WEST, level.getBlockState(pos.west()).is(SCBlocks.AQUARIUM));
-        bs = bs.setValue(NORTH, level.getBlockState(pos.north()).is(SCBlocks.AQUARIUM));
-        bs = bs.setValue(SOUTH, level.getBlockState(pos.south()).is(SCBlocks.AQUARIUM));
+        bs = bs.setValue(BOTTOM, level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM.get()));
+        bs = bs.setValue(TOP, level.getBlockState(pos.above()).is(SCBlocks.AQUARIUM.get()));
+        bs = bs.setValue(EAST, level.getBlockState(pos.east()).is(SCBlocks.AQUARIUM.get()));
+        bs = bs.setValue(WEST, level.getBlockState(pos.west()).is(SCBlocks.AQUARIUM.get()));
+        bs = bs.setValue(NORTH, level.getBlockState(pos.north()).is(SCBlocks.AQUARIUM.get()));
+        bs = bs.setValue(SOUTH, level.getBlockState(pos.south()).is(SCBlocks.AQUARIUM.get()));
 
         return bs;
     }
@@ -282,29 +282,29 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
         Ground ground = state.getValue(GROUND);
 
         BlockState stateBellow = level.getBlockState(pos.below());
-        Decoration decorationBelow = stateBellow.is(SCBlocks.AQUARIUM) ? stateBellow.getValue(DECORATION) : Decoration.NOTHING;
-        Ground groundBelow = stateBellow.is(SCBlocks.AQUARIUM) ? stateBellow.getValue(GROUND) : Ground.NOTHING;
+        Decoration decorationBelow = stateBellow.is(SCBlocks.AQUARIUM.get()) ? stateBellow.getValue(DECORATION) : Decoration.NOTHING;
+        Ground groundBelow = stateBellow.is(SCBlocks.AQUARIUM.get()) ? stateBellow.getValue(GROUND) : Ground.NOTHING;
 
         BlockState stateAbove = level.getBlockState(pos.above());
-        Decoration decorationAbove = stateAbove.is(SCBlocks.AQUARIUM) ? stateAbove.getValue(DECORATION) : Decoration.NOTHING;
+        Decoration decorationAbove = stateAbove.is(SCBlocks.AQUARIUM.get()) ? stateAbove.getValue(DECORATION) : Decoration.NOTHING;
 
         //update connections
-        state = state.setValue(BOTTOM, level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM));
-        state = state.setValue(TOP, level.getBlockState(pos.above()).is(SCBlocks.AQUARIUM));
-        state = state.setValue(EAST, level.getBlockState(pos.east()).is(SCBlocks.AQUARIUM));
-        state = state.setValue(WEST, level.getBlockState(pos.west()).is(SCBlocks.AQUARIUM));
-        state = state.setValue(NORTH, level.getBlockState(pos.north()).is(SCBlocks.AQUARIUM));
-        state = state.setValue(SOUTH, level.getBlockState(pos.south()).is(SCBlocks.AQUARIUM));
+        state = state.setValue(BOTTOM, level.getBlockState(pos.below()).is(SCBlocks.AQUARIUM.get()));
+        state = state.setValue(TOP, level.getBlockState(pos.above()).is(SCBlocks.AQUARIUM.get()));
+        state = state.setValue(EAST, level.getBlockState(pos.east()).is(SCBlocks.AQUARIUM.get()));
+        state = state.setValue(WEST, level.getBlockState(pos.west()).is(SCBlocks.AQUARIUM.get()));
+        state = state.setValue(NORTH, level.getBlockState(pos.north()).is(SCBlocks.AQUARIUM.get()));
+        state = state.setValue(SOUTH, level.getBlockState(pos.south()).is(SCBlocks.AQUARIUM.get()));
 
         level.setBlockAndUpdate(pos, state);
 
         //update ground
         if (!ground.isEmpty())
-            if (stateBellow.is(SCBlocks.AQUARIUM))
+            if (stateBellow.is(SCBlocks.AQUARIUM.get()))
                 level.setBlockAndUpdate(pos, state.setValue(GROUND, Ground.NOTHING));
 
         if (ground.isEmpty())
-            if (!stateBellow.is(SCBlocks.AQUARIUM))
+            if (!stateBellow.is(SCBlocks.AQUARIUM.get()))
                 level.setBlockAndUpdate(pos, state.setValue(GROUND, Ground.SAND));
 
         //update kelp top
@@ -492,7 +492,7 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
                 return l.setBlockAndUpdate(bp, bs.setValue(DECORATION, Decoration.KELP_TOP));
 
             BlockState stateUnder = l.getBlockState(bp.below());
-            if (stateUnder.is(SCBlocks.AQUARIUM))
+            if (stateUnder.is(SCBlocks.AQUARIUM.get()))
                 if (stateUnder.getValue(DECORATION) == Decoration.KELP_TOP)
                 {
                     l.setBlockAndUpdate(bp.below(), stateUnder.setValue(DECORATION, Decoration.KELP));

@@ -2,6 +2,7 @@ package com.wdiscute.starcatcher.blocks;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +40,7 @@ public class ConchBlock extends HorizontalDirectionalBlock implements SimpleWate
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
         playerDestroy(level, player, pos, state, null, player.getItemBySlot(EquipmentSlot.MAINHAND));
         level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

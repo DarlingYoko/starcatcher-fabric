@@ -67,7 +67,7 @@ public class AquariumBlockEntity extends BlockEntity implements TickableBlockEnt
         for (int i = 0; i < 5; i++)
         {
             BlockState bsToMoveTo = level.getBlockState(bpToMoveTo.relative(dir));
-            if (bsToMoveTo.is(SCBlocks.AQUARIUM) && level.random.nextFloat() > 0.5f)
+            if (bsToMoveTo.is(SCBlocks.AQUARIUM.get()) && level.random.nextFloat() > 0.5f)
             {
                 //only move if decoration allows swimming inside
                 if(bsToMoveTo.getValue(AquariumBlock.DECORATION).canFishSwimInside) bpToMoveTo = bpToMoveTo.relative(dir);

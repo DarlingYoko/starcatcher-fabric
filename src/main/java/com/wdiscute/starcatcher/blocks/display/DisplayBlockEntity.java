@@ -207,7 +207,7 @@ public class DisplayBlockEntity extends BlockEntity
     {
         item = ItemStack.EMPTY;
         BlockState blockState = level.getBlockState(getBlockPos());
-        if (blockState.is(SCBlocks.DISPLAY))
+        if (blockState.is(SCBlocks.DISPLAY.get()))
             level.setBlockAndUpdate(getBlockPos(), blockState.setValue(DisplayBlock.HAS_ITEM, false));
 
         sync();
