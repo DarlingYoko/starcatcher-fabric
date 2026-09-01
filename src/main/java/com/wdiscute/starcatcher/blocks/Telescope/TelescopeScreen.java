@@ -161,12 +161,6 @@ public class TelescopeScreen extends Screen
         guiGraphics.fill(width / 2 - 2, height / 2 - 2, width / 2 + 2, height / 2 + 2, 0xffff0000);
 
         pose.popPose();
-
-        pose.pushPose();
-        pose.scale(3, 3, 3);
-        guiGraphics.drawString(this.font, "rendered " + number + " stars", 0, 0, 0xffffffff);
-        guiGraphics.drawString(this.font, "fps: " + fps, 0, 10, 0xffffffff);
-        pose.popPose();
     }
 
     @Override
