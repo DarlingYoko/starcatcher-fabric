@@ -1,6 +1,7 @@
 package net.nikdo53.neobackports.io.networking;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,15 +34,31 @@ public class PayloadRegistrar
         CODECS.put(type.id(), codec);
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
-        {
-            ClientPlayNetworking.registerGlobalReceiver(type.id(), (client, listener, buf, sender) ->
-            {
-                T payload = codec.decode(buf);
-                handler.accept(payload, new PayloadContextImpl(client.player, client));
-            });
-        }
+            registerClientReceiver(type, codec, handler);
 
         return this;
+    }
+
+    /**
+     * Split out of {@link #playToClient} so the {@code ClientPlayNetworking}/{@code Minecraft}-typed
+     * lambda body never ends up in {@code playToClient}'s own bytecode: {@code playToClient} runs on
+     * both sides (called unconditionally from common init), so a client-only lambda inlined directly
+     * there would still be present in the class file's constant pool/verification data on a dedicated
+     * server even though the runtime `if` guard means it's never invoked — the JVM verifier resolves
+     * referenced types (e.g. {@code LocalPlayer}, captured via {@code client.player}) at class-load
+     * time regardless of reachability, which crashes server startup with "Cannot load class
+     * net.minecraft.client.player.LocalPlayer in environment type SERVER". Method-level
+     * {@code @Environment} is Fabric Loader's actual stripping unit, so it must be its own method.
+     */
+    @Environment(EnvType.CLIENT)
+    private static <T extends CustomPacketPayload> void registerClientReceiver(
+            CustomPacketPayload.Type<T> type, StreamCodec<T> codec, BiConsumer<T, IPayloadContext> handler)
+    {
+        ClientPlayNetworking.registerGlobalReceiver(type.id(), (client, listener, buf, sender) ->
+        {
+            T payload = codec.decode(buf);
+            handler.accept(payload, new PayloadContextImpl(client.player, client));
+        });
     }
 
     public <T extends CustomPacketPayload> PayloadRegistrar playToServer(
