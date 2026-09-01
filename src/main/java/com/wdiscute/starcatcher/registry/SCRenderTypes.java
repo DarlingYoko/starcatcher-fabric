@@ -4,21 +4,23 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.compat.IrisShadersCompat;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-import java.io.IOException;
 import java.util.function.Function;
 
-@Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+/**
+ * Formerly the `@Mod.EventBusSubscriber(Bus.MOD, Dist.CLIENT)` `RegisterShadersEvent` listener —
+ * see FABRIC_PORT_PLAN.md §6 (P5). Fabric API's `CoreShaderRegistrationCallback` constructs the
+ * `ShaderInstance` internally (given a location + vertex format) and hands it back via the consumer,
+ * unlike Forge's event which handed you a `ResourceProvider` to build the instance yourself — same
+ * net effect, one fewer step.
+ */
 public class SCRenderTypes extends RenderType {
     public SCRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
         super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
@@ -55,10 +57,11 @@ public class SCRenderTypes extends RenderType {
 
     public static final RenderType RENDER_TYPE_GOLD_ITEM = RENDER_TYPE_GOLD.apply(TextureAtlas.LOCATION_BLOCKS);
 
-    @SubscribeEvent
-    static void registerShaders(RegisterShadersEvent event) throws IOException {
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), Starcatcher.rl("gui_fade"), DefaultVertexFormat.POSITION), (shader) -> rendertypeGuiFadeShader = shader);
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), Starcatcher.rl("gold_item"), DefaultVertexFormat.NEW_ENTITY),  (shader) -> goldItemShader = shader);
+    public static void register() {
+        CoreShaderRegistrationCallback.EVENT.register(context -> {
+            context.register(Starcatcher.rl("gui_fade"), DefaultVertexFormat.POSITION, shader -> rendertypeGuiFadeShader = shader);
+            context.register(Starcatcher.rl("gold_item"), DefaultVertexFormat.NEW_ENTITY, shader -> goldItemShader = shader);
+        });
     }
 
 }

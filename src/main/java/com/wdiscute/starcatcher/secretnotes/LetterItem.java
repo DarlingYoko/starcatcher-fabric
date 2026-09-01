@@ -18,8 +18,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
 import org.jetbrains.annotations.Nullable;
@@ -60,14 +60,14 @@ public class LetterItem extends Item
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openMessageScreen(Message message)
     {
         Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PAGE_TURN);
         Minecraft.getInstance().setScreen(new MessageScreen(message));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openMessageWriteScreen(Message message)
     {
         Minecraft.getInstance().player.playSound(SoundEvents.BOOK_PAGE_TURN);

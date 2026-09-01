@@ -1,6 +1,6 @@
 # Starcatcher — Forge 1.20.1 → Fabric 1.20.1 Backport Plan
 
-Status: **P0-P4 done** — see §13. In progress on branch `fabric-port-1.20.1`. Next: P5 (Client, renderers/screens/layers/particles/keymaps/item-props/colors/tooltips).
+Status: **P0-P5 done** — see §13. In progress on branch `fabric-port-1.20.1`. Next: P6 (Datagen).
 Target: Minecraft **1.20.1**, loader **Fabric**
 Source branch: `v2.3-1.20.1` (Forge, MinecraftForge 47.4.0, LegacyForge ModDev)
 Scope: 335 Java files, 719 resource files, 9 lang files, 13 datagen providers, 9 network payloads, 9 screen/menu files.
@@ -83,7 +83,7 @@ Deliverable **met**: `./gradlew tasks` and `./gradlew dependencies --configurati
 
 - [x] **Stub only (P0 scope)**: `StarcatcherFabric implements ModInitializer` and `StarcatcherFabricClient implements ClientModInitializer` created as empty entrypoints (logger init only) so the mod jar/manifest is structurally valid. Both compile cleanly against pure Fabric API (no dependency on the still-Forge `Starcatcher.java`).
 - [ ] **P1+**: Wire the real subsystem `register()` calls into `StarcatcherFabric.onInitialize()` (Items, Blocks, BlockEntities, DataComponents, Sounds, Entities, Particles, Recipes, MenuTypes, DataAttachments, custom registries, criterion triggers, processors, loot modifiers, data maps, payloads, creative tabs) — replaces the `@Mod`-annotated constructor. On Fabric there is no `IEventBus` — the shim's `DeferredRegister.register(bus)` becomes `DeferredRegister.registerAll()` that flushes into vanilla registries directly.
-- [ ] **P5**: Fold `SCClientEvents`/`SCClientForgeEvents` (renderers, layers, screens, particles, keymaps, item properties, color handlers, tooltip processors init from `Starcatcher.Client.init`) into `StarcatcherFabricClient.onInitializeClient()`.
+- [x] **P5**: ✅ done (2026-09-01). `SCClientEvents`/`SCClientForgeEvents`/`TooltipEvents` (renderers, layers, screens, particles, keymaps, item properties, tooltip components, item tooltips) converted to plain methods called from `StarcatcherFabricClient.onInitializeClient()` — see §6 for the per-event mapping. `SCItemProperties.addCustomItemProperties()` was already pure vanilla `ItemProperties.register`, just needed calling. `SCRenderTypes`' `RegisterShadersEvent` converted to Fabric's `CoreShaderRegistrationCallback`. The 7 real `@OnlyIn(Dist.CLIENT)` sites (`FishingBobEntity` had only a dead unused import; `DisplayBlock`, `TelescopeBlock`, `FishingGuideItem`, `SecretNote`, `LetterItem`, `FishingStartedPayload`) flattened to `@Environment(EnvType.CLIENT)`. `Starcatcher.Client.init()` (tooltip-tag-processor registration) was **not** folded in — it's 100% `com.wdiscute.libtooltips`-dependent, and that companion library isn't ported yet (§7bis.1); tracked there, not here. Error count 358→274 (−84).
 - [ ] **P1+**: Strip `Starcatcher.java` down to a constants/util holder (MOD_ID, `rl()`, resource keys, toast helper) — remove the Forge constructor, `@Mod`, and all `net.minecraftforge`/NeoBackports imports (currently still Forge-shaped; this is the bulk of why `compileJava` fails right now).
 
 ---
@@ -209,21 +209,24 @@ Server-side/common events (`SCModEvents`, `SCEvents`) — ✅ DONE (2026-09-01, 
 | `RegisterPayloadHandlersEvent` | §5.4 shim registrar at init | ✅ done (P3) |
 | `ModList.get().isLoaded(id)` (16 files, not 14 as originally estimated) | `FabricLoader.getInstance().isModLoaded(id)` | ✅ done (P4) — no mod-id remapping needed anywhere (`"curios"` checks left as literal `"curios"` for now; remapping to `"trinkets"` is part of the separate §8/D5 Curios→Trinkets compat work, not this mechanical API swap) |
 
-Client-side rendering/registration events — **P5 scope, not started** (`SCClientEvents`, `SCClientForgeEvents`, `TooltipEvents` — confirmed by reading all 3 files fully: every method in them registers a renderer/screen/layer/particle-factory/keybind/tooltip-component-factory or reads/writes client-only state; none belong in "events & world systems"):
+Client-side rendering/registration events — ✅ **done (2026-09-01, P5)**. All real Fabric API class names below confirmed via `javap` against the actual `fabric-api` module jars in `.gradle/loom-cache`, not guessed:
 
-| Forge event | Fabric replacement |
-|---|---|
-| Client `EntityRenderersEvent.RegisterRenderers` | `EntityRendererRegistry.register`, `BlockEntityRendererFactories.register` |
-| `RegisterMenuScreensEvent` | `HandledScreens.register` (a.k.a. `MenuScreens`) |
-| `EntityRenderersEvent.RegisterLayerDefinitions` | `EntityModelLayerRegistry.registerModelLayer` |
-| Key mappings (`SCKeymappings`) | `KeyBindingHelper.registerKeyBinding` + `ClientTickEvents` |
-| Particle providers (`SCParticles`) | `ParticleFactoryRegistry.getInstance().register` |
-| Item properties (`SCItemProperties`) | `ItemProperties.register` in client init |
-| Block/render layers, color handlers (`SCRenderTypes`, `SCColors`) | `BlockRenderLayerMap.INSTANCE.putBlock`, `ColorProviderRegistry` |
-| `RegisterGuiOverlaysEvent` (fish radar, tournament overlay) | `HudRenderCallback` |
-| `InputEvent.Key` | Fabric's key-binding tick/press hooks |
-| `ItemTooltipEvent` | `ItemTooltipCallback` |
-| `DistExecutor`/`@OnlyIn`/`Dist` (12 files) | `@Environment(EnvType.CLIENT)`, `FabricLoader.getEnvironmentType()`, or Porting Lib `EnvExecutor` |
+| Forge event | Fabric replacement | Status |
+|---|---|---|
+| `EntityRenderersEvent.RegisterRenderers` (block entity renderers) | `net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry.register` | ✅ done |
+| `EntityRenderersEvent.RegisterRenderers` (entity renderers) | unchanged — vanilla `net.minecraft.client.renderer.entity.EntityRenderers.register` was already what Forge's event called internally, no Fabric API needed | ✅ done |
+| `RegisterMenuScreensEvent` | vanilla `net.minecraft.client.gui.screens.MenuScreens.register` directly (the NeoBackports `RegisterMenuScreensEvent` shim this used to depend on doesn't exist anywhere in this port's source tree — was itself a compile error) | ✅ done |
+| `EntityRenderersEvent.RegisterLayerDefinitions` | `net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry.registerModelLayer` | ✅ done |
+| Key mappings (`SCKeymappings`) | `net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper.registerKeyBinding` | ✅ done |
+| `InputEvent.Key` (raw GLFW key press → `TournamentOverlay.expandedType.next()`) | no raw key-event bus on Fabric; polled instead via `KeyMapping.consumeClick()` inside `net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK` — vanilla's own input handling already tracks queued clicks once the mapping is registered | ✅ done |
+| Particle providers (`SCParticles`) | `net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry.getInstance().register` | ✅ done |
+| Item properties (`SCItemProperties`) | unchanged — already pure vanilla `ItemProperties.register`, just needed calling from `onInitializeClient()` | ✅ done |
+| `RegisterShadersEvent` (`SCRenderTypes`, 2 core shaders) | `net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback` — its `RegistrationContext.register(ResourceLocation, VertexFormat, Consumer<ShaderInstance>)` builds the `ShaderInstance` internally instead of handing you a `ResourceProvider`, one fewer step than Forge's version | ✅ done |
+| `RegisterGuiOverlaysEvent` (fish radar, tournament overlay) | `net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback` — the overlays already implemented this port's own `LayeredDraw.Layer` shim (§5.8) whose `render(GuiGraphics, float)` shape is identical to `HudRenderCallback.onHudRender`, so it was a direct method-reference swap, `EVENT.register(instance::render)` | ✅ done |
+| `RegisterClientTooltipComponentFactoriesEvent` | `net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback` — unlike Forge (one registration per `TooltipComponent` subtype), Fabric has a single callback returning `ClientTooltipComponent`/`null`, so both of this mod's tooltip types are dispatched via `instanceof` inside one registration | ✅ done |
+| `ItemTooltipEvent` | `net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback` — note it does **not** expose the viewing entity like Forge's event did (`getTooltip(ItemStack, TooltipFlag, List<Component>)` only); call sites that used `event.getEntity()` now read `Minecraft.getInstance().player` directly instead | ✅ done |
+| `DistExecutor`/`@OnlyIn`/`Dist` | `@Environment(EnvType.CLIENT)` (`net.fabricmc.api.Environment`/`EnvType`) — turned out to be **7 files**, not 12 as originally estimated (`FishingBobEntity` had only a dead unused import, already worked around via a nested `PlayerGetter` helper) | ✅ done, except `Starcatcher.java`'s `DistExecutor.safeRunWhenOn(Dist.CLIENT, Client::init)` call site — left alone since `Client.init()` itself is 100% blocked on the unported `libtooltips` (§7bis.1) and the surrounding constructor is the separate §4 "P1+: strip `Starcatcher.java`" task |
+| Block/render layers, item/block color handlers (`BlockRenderLayerMap`, `ColorProviderRegistry`) | n/a — **not actually used anywhere in this mod**, confirmed by grep; the original table row guessed these were needed based on `SCRenderTypes`/`SCColors`' names alone. `SCColors` is a plain `int` constants interface with zero Forge dependency; `SCRenderTypes`' only Forge-event use was the core-shader registration above | n/a, nothing to do |
 
 ---
 
@@ -347,7 +350,7 @@ Note: much of `src/generated/resources` (fish JSON, tags, models) is **loader-ne
 3. **P2 Components & stacks** — ✅ done (2026-09-01). §5.2 (D1) done 2026-08-31 (error count 619→555 including a bundled jsr305 fix); §7 recipes/menus done in §5.8; §7 creative tabs (needed no changes), loot modifiers (`LootTableEvents.MODIFY`), and the self-contained inventory sites (`SimpleContainer`/`Slot`) done 2026-09-01 (error count 555→535). Two inventory sites deliberately deferred — `TackleBoxBlockEntity`'s Forge Capability (needs Fabric Transfer API, not a 1:1 swap) and `CuriosCompat` (needs the Curios→Trinkets swap, §8/D5) — neither blocks anything else. Mixins (§10) not yet reviewed.
 4. **P3 Networking & attachments** — ✅ done (2026-09-01). §5.4 (D4) payload registrar/distributor over Fabric Networking API v1; §5.5 (D2) attachments over Cardinal Components. Error count 535→423 (−112). Mixins (§10) not yet reviewed.
 5. **P4 Events & world systems** — ✅ done (2026-09-01), except the two explicitly-deferred items noted below. Custom registries (§5.1, `SCCustomRegistries`), dynamic registry (§5.7, `SCDynamicRegistries`), server-side/common events (§6, `SCModEvents`/`SCEvents`), and data maps (§5.6, reimplemented from scratch rather than vendoring the unpublished Datamaps Refabricated — see §5.6 for why) all done; also flattened `ModList.get().isLoaded(id)` → `FabricLoader.getInstance().isModLoaded(id)` across 16 files (§6's own table item). Error count 423→368→358 across the three sub-steps (ModList+registries+events, then data maps). Still open, both deliberately: `AddPackFindersEvent` (blocked on the not-yet-downported selling-bin companion mod, §7bis.3/P8) and `ItemAttributeModifierEvent` (needs a design decision per §5.6, not a mechanical port).
-6. **P5 Client** — renderers, screens, layers, particles, keymaps, item props, colors, tooltips (§4/§6).
+6. **P5 Client** — ✅ done (2026-09-01). Renderers, block-entity renderers, screens, model layers, keymaps (+ tick-polled key handling), particle factories, item properties, core shaders, HUD overlays, tooltip components, item tooltips, and the `@OnlyIn`/`Dist`/`DistExecutor`→`@Environment` sweep (§4/§6). Error count 358→274 (−84); everything left is cleanly attributable to P6 (datagen), P7 (compat), P8 (companion mods), or the still-open `Starcatcher.java` strip (§4 P1+).
 7. **P6 Datagen** — §9 (regenerate & diff data).
 8. **P7 Compat** — §8 modules one by one, gated.
 9. **P8 Companion-mod resolution** — §7bis: swap tiny-multiblock-lib (Fabric); reimplement libtooltips facade on Ember's Text API (Fabric); **downport wd's Selling-Bin `1.21.1-fabric`→`1.20.1-fabric` as a parallel sub-project** (own repo/branch, shares the §5.2 component shim), then depend on it. Start the selling-bin downport early — it is independent of Starcatcher P1–P6.

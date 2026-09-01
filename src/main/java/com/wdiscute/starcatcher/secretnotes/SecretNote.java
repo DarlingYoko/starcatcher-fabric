@@ -11,8 +11,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.NeoForgeStreamCodecs;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ public class SecretNote extends Item
         return InteractionResultHolder.success(itemInHand);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openNoteScreen(Note note)
     {
         Minecraft.getInstance().setScreen(new SecretNoteScreen(note, null));

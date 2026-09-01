@@ -26,8 +26,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -95,13 +95,13 @@ public class FishingGuideItem extends Item
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openPersonalGuide()
     {
         Minecraft.getInstance().setScreen(new FishingGuideScreen());
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openSignedGuide(SignedGuide signedGuide)
     {
         Minecraft.getInstance().setScreen(new FishingSignedGuideScreen(signedGuide));

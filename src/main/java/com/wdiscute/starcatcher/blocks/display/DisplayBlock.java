@@ -34,8 +34,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nullable;
 
@@ -200,12 +200,12 @@ public class DisplayBlock extends BaseEntityBlock implements SimpleWaterloggedBl
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openPersonalGuide() {
         Minecraft.getInstance().setScreen(new FishingGuideScreen());
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void openSignedGuide(SignedGuide signedGuide) {
         Minecraft.getInstance().setScreen(new FishingSignedGuideScreen(signedGuide));
     }

@@ -39,8 +39,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.nikdo53.neobackports.io.networking.PacketDistributorNeo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

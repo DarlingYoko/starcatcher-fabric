@@ -10,8 +10,9 @@ import com.wdiscute.starcatcher.registry.FishProperties;
 import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -21,39 +22,44 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.item.TooltipFlag;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, value = Dist.CLIENT,  bus = Mod.EventBusSubscriber.Bus.FORGE)
+/**
+ * Formerly the `@Mod.EventBusSubscriber(Bus.FORGE, Dist.CLIENT)` `ItemTooltipEvent` listener —
+ * see FABRIC_PORT_PLAN.md §6 (P5). Fabric's `ItemTooltipCallback` doesn't expose the viewing
+ * entity (unlike Forge's event), so registry lookups that used `event.getEntity().level()` now
+ * go through `Minecraft.getInstance().player`/`.level` directly instead — the only real API-shape
+ * difference; the caching/formatting logic itself is unchanged.
+ */
 public class TooltipEvents
 {
-
     static int cachedTimer = 0;
     static ItemStack cachedItem = ItemStack.EMPTY;
     static List<Component> cachedComps = List.of();
     static boolean cachedShift = false;
 
-    @SubscribeEvent
-    public static void tooltipEvent(ItemTooltipEvent event)
+    public static void register()
+    {
+        ItemTooltipCallback.EVENT.register(TooltipEvents::tooltipEvent);
+    }
+
+    public static void tooltipEvent(ItemStack stack, TooltipFlag flag, List<Component> tooltipLines)
     {
         List<Component> comp = new ArrayList<>();
-        ItemStack stack = event.getItemStack();
         boolean hasShiftDown = Screen.hasShiftDown();
 
         //cache check
         if (stack == cachedItem && cachedTimer > 0 && hasShiftDown == cachedShift)
         {
             cachedTimer--;
-            if (!event.getToolTip().isEmpty())
-                event.getToolTip().addAll(1, cachedComps);
+            if (!tooltipLines.isEmpty())
+                tooltipLines.addAll(1, cachedComps);
             else
-                event.getToolTip().addAll(cachedComps);
+                tooltipLines.addAll(cachedComps);
             return;
         }
 
@@ -90,7 +96,7 @@ public class TooltipEvents
             List<Component> modComp = new ArrayList<>();
 
             //add minigame modifiers
-            Player entity = event.getEntity();
+            Player entity = Minecraft.getInstance().player;
             if (entity != null)
             {
                 minigameModifiersRLs.forEach(o ->
@@ -150,9 +156,9 @@ public class TooltipEvents
         }
 
         cachedComps = comp;
-        if (!event.getToolTip().isEmpty())
-            event.getToolTip().addAll(1, comp);
+        if (!tooltipLines.isEmpty())
+            tooltipLines.addAll(1, comp);
         else
-            event.getToolTip().addAll(comp);
+            tooltipLines.addAll(comp);
     }
 }

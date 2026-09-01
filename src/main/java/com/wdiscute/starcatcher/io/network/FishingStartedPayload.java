@@ -6,8 +6,8 @@ import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.networking.CustomPacketPayload;
 import net.nikdo53.neobackports.io.networking.IPayloadContext;
@@ -33,7 +33,7 @@ public record FishingStartedPayload(FishProperties fp, ItemStack rod) implements
         context.enqueueWork(()-> client(this, context));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void client(FishingStartedPayload data, IPayloadContext context) {
         Minecraft.getInstance().setScreen(new FishingMinigameScreen(data.fp(), data.rod()));
     }
