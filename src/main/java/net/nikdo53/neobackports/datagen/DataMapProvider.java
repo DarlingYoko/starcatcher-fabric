@@ -27,9 +27,13 @@ import java.util.concurrent.CompletableFuture;
  * network-sync flag — not meaningful here, see {@link DataMapType.Builder#synced}; no per-entry
  * conditions — dropped the same way {@code DGSCFishingPropertiesProvider} already dropped
  * {@code ModLoadedCondition} gating, see its own doc comment) but supports every entry-reference
- * form actually used by this mod's data maps: a {@link Holder}, a {@link TagKey} (resolved via the
- * registry lookup at generation time), a {@link ResourceKey}, a raw {@link ResourceLocation}, or a
- * {@link DeferredHolder} (resolved via its id, so it doesn't need to be bound/registered yet).
+ * form actually used by this mod's data maps: a {@link Holder} (including a {@link DeferredHolder},
+ * which implements {@code Holder<T>} directly — see FABRIC_PORT_PLAN.md §5.1), a {@link TagKey}
+ * (resolved via the registry lookup at generation time), a {@link ResourceKey}, or a raw
+ * {@link ResourceLocation}. There is deliberately no separate {@code DeferredHolder} overload —
+ * one used to exist here, but since {@code DeferredHolder} implements {@code Holder<T>} it made
+ * every call site passing an {@code SCItems.X}/{@code SCBlocks.X} field ambiguous between the two
+ * overloads (P9, found once the codebase was actually fully attributed for the first time).
  */
 public abstract class DataMapProvider implements DataProvider
 {
@@ -95,12 +99,6 @@ public abstract class DataMapProvider implements DataProvider
         public Builder<T, R> add(Holder<R> holder, T value, boolean replace)
         {
             holder.unwrapKey().ifPresent(key -> values.put(key.location(), value));
-            return this;
-        }
-
-        public Builder<T, R> add(DeferredHolder<R, ? extends R> holder, T value, boolean replace)
-        {
-            values.put(holder.getId(), value);
             return this;
         }
 

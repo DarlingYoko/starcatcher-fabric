@@ -27,17 +27,16 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 
 /**
  * Client-side rendering/registration, formerly the `@Mod.EventBusSubscriber(Bus.MOD, Dist.CLIENT)`
- * `SCClientEvents` — see FABRIC_PORT_PLAN.md §4/§6 (P5). Every Forge client-registration event
- * used here had a real Fabric API replacement; entity renderers themselves (`EntityRenderers.register`)
- * were already plain vanilla calls even under Forge, so those are untouched.
+ * `SCClientEvents` — see FABRIC_PORT_PLAN.md §4/§6 (P5). Entity renderers go through Fabric API's
+ * `EntityRendererRegistry` since vanilla `EntityRenderers.register` is private in 1.20.1.
  */
 public class SCClientEvents
 {
@@ -47,10 +46,10 @@ public class SCClientEvents
         BlockEntityRendererRegistry.register(SCBlockEntities.AQUARIUM.get(), AquariumRenderer::new);
         //BlockEntityRendererRegistry.register(SCBlockEntities.TACKLE_BOX.get(), TackleBoxRenderer::new);
 
-        EntityRenderers.register(SCEntities.FISHING_BOB.get(), FishingBobRenderer::new);
-        EntityRenderers.register(SCEntities.BROKEN_BOTTLE.get(), ThrownItemRenderer::new);
-        EntityRenderers.register(SCEntities.BOTTLED_LETTER.get(), ThrownItemRenderer::new);
-        EntityRenderers.register(SCEntities.FISH.get(), FishRenderer::new);
+        EntityRendererRegistry.register(SCEntities.FISHING_BOB.get(), FishingBobRenderer::new);
+        EntityRendererRegistry.register(SCEntities.BROKEN_BOTTLE.get(), ThrownItemRenderer::new);
+        EntityRendererRegistry.register(SCEntities.BOTTLED_LETTER.get(), ThrownItemRenderer::new);
+        EntityRendererRegistry.register(SCEntities.FISH.get(), FishRenderer::new);
 
         //Trinkets (curios' Fabric replacement, D5) is a hard dependency, always present
         CuriosEvents.registerRenderers();

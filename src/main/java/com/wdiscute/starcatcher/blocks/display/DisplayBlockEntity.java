@@ -161,18 +161,18 @@ public class DisplayBlockEntity extends BlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries)
+    public CompoundTag getUpdateTag()
     {
-        super.getUpdateTag(registries);
+        super.getUpdateTag();
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void load(CompoundTag tag)
     {
-        super.loadAdditional(tag, registries);
+        super.load(tag);
         if (tag.contains("Book"))
         {
 
@@ -189,12 +189,12 @@ public class DisplayBlockEntity extends BlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void saveAdditional(CompoundTag tag)
     {
-        super.saveAdditional(tag, registries);
+        super.saveAdditional(tag);
         if (!this.getItem().isEmpty())
         {
-            tag.put("Book", this.getItem().save(registries));
+            tag.put("Book", this.getItem().save(new CompoundTag()));
         }
         else
         {

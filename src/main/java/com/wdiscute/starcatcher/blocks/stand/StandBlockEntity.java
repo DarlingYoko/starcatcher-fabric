@@ -158,11 +158,11 @@ public class StandBlockEntity extends AbstractMultiBlockEntity implements MenuPr
 
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries)
+    public CompoundTag getUpdateTag()
     {
 
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 

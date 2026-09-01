@@ -17,13 +17,13 @@ public class SCParticles
 
 
     public static final Supplier<SimpleParticleType> FISHING_NOTIFICATION =
-            PARTICLE_TYPES.register("fishing_notification", () -> new SimpleParticleType(true));
+            PARTICLE_TYPES.register("fishing_notification", () -> new SimpleParticleType(true) {});
 
     public static final Supplier<SimpleParticleType> FISHING_BITING =
-            PARTICLE_TYPES.register("fishing_biting", () -> new SimpleParticleType(true));
+            PARTICLE_TYPES.register("fishing_biting", () -> new SimpleParticleType(true) {});
 
     public static final Supplier<SimpleParticleType> FISHING_BITING_LAVA =
-            PARTICLE_TYPES.register("fishing_biting_lava", () -> new SimpleParticleType(true));
+            PARTICLE_TYPES.register("fishing_biting_lava", () -> new SimpleParticleType(true) {});
 
     public static void register(IEventBus eventBus)
     {

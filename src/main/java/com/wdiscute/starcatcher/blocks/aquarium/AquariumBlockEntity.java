@@ -97,9 +97,9 @@ public class AquariumBlockEntity extends BlockEntity implements TickableBlockEnt
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void saveAdditional(CompoundTag tag)
     {
-        super.saveAdditional(tag, registries);
+        super.saveAdditional(tag);
 
         NBTCodecHelper.encode(SingleStackContainer.CODEC, new SingleStackContainer(getFish().copy()), tag, "fish");
 
@@ -109,9 +109,9 @@ public class AquariumBlockEntity extends BlockEntity implements TickableBlockEnt
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void load(CompoundTag tag)
     {
-        super.loadAdditional(tag, registries);
+        super.load(tag);
 
         double x = 0;
         double y = 0;
@@ -133,10 +133,10 @@ public class AquariumBlockEntity extends BlockEntity implements TickableBlockEnt
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries)
+    public CompoundTag getUpdateTag()
     {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 }

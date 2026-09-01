@@ -244,31 +244,31 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void load(CompoundTag tag)
     {
-        super.loadAdditional(tag, registries);
-        this.loadFromTag(tag, registries);
+        super.load(tag);
+        this.loadFromTag(tag);
         if (tag.contains("CustomName", 8)) {
             this.name = Component.Serializer.fromJson(tag.getString("CustomName"));
         }
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void saveAdditional(CompoundTag tag)
     {
-        super.saveAdditional(tag, registries);
+        super.saveAdditional(tag);
         //save normal slots
         ContainerHelper.saveAllItems(tag, this.itemStacks, false);
 
         //save fishes
-        saveAllFishes(tag, fishes, false, registries);
+        saveAllFishes(tag, fishes, false);
 
         if (this.name != null) {
             tag.putString("CustomName", Component.Serializer.toJson(this.name));
         }
     }
 
-    public static void saveAllFishes(CompoundTag tag, List<ItemStack> items, boolean alwaysPutTag, HolderLookup.Provider levelRegistry)
+    public static void saveAllFishes(CompoundTag tag, List<ItemStack> items, boolean alwaysPutTag)
     {
         ListTag listtag = new ListTag();
 
@@ -287,7 +287,7 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
 
     }
 
-    public void loadFromTag(CompoundTag tag, HolderLookup.Provider levelRegistry)
+    public void loadFromTag(CompoundTag tag)
     {
         //load normal slots
         this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
@@ -297,11 +297,11 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
         //load fishes
         this.fishes = new ArrayList<>();
         if (tag.contains("Fishes", 9))
-            loadAllFishes(tag, this.fishes, levelRegistry);
+            loadAllFishes(tag, this.fishes);
 
     }
 
-    public static void loadAllFishes(CompoundTag tag, List<ItemStack> items, HolderLookup.Provider levelRegistry)
+    public static void loadAllFishes(CompoundTag tag, List<ItemStack> items)
     {
         ListTag listtag = tag.getList("Fishes", 10);
 
