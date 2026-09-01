@@ -5,6 +5,7 @@
   "mixins": [
     "GetNameMixin",
     "LecternReturnMixin",
+    "RegistryDataLoaderMixin",
     "RemoveFishSizeAndWeightWhenStacking"
   ],
   "injectors": {
