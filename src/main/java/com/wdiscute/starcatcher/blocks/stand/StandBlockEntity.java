@@ -12,13 +12,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.GameProfileCache;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -30,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class StandBlockEntity extends AbstractMultiBlockEntity implements MenuProvider
+public class StandBlockEntity extends AbstractMultiBlockEntity implements ExtendedScreenHandlerFactory
 {
     public Tournament tournament;
     public Map<UUID, String> profiles;
@@ -176,5 +178,11 @@ public class StandBlockEntity extends AbstractMultiBlockEntity implements MenuPr
     public Component getDisplayName()
     {
         return Component.empty();
+    }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf)
+    {
+        buf.writeBlockPos(this.getBlockPos());
     }
 }

@@ -9,12 +9,14 @@ import com.wdiscute.starcatcher.io.SingleStackContainer;
 import com.wdiscute.starcatcher.io.attachments.FishingBobAttachment;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,8 +33,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class StarcatcherFishingRodItem extends Item implements MenuProvider
+public class StarcatcherFishingRodItem extends Item implements ExtendedScreenHandlerFactory
 {
+    @Override
+    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf)
+    {
+        // FishingRodMenu's buffer constructor doesn't read anything -- it derives the rod from
+        // whichever hand is currently holding it, purely client-side. Still required: the menu
+        // type is registered as an ExtendedScreenHandlerType (net.nikdo53.neobackports.utils.
+        // IMenuTypeExtension, §5.8), so Fabric refuses to open it at all without this override.
+    }
+
+
     public StarcatcherFishingRodItem()
     {
         super(new Item.Properties()

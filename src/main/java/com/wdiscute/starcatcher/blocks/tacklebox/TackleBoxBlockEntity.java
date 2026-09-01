@@ -11,13 +11,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +37,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContainer, TickableBlockEntity, MenuProvider
+public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContainer, TickableBlockEntity, ExtendedScreenHandlerFactory
 {
     private NonNullList<ItemStack> itemStacks;
     private List<ItemStack> fishes;
@@ -359,6 +361,12 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
             return new TackleBoxMenu(containerId, playerInventory, this, this);
         else
             return null;
+    }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf)
+    {
+        buf.writeBlockPos(this.getBlockPos());
     }
 
 }
