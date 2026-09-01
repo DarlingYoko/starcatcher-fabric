@@ -1397,7 +1397,7 @@ public class FishingGuideScreen extends Screen
 
     private void renderEntry(GuiGraphics guiGraphics, int mouseX, int mouseY, int xOffset, int entry)
     {
-        if (level == null) level = getMinecraft().level;
+        if (level == null) level = Minecraft.getInstance().level;
 
         if (entries.size() <= entry) return;
 

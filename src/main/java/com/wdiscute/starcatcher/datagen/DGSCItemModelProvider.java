@@ -8,6 +8,7 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.world.item.Item;
 import net.nikdo53.neobackports.registry.DeferredHolder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.nikdo53.neobackports.registry.DeferredItem;
 
 import static com.wdiscute.starcatcher.registry.SCItems.*;
@@ -139,8 +140,8 @@ public class DGSCItemModelProvider extends FabricModelProvider
         //rods
         //custom model
 
-        simpleItem(itemModelGenerators, DeferredItem.createItem(Starcatcher.rl("clam")));
-        simpleItem(itemModelGenerators, DeferredItem.createItem(Starcatcher.rl("conch")));
+        simpleItem(itemModelGenerators, BuiltInRegistries.ITEM.get(Starcatcher.rl("clam")));
+        simpleItem(itemModelGenerators, BuiltInRegistries.ITEM.get(Starcatcher.rl("conch")));
 
         //trophies, hats, tackle boxes: block-item models parenting to the block's own model —
         //already exist as static resources, see class javadoc.
@@ -149,5 +150,10 @@ public class DGSCItemModelProvider extends FabricModelProvider
     private void simpleItem(ItemModelGenerators itemModelGenerators, DeferredHolder<Item, ? extends Item> item)
     {
         itemModelGenerators.generateFlatItem(item.get(), ModelTemplates.FLAT_ITEM);
+    }
+
+    private void simpleItem(ItemModelGenerators itemModelGenerators, Item item)
+    {
+        itemModelGenerators.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
     }
 }

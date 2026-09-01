@@ -653,7 +653,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
         modifiers.forEach(AbstractMinigameModifier::onRemove);
 
         PacketDistributorNeo.sendToServer(new FishingCompletedPayload(-1, false, false, consecutiveHits));
-        this.minecraft.popGuiLayer();
+        this.minecraft.setScreen(null);
     }
 
     public void addParticles(float posInDegrees, int count, int color)

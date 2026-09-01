@@ -18,7 +18,7 @@ public record SBStandTournamentNameChangePayload(UUID uuid, String name) impleme
 {
 
     public static final StreamCodec<GameProfile> GAME_PROFILE_STREAM_CODEC = StreamCodec.composite(
-            StreamCodec.UUID, GameProfile::getId,
+            ByteBufCodecs.UUID, GameProfile::getId,
             ByteBufCodecs.STRING_UTF8, GameProfile::getName,
             GameProfile::new
     );
@@ -28,7 +28,7 @@ public record SBStandTournamentNameChangePayload(UUID uuid, String name) impleme
     public static final Type<SBStandTournamentNameChangePayload> TYPE = new Type<>(Starcatcher.rl("sb_stand_tournament_name"), SBStandTournamentNameChangePayload.class);
 
     public static final StreamCodec<SBStandTournamentNameChangePayload> STREAM_CODEC = StreamCodec.composite(
-            StreamCodec.UUID, SBStandTournamentNameChangePayload::uuid,
+            ByteBufCodecs.UUID, SBStandTournamentNameChangePayload::uuid,
             ByteBufCodecs.STRING_UTF8, SBStandTournamentNameChangePayload::name,
             SBStandTournamentNameChangePayload::new
     );

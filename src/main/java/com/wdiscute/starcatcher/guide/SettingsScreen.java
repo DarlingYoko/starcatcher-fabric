@@ -5,6 +5,7 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
@@ -106,7 +107,7 @@ public class SettingsScreen extends FishingMinigameScreen {
     }
 
     public Options getOptions() {
-        return getMinecraft().options;
+        return Minecraft.getInstance().options;
     }
 
     private @NotNull OptionInstance<Integer> guiScale() {
@@ -155,7 +156,7 @@ public class SettingsScreen extends FishingMinigameScreen {
 
         modifiers.forEach(AbstractMinigameModifier::onRemove);
 
-        this.minecraft.popGuiLayer();
+        this.minecraft.setScreen(null);
     }
 
     public class LeftRightButtonWidget<T extends Comparable<T>> extends AbstractWidget {
@@ -197,7 +198,7 @@ public class SettingsScreen extends FishingMinigameScreen {
             }
 
             MutableComponent component = Component.empty().append(name).append(": ").append(String.valueOf(o));
-            guiGraphics.drawCenteredString(getMinecraft().font, component, getX() + (getWidth() / 2), getY() + (getHeight() / 4), 0x000000);
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, component, getX() + (getWidth() / 2), getY() + (getHeight() / 4), 0x000000);
 
             guiGraphics.blit(
                     texture, getX(), getY(),

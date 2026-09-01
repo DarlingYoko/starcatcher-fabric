@@ -42,7 +42,7 @@ public record CBActiveTournamentUpdatePayload(List<GameProfile> listSignups, Tou
     }
 
     public static final StreamCodec<GameProfile> GAME_PROFILE_STREAM_CODEC = StreamCodec.composite(
-            StreamCodec.UUID, GameProfile::getId,
+            ByteBufCodecs.UUID, GameProfile::getId,
             ByteBufCodecs.STRING, GameProfile::getName,
             GameProfile::new
     );
