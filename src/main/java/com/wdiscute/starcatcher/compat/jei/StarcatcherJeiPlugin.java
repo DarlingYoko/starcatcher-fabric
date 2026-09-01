@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.compat.jei;
 
-import com.wdiscute.sellingbin.SellingBin;
 import com.wdiscute.starcatcher.SCTags;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
@@ -28,11 +27,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmithingRecipe;
 import net.minecraft.world.level.block.SmithingTableBlock;
-import net.nikdo53.neobackports.utils.recipe.holder.RecipeHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +38,9 @@ import java.util.List;
 public class StarcatcherJeiPlugin implements IModPlugin
 {
     public static final ResourceLocation ARROW = Starcatcher.rl("textures/gui/emi/arrow.png");
-    public static final ResourceLocation SLOT_BACKGROUND = SellingBin.rl("textures/gui/slot_background.png");
+    //TODO(P8): this texture lives in the still-unported sellingbin companion mod's assets
+    //(see FABRIC_PORT_PLAN.md §7bis.3); points at a Starcatcher-namespaced path for now.
+    public static final ResourceLocation SLOT_BACKGROUND = Starcatcher.rl("textures/gui/slot_background.png");
 
     public static List<StarcatcherJeiFPRecipe.Recipe> listRecipes = new ArrayList<>();
 
@@ -140,19 +139,14 @@ public class StarcatcherJeiPlugin implements IModPlugin
 
         for (SmithingRecipe smithingRecipe : allSmithingRecipes)
         {
-            if(smithingRecipe instanceof RecipeHolder<?, ?> holder)
-            {
-                Recipe<?> recipe = holder.getRecipe();
+            if(smithingRecipe instanceof NetheriteUpgradeSmithingRecipe nusr)
+                smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(nusr));
 
-                if(recipe instanceof NetheriteUpgradeSmithingRecipe nusr)
-                    smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(nusr));
+            if(smithingRecipe instanceof TackleSkinSmithingRecipe tssr)
+                smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(tssr));
 
-                if(recipe instanceof TackleSkinSmithingRecipe tssr)
-                    smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(tssr));
-
-                if(recipe instanceof FishingRodSkinSmithingRecipe frssr)
-                    smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(frssr));
-            }
+            if(smithingRecipe instanceof FishingRodSkinSmithingRecipe frssr)
+                smithing.add(StarcatcherJeiSmithingRecipe.Recipe.of(frssr));
         }
 
         registration.addRecipes(StarcatcherJeiSmithingRecipe.Recipe.TYPE, smithing);
@@ -169,6 +163,6 @@ public class StarcatcherJeiPlugin implements IModPlugin
     @Override
     public ResourceLocation getPluginUid()
     {
-        return SellingBin.rl("selling_bin_jei_plugin");
+        return Starcatcher.rl("starcatcher_jei_plugin");
     }
 }

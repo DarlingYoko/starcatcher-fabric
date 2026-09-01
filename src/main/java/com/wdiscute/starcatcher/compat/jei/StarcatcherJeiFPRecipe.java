@@ -1,7 +1,6 @@
 package com.wdiscute.starcatcher.compat.jei;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.wdiscute.sellingbin.jei.SellingBinJeiPlugin;
 import com.wdiscute.starcatcher.SCColors;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.registry.FishProperties;
@@ -88,10 +87,10 @@ public class StarcatcherJeiFPRecipe extends AbstractRecipeCategory<StarcatcherJe
         Font font = Minecraft.getInstance().font;
         guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 4, 1, 18, 18, 0, 0, 18, 18, 18, 18);
         guiGraphics.blit(StarcatcherJeiPlugin.ARROW, 25, 2, 16, 16, 0, 0, 16, 16, 16, 16);
-        guiGraphics.blit(SellingBinJeiPlugin.SLOT_BACKGROUND, 43, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 43, 1, 18, 18, 0, 0, 18, 18, 18, 18);
 
         if (!recipe.treasure.isEmpty())
-            guiGraphics.blit(SellingBinJeiPlugin.SLOT_BACKGROUND, 63, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+            guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 63, 1, 18, 18, 0, 0, 18, 18, 18, 18);
 
         bookIcon(guiGraphics, 83, 0, (int) mouseX, (int) mouseY);
 

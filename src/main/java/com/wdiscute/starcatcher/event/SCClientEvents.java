@@ -29,7 +29,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -53,10 +52,8 @@ public class SCClientEvents
         EntityRenderers.register(SCEntities.BOTTLED_LETTER.get(), ThrownItemRenderer::new);
         EntityRenderers.register(SCEntities.FISH.get(), FishRenderer::new);
 
-        if (FabricLoader.getInstance().isModLoaded("curios"))
-        {
-            CuriosEvents.registerRenderers();
-        }
+        //Trinkets (curios' Fabric replacement, D5) is a hard dependency, always present
+        CuriosEvents.registerRenderers();
     }
 
     public static void registerHudLayers()

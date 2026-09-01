@@ -2,28 +2,24 @@ package com.wdiscute.starcatcher.compat.curios;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.client.TrinketRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.client.ICurioRenderer;
 
-public class CurioHatRenderer implements ICurioRenderer {
-
+public class CurioHatRenderer implements TrinketRenderer {
 
     @Override
-    public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack,
-                                                                          RenderLayerParent<T, M> renderLayerParent, MultiBufferSource bufferSource,
-                                                                          int light, float limbSwing, float limbSwingAmount, float partialTicks,
-                                                                          float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(ItemStack stack, SlotReference slotReference, EntityModel<? extends LivingEntity> entityModel,
+                        PoseStack poseStack, MultiBufferSource bufferSource, int light, LivingEntity entity,
+                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+                        float netHeadYaw, float headPitch) {
 
-
-        LivingEntity entity = slotContext.entity();
         poseStack.pushPose();
 
         float yOffset = entity.isCrouching() ? 25 : 0F;
@@ -45,4 +41,3 @@ public class CurioHatRenderer implements ICurioRenderer {
         poseStack.popPose();
     }
 }
-

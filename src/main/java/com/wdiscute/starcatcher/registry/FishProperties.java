@@ -7,7 +7,6 @@ import com.wdiscute.starcatcher.SCConfig;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.U;
 import com.wdiscute.starcatcher.bobberentity.FishingBobEntity;
-import com.wdiscute.starcatcher.compat.QualityFoodCompat;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
 import com.wdiscute.starcatcher.io.*;
 import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
@@ -1994,9 +1993,7 @@ public record FishProperties(
         if (isStarcaught)
         {
             ItemStack fish = new ItemStack(fp.catchInfo().fish());
-            //quality food compat
-            if (FabricLoader.getInstance().isModLoaded("quality_food"))
-                QualityFoodCompat.addQuality(fish, player, player.level(), golden, perfectCatch, percentile);
+            //Quality Food has no Fabric 1.20.1 build at all (confirmed 2026-09-01, see FABRIC_PORT_PLAN.md §8)
             ItemStack bucket = new ItemStack(SCItems.STARCAUGHT_BUCKET.get());
             SCDataComponents.set(fish, SCDataComponents.CAUGHT_FISH_INFO, caughtFishInfo);
             SCDataComponents.set(bucket, SCDataComponents.BUCKETED_FISH, new SingleStackContainer(fish));
@@ -2014,9 +2011,7 @@ public record FishProperties(
         if (fp.hasGuideEntry() && SCConfig.SAVE_DATA_TO_ITEMS.get())
             SCDataComponents.set(fish, SCDataComponents.CAUGHT_FISH_INFO, caughtFishInfo);
 
-        //quality food compat
-        if (FabricLoader.getInstance().isModLoaded("quality_food"))
-            QualityFoodCompat.addQuality(fish, player, player.level(), golden, perfectCatch, percentile);
+        //Quality Food has no Fabric 1.20.1 build at all (confirmed 2026-09-01, see FABRIC_PORT_PLAN.md §8)
 
         return fish;
     }

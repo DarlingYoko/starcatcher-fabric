@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.*;
@@ -125,11 +124,8 @@ public interface SCCatchModifiers
         //armor
         player.getInventory().armor.forEach(o -> rls.addAll(getCatchModifiersRLs(o)));
 
-        //curios
-        if (FabricLoader.getInstance().isModLoaded("curios"))
-        {
-            CuriosCompat.getItems(player).forEach(o -> rls.addAll(getCatchModifiersRLs(o)));
-        }
+        //curios (Trinkets on Fabric, D5) — hard dependency, always present
+        CuriosCompat.getItems(player).forEach(o -> rls.addAll(getCatchModifiersRLs(o)));
 
         List<AbstractCatchModifier> catchModifiers = new ArrayList<>();
         rls.forEach(o -> catchModifiers.add(getCatchModifierSupplier(player.level(), o).get()));

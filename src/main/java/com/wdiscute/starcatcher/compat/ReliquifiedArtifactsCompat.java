@@ -1,42 +1,17 @@
 package com.wdiscute.starcatcher.compat;
 
-import com.wdiscute.starcatcher.U;
 import com.wdiscute.starcatcher.bobberentity.FishingBobEntity;
-import com.wdiscute.starcatcher.io.FishCaughtCounter;
-import com.wdiscute.starcatcher.registry.FishProperties;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 
+//Reliquified Artifacts (and the Relics/Artifacts mods it bridges) have no Fabric 1.20.1 build at all
+//(confirmed 2026-09-01, see FABRIC_PORT_PLAN.md §8) — "reliquified_artifacts" can never be loaded on
+//Fabric, so this compat is gated off rather than ported; the private Relics-API helpers the original
+//used are dropped since that API doesn't exist here to compile against.
 public class ReliquifiedArtifactsCompat
 {
-    private static Item getHatItem()
-    {
-        return BuiltInRegistries.ITEM.get(U.rl("artifacts", "anglers_hat"));
-    }
-
-    private static ItemStack getEquippedHatStack(Player player)
-    {
-        ItemStack stack = EntityUtils.findEquippedCurio(player, getHatItem());
-        if (stack.isEmpty() || !(stack.getItem() instanceof IRelicItem)) return ItemStack.EMPTY;
-        return stack;
-    }
-
-    private static AbilityData getCatchAbility(Player player, ItemStack stack)
-    {
-        IRelicItem relic = (IRelicItem) stack.getItem();
-        return relic.getRelicData().getAbilities().getAbilities().get("catch");
-    }
-
     //todo: I have genuinely no clue how this works
     public static boolean shouldAwardBonusTreasure(Player player)
     {

@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.compat.jei;
 
-import com.wdiscute.sellingbin.jei.SellingBinJeiPlugin;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.recipe.FishingRodSkinSmithingRecipe;
@@ -64,9 +63,9 @@ public class StarcatcherJeiSmithingRecipe extends AbstractRecipeCategory<Starcat
     public void draw(Recipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
     {
         guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 4, 1, 18, 18, 0, 0, 18, 18, 18, 18);
-        guiGraphics.blit(SellingBinJeiPlugin.SLOT_BACKGROUND, 24, 1, 18, 18, 0, 0, 18, 18, 18, 18);
-        guiGraphics.blit(SellingBinJeiPlugin.SLOT_BACKGROUND, 44, 1, 18, 18, 0, 0, 18, 18, 18, 18);
-        guiGraphics.blit(SellingBinJeiPlugin.SLOT_BACKGROUND, 84, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 24, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 44, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 84, 1, 18, 18, 0, 0, 18, 18, 18, 18);
         guiGraphics.blit(StarcatcherJeiPlugin.ARROW, 65, 2, 16, 16, 0, 0, 16, 16, 16, 16);
     }
 

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;
@@ -137,11 +136,8 @@ public interface SCMinigameModifiers
         //armor
         player.getInventory().armor.forEach(o -> rls.addAll(getMinigameModifiersRLs(o)));
 
-        //curios
-        if (FabricLoader.getInstance().isModLoaded("curios"))
-        {
-            CuriosCompat.getItems(player).forEach(o -> rls.addAll(getMinigameModifiersRLs(o)));
-        }
+        //curios (Trinkets on Fabric, D5) — hard dependency, always present
+        CuriosCompat.getItems(player).forEach(o -> rls.addAll(getMinigameModifiersRLs(o)));
 
         //get all AbstractMinigameModifier instances of registered RLs
         List<AbstractMinigameModifier> minigameModifiers = new ArrayList<>();

@@ -5,9 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.SCConfig;
 import com.wdiscute.starcatcher.SCColors;
-import com.wdiscute.starcatcher.compat.EclipticSeasonsCompat;
 import com.wdiscute.starcatcher.compat.SereneSeasonsCompat;
-import com.wdiscute.starcatcher.compat.TerraFirmaCraftSeasonsCompat;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -88,17 +86,9 @@ public class SeasonRestriction extends AbstractFishRestriction
             currentSeason = SereneSeasonsCompat.getSeason(level);
         }
 
-        //Ecliptic Seasons check
-        if (FabricLoader.getInstance().isModLoaded("eclipticseasons") && SCConfig.ENABLE_SEASONS.get())
-        {
-            currentSeason = EclipticSeasonsCompat.getSeason(level);
-        }
-
-        //TerraFirmaCraft Seasons check
-        if (FabricLoader.getInstance().isModLoaded("tfc") && SCConfig.ENABLE_SEASONS.get())
-        {
-            currentSeason = TerraFirmaCraftSeasonsCompat.getSeason(level);
-        }
+        //Ecliptic Seasons and TerraFirmaCraft have no Fabric 1.20.1 build at all (confirmed 2026-09-01,
+        //see FABRIC_PORT_PLAN.md §8) — "eclipticseasons"/"tfc" can never be loaded on Fabric, so those
+        //branches are gated off rather than ported.
 
         if (currentSeason.equals(Seasons.ALL)) return 0;
 

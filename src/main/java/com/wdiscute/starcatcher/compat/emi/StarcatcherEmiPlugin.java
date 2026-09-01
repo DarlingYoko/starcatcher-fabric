@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.compat.emi;
 
-import com.wdiscute.sellingbin.SellingBin;
 import com.wdiscute.starcatcher.SCTags;
 import com.wdiscute.starcatcher.recipe.FishingRodSkinSmithingRecipe;
 import com.wdiscute.starcatcher.recipe.NetheriteUpgradeSmithingRecipe;
@@ -23,7 +22,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.nikdo53.neobackports.utils.recipe.holder.RecipeHolder;
 
 import java.util.List;
 
@@ -55,7 +53,7 @@ public class StarcatcherEmiPlugin implements EmiPlugin
                         Component.translatable("emi.info.starcatcher.worms.1"),
                         Component.translatable("emi.info.starcatcher.worms.2")
                 ),
-                SellingBin.rl("/worms")));
+                Starcatcher.rl("/worms")));
 
         //clams info
         registry.addRecipe(new EmiInfoRecipe(List.of(
@@ -66,7 +64,7 @@ public class StarcatcherEmiPlugin implements EmiPlugin
                         Component.translatable("emi.info.starcatcher.pearls.0"),
                         Component.translatable("emi.info.starcatcher.pearls.1")
                 ),
-                SellingBin.rl("/pearls")));
+                Starcatcher.rl("/pearls")));
 
         //hooks, baits, bobbers
         registry.addRecipe(new EmiInfoRecipe(List.of(
@@ -77,28 +75,28 @@ public class StarcatcherEmiPlugin implements EmiPlugin
                         Component.translatable("emi.info.starcatcher.attachments.0"),
                         Component.translatable("emi.info.starcatcher.attachments.1")
                 ),
-                SellingBin.rl("/attachments")));
+                Starcatcher.rl("/attachments")));
 
         //fine bones info
         registry.addRecipe(new EmiInfoRecipe(List.of(EmiIngredient.of(Ingredient.of(SCItems.FISH_BONES))),
                 List.of(
                         Component.translatable("emi.info.starcatcher.fish_bones.0")
                 ),
-                SellingBin.rl("/fish_bones")));
+                Starcatcher.rl("/fish_bones")));
 
         //pearl template info
         registry.addRecipe(new EmiInfoRecipe(List.of(EmiIngredient.of(Ingredient.of(SCItems.PEARL_SMITHING_TEMPLATE))),
                 List.of(
                         Component.translatable("emi.info.starcatcher.pearl_template.0")
                 ),
-                SellingBin.rl("/pearl_template")));
+                Starcatcher.rl("/pearl_template")));
 
         //fisherman's hat
         registry.addRecipe(new EmiInfoRecipe(List.of(EmiIngredient.of(Ingredient.of(SCTags.HATS))),
                 List.of(
                         Component.translatable("emi.info.starcatcher.hat.0")
                 ),
-                SellingBin.rl("/hats")));
+                Starcatcher.rl("/hats")));
 
         Registry<FishProperties> fps = FishProperties.getRegistry(Minecraft.getInstance().level);
 
@@ -109,24 +107,18 @@ public class StarcatcherEmiPlugin implements EmiPlugin
         //add all starcatcher:smithing_netherite_upgraded
         List<SmithingRecipe> smithingRecipes = registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING);
         smithingRecipes.stream()
-                .filter(o -> o instanceof RecipeHolder<?,?>)
-                .map(o -> ((RecipeHolder<?,?>) o).getRecipe())
                 .filter(o -> o instanceof NetheriteUpgradeSmithingRecipe)
                 .forEach(o -> registry.addRecipe(
                         new StarcatcherEmiSmithingRecipe(((NetheriteUpgradeSmithingRecipe) o))));
 
         //add all starcatcher:smithing_rod_skin
         smithingRecipes.stream()
-                .filter(o -> o instanceof RecipeHolder<?,?>)
-                .map(o -> ((RecipeHolder<?,?>) o).getRecipe())
                 .filter(o -> o instanceof FishingRodSkinSmithingRecipe)
                 .forEach(o -> registry.addRecipe(
                         new StarcatcherEmiSmithingRecipe(((FishingRodSkinSmithingRecipe) o))));
 
         //add all starcatcher:smithing_tackle_skin
         smithingRecipes.stream()
-                .filter(o -> o instanceof RecipeHolder<?,?>)
-                .map(o -> ((RecipeHolder<?,?>) o).getRecipe())
                 .filter(o -> o instanceof TackleSkinSmithingRecipe)
                 .forEach(o -> registry.addRecipe(
                         new StarcatcherEmiSmithingRecipe(((TackleSkinSmithingRecipe) o))));
