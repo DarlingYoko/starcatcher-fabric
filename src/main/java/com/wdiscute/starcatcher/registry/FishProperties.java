@@ -113,7 +113,7 @@ public record FishProperties(
     public Component getDisplayName()
     {
         if (catchInfo.alwaysSpawnEntity)
-            return Component.translatable("entity." + catchInfo.entityToSpawn.getRegisteredName().replace(":", "."));
+            return Component.translatable("entity." + catchInfo.entityToSpawn.unwrapKey().orElseThrow().location().toString().replace(":", "."));
         else
             return Component.translatable(catchInfo.fish.value().getDescriptionId());
     }
@@ -1912,7 +1912,7 @@ public record FishProperties(
             {
                 for (Holder<Biome> biomeHolder : optional.get())
                 {
-                    String biomeString = biomeHolder.getRegisteredName();
+                    String biomeString = biomeHolder.unwrapKey().orElseThrow().location().toString();
 
                     rls.add(ResourceLocation.tryParse(biomeString));
                 }
@@ -1944,7 +1944,7 @@ public record FishProperties(
             {
                 for (Holder<Biome> biomeHolder : optional.get())
                 {
-                    String biomeString = biomeHolder.getRegisteredName();
+                    String biomeString = biomeHolder.unwrapKey().orElseThrow().location().toString();
 
                     rls.add(new ResourceLocation(biomeString));
                 }

@@ -23,8 +23,7 @@ public class FishingRodScreen extends AbstractContainerScreen<FishingRodMenu>
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey))
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode))
         {
             this.onClose();
             return true;

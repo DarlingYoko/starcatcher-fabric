@@ -52,7 +52,6 @@ public class StandScreen extends AbstractContainerScreen<StandMenu>
         nameEditBox.setBordered(false);
         nameEditBox.setMaxLength(20);
         nameEditBox.setValue("");
-        nameEditBox.setTextShadow(false);
         nameEditBox.setEditable(false);
         addWidget(this.nameEditBox);
     }

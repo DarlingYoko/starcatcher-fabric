@@ -49,7 +49,6 @@ public class MessageWriteScreen extends Screen
             box.setTextColor(0x635040);
             box.setBordered(false);
             box.setMaxLength(40);
-            box.setTextShadow(false);
             box.setEditable(true);
             if(message.text().size() > i) box.setValue(message.text().get(i));
             addWidget(box);
@@ -63,7 +62,6 @@ public class MessageWriteScreen extends Screen
         name.setBordered(false);
         name.setMaxLength(17);
         name.setValue(message.senderDisplayName());
-        name.setTextShadow(false);
         name.setEditable(true);
         addWidget(name);
     }

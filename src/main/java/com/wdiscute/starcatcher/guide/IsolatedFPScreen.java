@@ -39,8 +39,7 @@ public class IsolatedFPScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(key))
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode))
         {
             this.onClose();
             return true;

@@ -9,6 +9,7 @@ import com.wdiscute.starcatcher.registry.SCEntities;
 import com.wdiscute.starcatcher.registry.SCItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
@@ -25,11 +26,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.Holder;
+
 import java.util.function.Supplier;
 
 public class StarcaughtBucket extends BucketItem
 {
-    Supplier<EntityType<FishEntity>> entity;
+    Holder<EntityType<FishEntity>> entity;
 
     public StarcaughtBucket(Fluid fluid)
     {
@@ -50,7 +53,7 @@ public class StarcaughtBucket extends BucketItem
 
     private void spawn(ServerLevel serverLevel, ItemStack bucketedMobStack, BlockPos pos)
     {
-        FishEntity fishEntity = this.entity.get().spawn(serverLevel, bucketedMobStack, null, pos, MobSpawnType.BUCKET, true, false);
+        FishEntity fishEntity = this.entity.value().spawn(serverLevel, bucketedMobStack, null, pos, MobSpawnType.BUCKET, true, false);
         if (SCDataComponents.has(bucketedMobStack, SCDataComponents.BUCKETED_FISH))
             fishEntity.setFish(getFish(bucketedMobStack));
         else
@@ -69,8 +72,8 @@ public class StarcaughtBucket extends BucketItem
         ItemStack fish = getFish(stack);
         if (fish.isEmpty())
         {
-            tooltipComponents.add(1, Component.translatable("tooltip.starcatcher.starcaught_bucket.creative.1").withColor(0x888888));
-            tooltipComponents.add(1, Component.translatable("tooltip.starcatcher.starcaught_bucket.creative.0").withColor(0x888888));
+            tooltipComponents.add(1, Component.translatable("tooltip.starcatcher.starcaught_bucket.creative.1").withStyle(Style.EMPTY.withColor(0x888888)));
+            tooltipComponents.add(1, Component.translatable("tooltip.starcatcher.starcaught_bucket.creative.0").withStyle(Style.EMPTY.withColor(0x888888)));
         }
     }
 

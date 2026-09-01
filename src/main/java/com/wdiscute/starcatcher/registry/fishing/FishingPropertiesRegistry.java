@@ -331,7 +331,7 @@ public class FishingPropertiesRegistry
     static ResourceKey<FishProperties> createKey(FishProperties fp)
     {
         if (fp.catchInfo().fishEntryType().equals(FishProperties.CatchInfo.FishEntryType.FISH))
-            return ResourceKey.create(Starcatcher.FISH_REGISTRY_KEY, ResourceLocation.tryParse(fp.catchInfo().fish().getRegisteredName()));
+            return ResourceKey.create(Starcatcher.FISH_REGISTRY_KEY, ResourceLocation.tryParse(fp.catchInfo().fish().unwrapKey().orElseThrow().location().toString()));
 
         return ResourceKey.create(Starcatcher.FISH_REGISTRY_KEY, ResourceLocation.tryParse(
                 fp.catchInfo().fish().unwrapKey().orElseThrow().location().getNamespace() + ":" +

@@ -209,7 +209,7 @@ public class SettingsScreen extends FishingMinigameScreen {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             //confirm the mouse is on the element
-            if (!(mouseX > getX() && mouseX < getRight() && mouseY > getY() && mouseY < getBottom()))
+            if (!(mouseX > getX() && mouseX < (getX() + getWidth()) && mouseY > getY() && mouseY < (getY() + getHeight())))
                 return super.mouseClicked(mouseX, mouseY, button);
 
             //left button
@@ -221,7 +221,7 @@ public class SettingsScreen extends FishingMinigameScreen {
 
 
             //right button
-            if (mouseX > getRight() - buttonWidth){
+            if (mouseX > (getX() + getWidth()) - buttonWidth){
                 if (rightLimit != null && value.get().compareTo(rightLimit) >= 0) return false;
 
                 rightAction.run();
@@ -258,7 +258,7 @@ public class SettingsScreen extends FishingMinigameScreen {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             //confirm the mouse is on the element
-            if (!(mouseX > getX() && mouseX < getRight() && mouseY > getY() && mouseY < getBottom()))
+            if (!(mouseX > getX() && mouseX < (getX() + getWidth()) && mouseY > getY() && mouseY < (getY() + getHeight())))
                 return super.mouseClicked(mouseX, mouseY, button);
 
             int current = guiScale().get();

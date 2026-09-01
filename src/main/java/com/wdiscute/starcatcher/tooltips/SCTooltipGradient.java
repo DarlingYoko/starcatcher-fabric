@@ -2,6 +2,7 @@ package com.wdiscute.starcatcher.tooltips;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.tuple.Triple;
 
 public class SCTooltipGradient
@@ -14,7 +15,7 @@ public class SCTooltipGradient
 
         for (int i = 0; i < text.length(); i++)
         {
-            component.append(Component.literal(String.valueOf(text.charAt(i))).withColor(getBlueColorForIndex(i, time, firstColor, secondColor)));
+            component.append(Component.literal(String.valueOf(text.charAt(i))).withStyle(Style.EMPTY.withColor(getBlueColorForIndex(i, time, firstColor, secondColor))));
         }
 
         return component;

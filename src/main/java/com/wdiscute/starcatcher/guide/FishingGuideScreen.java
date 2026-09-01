@@ -211,7 +211,6 @@ public class FishingGuideScreen extends Screen
         this.editBox.setTextColor(0xff937d70);
         this.editBox.setBordered(false);
         this.editBox.setMaxLength(20);
-        this.editBox.setTextShadow(false);
         this.editBox.setCanLoseFocus(true);
         this.editBox.setValue("");
         this.addWidget(this.editBox);
@@ -267,8 +266,7 @@ public class FishingGuideScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(key) && !editBox.canConsumeInput())
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode) && !editBox.canConsumeInput())
         {
             if (menu == 0)
             {
@@ -1366,8 +1364,8 @@ public class FishingGuideScreen extends Screen
         }
         else
         {
-            if (fp.catchInfo().alwaysSpawnEntity() && !fp.catchInfo().entityToSpawn().is(U.holderEntity(SCEntities.FISH).getKey()))
-                components.add(translatable("entity." + fp.catchInfo().entityToSpawn().getRegisteredName().replace(":", ".")));
+            if (fp.catchInfo().alwaysSpawnEntity() && !fp.catchInfo().entityToSpawn().is(SCEntities.FISH.unwrapKey().orElseThrow()))
+                components.add(translatable("entity." + fp.catchInfo().entityToSpawn().unwrapKey().orElseThrow().location().toString().replace(":", ".")));
             else
                 components.add(translatable(fp.catchInfo().fish().value().getDescriptionId()));
 
