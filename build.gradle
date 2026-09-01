@@ -146,21 +146,28 @@ fabricApi {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mod_id", mod_id
-    inputs.property "mod_name", mod_name
-    inputs.property "mod_license", mod_license
-    inputs.property "mod_authors", mod_authors
-    inputs.property "mod_description", mod_description
+    def resolvedVersion = mod_version
+    def resolvedModId = mod_id
+    def resolvedModName = mod_name
+    def resolvedModLicense = mod_license
+    def resolvedModAuthors = mod_authors
+    def resolvedModDescription = mod_description
+
+    inputs.property "version", resolvedVersion
+    inputs.property "mod_id", resolvedModId
+    inputs.property "mod_name", resolvedModName
+    inputs.property "mod_license", resolvedModLicense
+    inputs.property "mod_authors", resolvedModAuthors
+    inputs.property "mod_description", resolvedModDescription
 
     filesMatching("fabric.mod.json") {
         expand(
-                version: project.version,
-                mod_id: mod_id,
-                mod_name: mod_name,
-                mod_license: mod_license,
-                mod_authors: mod_authors,
-                mod_description: mod_description,
+                version: resolvedVersion,
+                mod_id: resolvedModId,
+                mod_name: resolvedModName,
+                mod_license: resolvedModLicense,
+                mod_authors: resolvedModAuthors,
+                mod_description: resolvedModDescription,
         )
     }
 }
