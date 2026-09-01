@@ -18,10 +18,12 @@ import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
 import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
 import com.wdiscute.starcatcher.registry.tackleskin.AbstractTackleSkin;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceArgument;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -57,6 +59,20 @@ public class SCCommands
             o -> Component.translatable("commands.starcatcher.modifier_not_found", o)
     );
 
+    static
+    {
+        /*
+         * Vanilla's own ArgumentTypeInfos registry has no public registration method for custom
+         * ArgumentTypes (its BY_CLASS lookup, used to serialize the command tree sent to clients on
+         * join, is populated only from its private bootstrap() call for vanilla's own types) — without
+         * this, syncing any command using EnumArgument throws "Unrecognized argument type EnumArgument"
+         * server-side, which disconnects every joining player with "Invalid player data". EnumArgument
+         * is only ever used with FishProperties.Rarity in this codebase (see the "rarity" argument
+         * below), so a single contextFree singleton registration covers every usage.
+         */
+        ArgumentTypeRegistry.registerArgumentType(Starcatcher.rl("enum"), EnumArgument.class,
+                SingletonArgumentInfo.contextFree(() -> EnumArgument.enumArgument(FishProperties.Rarity.class)));
+    }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context)
     {
