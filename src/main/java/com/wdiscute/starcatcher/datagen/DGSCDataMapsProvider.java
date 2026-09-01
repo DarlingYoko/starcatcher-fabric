@@ -1,8 +1,5 @@
 package com.wdiscute.starcatcher.datagen;
 
-import com.wdiscute.sellingbin.processors.AbstractProcessor;
-import com.wdiscute.sellingbin.processors.QualityFoodsProcessor;
-import com.wdiscute.sellingbin.registry.SBDataMaps;
 import com.wdiscute.starcatcher.SCTags;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.registry.FishProperties;
@@ -15,7 +12,6 @@ import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
 import com.wdiscute.starcatcher.registry.fishing.FishingPropertiesRegistry;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
-import com.wdiscute.starcatcher.sellingbin.FishProcessor;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -30,7 +26,6 @@ import net.nikdo53.neobackports.datamaps.NeoForgeDataMaps;
 import net.nikdo53.neobackports.datamaps.builtin.Compostable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class DGSCDataMapsProvider extends DataMapProvider
@@ -44,8 +39,6 @@ public class DGSCDataMapsProvider extends DataMapProvider
     protected void gather(HolderLookup.Provider provider)
     {
         var aquarium = this.builder(SCDataMaps.AQUARIUM_INTERACTION);
-        var currencies = this.builder(SBDataMaps.SELLING_BIN_CURRENCIES);
-        var sellable = this.builder(SBDataMaps.SELLING_BIN_VALUE);
         var compostable = this.builder(NeoForgeDataMaps.COMPOSTABLES);
         var catchModifiers = this.builder(SCDataMaps.CATCH_MODIFIERS);
         var minigameModifiers = this.builder(SCDataMaps.MINIGAME_MODIFIERS);
@@ -73,50 +66,10 @@ public class DGSCDataMapsProvider extends DataMapProvider
         compostable.add(SCTags.WORMS, new Compostable(0.65F, false), false);
         compostable.add(SCTags.BUCKETABLE_FISHES, new Compostable(0.9F, false), false);
 
-        //selling sellable datagen
-        //shouldn't be run as the JSONs are manually moved to a
-        //built-in datapack instead of hard coded into the mod's resources
-        if (false)
-        {
-            //selling sellable currencies
-            currencies.add(Items.EMERALD.builtInRegistryHolder(), 100, false);
-            currencies.add(Items.EMERALD_BLOCK.builtInRegistryHolder(), 900, false);
-
-            //selling sellable fishes
-            Map<String, Float> qualities = Map.of(
-                    "diamond", 2f,
-                    "gold", 1.5f,
-                    "iron", 1.25f
-            );
-
-            sellable.add(SCTags.COMMON_FISHES, new SBDataMaps.ItemValue(25, List.of(
-                    new FishProcessor(2, 10f),
-                    new QualityFoodsProcessor(qualities)
-            )), false);
-
-            sellable.add(SCTags.UNCOMMON_FISHES, new SBDataMaps.ItemValue(50, List.of(
-                    new FishProcessor(2, 10f),
-                    new QualityFoodsProcessor(qualities)
-            )), false);
-
-            sellable.add(SCTags.RARE_FISHES, new SBDataMaps.ItemValue(100, List.of(
-                    new FishProcessor(2, 10f),
-                    new QualityFoodsProcessor(qualities)
-            )), false);
-
-            sellable.add(SCTags.EPIC_FISHES, new SBDataMaps.ItemValue(150, List.of(
-                    new FishProcessor(2, 10f),
-                    new QualityFoodsProcessor(qualities)
-            )), false);
-
-            sellable.add(SCTags.LEGENDARY_FISHES, new SBDataMaps.ItemValue(200, List.of(
-                    new FishProcessor(2, 10f),
-                    new QualityFoodsProcessor(qualities)
-            )), false);
-
-            sellable.add(SCItems.PEARL.get().asItem().builtInRegistryHolder(), AbstractProcessor.createEmpty(50), false);
-        }
-
+        //Selling-bin sellable-value datagen (currencies/sellable builders) removed here — the
+        //selling-bin subsystem is gated off on Fabric for now (no Fabric build of wd's own
+        //selling-bin mod yet, see FABRIC_PORT_PLAN.md §7bis.3/§8); this code was already dead
+        //under Forge too (`if (false)`, values were hand-edited into a built-in datapack instead).
 
         //minigame modifiers
         minigameModifiers.add(SCItems.FROZEN_HOOK, List.of(SCMinigameModifiers.PREVENT_FROZEN.getId()), false);

@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
 import com.wdiscute.libtooltips.Tooltips;
-import com.wdiscute.sellingbin.registry.SBBlocks;
 import com.wdiscute.starcatcher.*;
 import com.wdiscute.starcatcher.compat.emi.StarcatcherEmiPlugin;
 import com.wdiscute.starcatcher.compat.jei.StarcatcherJeiPlugin;
@@ -1791,7 +1790,9 @@ public class FishingGuideScreen extends Screen
         letterBottleIcon = new ItemStack(SCItems.BOTTLED_LETTER.get());
         var messageBottleIcon = new ItemStack(SCItems.MESSAGE_IN_A_BOTTLE.get());
         var messageIcon = new ItemStack(SCItems.MESSAGE.get());
-        sellingBinIcon = new ItemStack(SBBlocks.SELLING_BIN.get());
+        //TODO(P8): stand-in for the selling-bin block icon until the selling-bin subsystem is
+        //ported/gated back in (see FABRIC_PORT_PLAN.md §7bis.3) — SBBlocks.SELLING_BIN doesn't exist
+        sellingBinIcon = new ItemStack(Items.EMERALD);
         aquariumIcon = new ItemStack(SCBlocks.AQUARIUM.get());
         displayIcon = new ItemStack(SCBlocks.DISPLAY.get());
         guideIcon = new ItemStack(SCItems.GUIDE.get());
