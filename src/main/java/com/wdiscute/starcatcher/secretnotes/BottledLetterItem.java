@@ -55,7 +55,7 @@ public class BottledLetterItem extends Item
         }
 
         player.awardStat(Stats.ITEM_USED.get(this));
-        itemstack.consume(1, player);
+        if (!player.getAbilities().instabuild) itemstack.shrink(1);
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
     }
 /*

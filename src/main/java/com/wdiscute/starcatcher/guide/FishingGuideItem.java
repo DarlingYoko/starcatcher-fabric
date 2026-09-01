@@ -7,6 +7,7 @@ import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.SignedGuide;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -57,7 +58,10 @@ public class FishingGuideItem extends Item
 
                 if (level.getBlockEntity(clickedPos) instanceof DisplayBlockEntity dbe)
                 {
-                    dbe.setItem(context.getItemInHand().consumeAndReturn(1, context.getPlayer()));
+                    ItemStack heldStack = context.getItemInHand();
+                    Player itemPlayer = context.getPlayer();
+                    if (itemPlayer == null || !itemPlayer.getAbilities().instabuild) heldStack.shrink(1);
+                    dbe.setItem(heldStack);
                 }
                 return InteractionResult.SUCCESS;
             }
@@ -72,7 +76,7 @@ public class FishingGuideItem extends Item
         {
             var sign = SCDataComponents.get(stack, SCDataComponents.SIGNED_GUIDE);
 
-            if (tooltipFlag.hasShiftDown())
+            if (Screen.hasShiftDown())
                 tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.signed_shift", sign.owner().toString()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
             else
                 tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.signed", sign.signature()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));

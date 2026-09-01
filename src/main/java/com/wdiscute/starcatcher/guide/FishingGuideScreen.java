@@ -1364,7 +1364,7 @@ public class FishingGuideScreen extends Screen
         }
         else
         {
-            if (fp.catchInfo().alwaysSpawnEntity() && !fp.catchInfo().entityToSpawn().is(SCEntities.FISH.unwrapKey().orElseThrow()))
+            if (fp.catchInfo().alwaysSpawnEntity() && !fp.catchInfo().entityToSpawn().is(SCEntities.FISH.unwrapKey().orElseThrow().location()))
                 components.add(translatable("entity." + fp.catchInfo().entityToSpawn().unwrapKey().orElseThrow().location().toString().replace(":", ".")));
             else
                 components.add(translatable(fp.catchInfo().fish().value().getDescriptionId()));
