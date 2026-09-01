@@ -1,59 +1,38 @@
 package com.wdiscute.starcatcher.datagen;
 
 import com.wdiscute.starcatcher.Starcatcher;
-import com.wdiscute.starcatcher.registry.fishing.FishingPropertiesRegistry;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 
-public class DGSCFishingPropertiesProvider extends DatapackBuiltinEntriesProvider
+/**
+ * Was `DatapackBuiltinEntriesProvider` (Forge) — Fabric's dynamic-registry datagen equivalent is
+ * `FabricDynamicRegistryProvider`; the actual `RegistrySetBuilder.add(FISH_REGISTRY_KEY, ...)` call
+ * moved to `SCDataGenerator.buildRegistry(...)` (the `DataGeneratorEntrypoint` hook Fabric provides
+ * for exactly this). See FABRIC_PORT_PLAN.md §9 (P6).
+ *
+ * Known gap, documented not silently dropped: the original's `registerConditions` gated every
+ * cross-mod fish entry (aquaculture, tide, etc.) behind a `ModLoadedCondition` so datapacks generated
+ * on a dev machine with every compat mod installed wouldn't reference missing items/fish at runtime
+ * on a server without them. `FabricDynamicRegistryProvider` has no per-entry condition hook at all
+ * (Fabric's condition system, `fabric-resource-conditions-api-v1`, isn't wired into the dynamic
+ * registry codec path the way NeoForge's `ConditionalOps` is) — so that gating is lost for now.
+ * Not a runtime crash risk (the registry codec still round-trips fine at load time either way), just
+ * a loss of the "don't even emit compat entries for absent mods" datagen optimization.
+ */
+public class DGSCFishingPropertiesProvider extends FabricDynamicRegistryProvider
 {
-
-    static
+    public DGSCFishingPropertiesProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture)
     {
-        FishingPropertiesRegistry.register(); //register all entries before anything else
-    }
-
-    public static final RegistrySetBuilder REGISTRY = new RegistrySetBuilder().add(Starcatcher.FISH_REGISTRY_KEY, FishingPropertiesRegistry::bootstrap);
-
-    public DGSCFishingPropertiesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries)
-    {
-        super(output, registries, REGISTRY, Set.of(
-                Starcatcher.MOD_ID,
-                "minecraft",
-                "tide",
-                "aquaculture",
-                "fishofthieves",
-                "netherdepthsupgrade",
-                "sullysmod",
-                "upgrade_aquatic",
-                "environmental",
-                "collectorsreap",
-                "miners_delight",
-                "alexscaves",
-                "crittersandcompanions",
-                "aquamirae",
-                "hybrid_aquatic",
-                "hybrid-aquatic",
-                "tfc",
-                "betterend",
-                "unusualfishmod",
-                "spawn",
-                "fintastic"
-                //That's a lot of compatibilities
-        ));
+        super(output, registriesFuture);
     }
 
     @Override
-    public void registerConditions(BiConsumer<ResourceKey<?>, ICondition> consumer) {
-        FishingPropertiesRegistry.registerConditions(consumer);
+    protected void configure(HolderLookup.Provider registries, Entries entries)
+    {
+        entries.addAll(registries.lookupOrThrow(Starcatcher.FISH_REGISTRY_KEY));
     }
 
     @Override

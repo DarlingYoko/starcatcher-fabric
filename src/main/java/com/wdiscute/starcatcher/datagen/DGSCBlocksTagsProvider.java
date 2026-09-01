@@ -1,26 +1,16 @@
 package com.wdiscute.starcatcher.datagen;
 
-import com.wdiscute.starcatcher.Starcatcher;
-import com.wdiscute.starcatcher.blocks.SCBlocks;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.data.BlockTagsProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class DGSCBlocksTagsProvider extends BlockTagsProvider
+public class DGSCBlocksTagsProvider extends FabricTagProvider.BlockTagProvider
 {
-
-    public DGSCBlocksTagsProvider(PackOutput output,
-                                  CompletableFuture<HolderLookup.Provider> lookupProvider,
-                                  @Nullable ExistingFileHelper existingFileHelper)
+    public DGSCBlocksTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider)
     {
-        super(output, lookupProvider, Starcatcher.MOD_ID, existingFileHelper);
+        super(output, lookupProvider);
     }
 
     @Override

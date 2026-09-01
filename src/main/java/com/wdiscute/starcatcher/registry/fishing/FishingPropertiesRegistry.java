@@ -13,13 +13,10 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.BiConsumer;
 
 public class FishingPropertiesRegistry
 {
@@ -365,14 +362,6 @@ public class FishingPropertiesRegistry
         String namespace = key.location().getNamespace();
         if (!namespace.equals("minecraft") && !namespace.equals("starcatcher"))
             COMPAT_KEYS.add(key);
-    }
-
-    public static void registerConditions(BiConsumer<ResourceKey<?>, ICondition> consumer)
-    {
-        for (ResourceKey<FishProperties> compatKey : COMPAT_KEYS)
-        {
-            consumer.accept(compatKey, new ModLoadedCondition(compatKey.location().getNamespace()));
-        }
     }
 
     public static void bootstrap(BootstapContext<FishProperties> context)

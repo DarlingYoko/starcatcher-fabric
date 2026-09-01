@@ -21,6 +21,9 @@
 		"client": [
 			"com.wdiscute.starcatcher.StarcatcherFabricClient"
 		],
+		"fabric-datagen": [
+			"com.wdiscute.starcatcher.datagen.SCDataGenerator"
+		],
 		"cardinal-components-entity": [
 			"com.wdiscute.starcatcher.io.attachments.SCEntityComponents"
 		]

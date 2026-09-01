@@ -7,6 +7,7 @@ import com.wdiscute.starcatcher.recipe.FishingRodSkinSmithingRecipeBuilder;
 import com.wdiscute.starcatcher.recipe.NetheriteUpgradeSmithingRecipeBuilder;
 import com.wdiscute.starcatcher.recipe.TackleSkinSmithingRecipeBuilder;
 import com.wdiscute.starcatcher.registry.SCItems;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -453,7 +453,7 @@ public class DGSCRecipeProvider extends RecipeProvider
 
         //aquarium
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SCBlocks.AQUARIUM)
-                .define('G', Tags.Items.GLASS_PANES)
+                .define('G', ConventionalItemTags.GLASS_PANES)
                 .pattern("GGG")
                 .pattern("G G")
                 .pattern("GGG")
@@ -560,7 +560,7 @@ public class DGSCRecipeProvider extends RecipeProvider
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SCItems.COLORFUL_SMITHING_TEMPLATE, 2)
                 .define('T', SCItems.COLORFUL_SMITHING_TEMPLATE)
                 .define('D', Items.DIAMOND)
-                .define('C', Tags.Items.DYES)
+                .define('C', ConventionalItemTags.DYES)
                 .pattern("DTD")
                 .pattern("DCD")
                 .pattern("DDD")
@@ -570,7 +570,7 @@ public class DGSCRecipeProvider extends RecipeProvider
         TackleSkinSmithingRecipeBuilder.smithing(
                         Ingredient.of(SCItems.COLORFUL_SMITHING_TEMPLATE),
                         Ingredient.of(SCTags.RODS),
-                        Ingredient.of(Tags.Items.DYES),
+                        Ingredient.of(ConventionalItemTags.DYES),
                         RecipeCategory.TOOLS
                 )
                 .unlocks("has_template_humble", has(SCItems.COLORFUL_SMITHING_TEMPLATE))

@@ -1,63 +1,67 @@
 package com.wdiscute.starcatcher.datagen;
 
-import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.SCTags;
 import com.wdiscute.starcatcher.U;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.BiomeTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class DGSCBiomeTagsProvider extends BiomeTagsProvider
+/**
+ * Was `BlockTagsProvider` (Forge convenience subclass, modid+ExistingFileHelper ctor, `addOptional`/
+ * `addOptionalTag` sugar) — vanilla has no such subclass at all for biome tags with that sugar, so
+ * this now extends Fabric's base `FabricTagProvider<Biome>` directly (there's no `BiomeTagProvider`
+ * inner specialization the way there is for Item/Block), using `getOrCreateTagBuilder` for the same
+ * optional-add semantics. `Tags.Biomes.IS_MUSHROOM/IS_SWAMP/IS_DESERT` (Forge conventional tags)
+ * became Fabric's `ConventionalBiomeTags.MUSHROOM/SWAMP/DESERT` — same `c:` convention, different name.
+ */
+public class DGSCBiomeTagsProvider extends FabricTagProvider<Biome>
 {
-    public DGSCBiomeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper)
+    public DGSCBiomeTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider)
     {
-        super(output, lookupProvider, Starcatcher.MOD_ID, existingFileHelper);
+        super(output, Registries.BIOME, lookupProvider);
     }
-
 
     @Override
     protected void addTags(HolderLookup.Provider provider)
     {
-        this.tag(create(SCTags.IS_BEACH))
+        getOrCreateTagBuilder(create(SCTags.IS_BEACH))
                 .addOptional(BiomeTags.IS_BEACH.location())
         ;
 
-        this.tag(create(SCTags.IS_WARPED_FOREST))
+        getOrCreateTagBuilder(create(SCTags.IS_WARPED_FOREST))
                 .addOptional(Biomes.WARPED_FOREST.location())
         ;
 
-        this.tag(create(SCTags.IS_SOUL_SAND_VALLEY))
+        getOrCreateTagBuilder(create(SCTags.IS_SOUL_SAND_VALLEY))
                 .addOptional(Biomes.SOUL_SAND_VALLEY.location())
         ;
 
-        this.tag(create(SCTags.IS_BASALT_DELTAS))
+        getOrCreateTagBuilder(create(SCTags.IS_BASALT_DELTAS))
                 .addOptional(Biomes.BASALT_DELTAS.location())
         ;
 
-        this.tag(create(SCTags.IS_CRIMSON_FOREST))
+        getOrCreateTagBuilder(create(SCTags.IS_CRIMSON_FOREST))
                 .addOptional(Biomes.CRIMSON_FOREST.location())
         ;
 
-        this.tag(create(SCTags.IS_BIRCH_FOREST))
+        getOrCreateTagBuilder(create(SCTags.IS_BIRCH_FOREST))
                 .addOptional(Biomes.BIRCH_FOREST.location())
                 .addOptional(Biomes.OLD_GROWTH_BIRCH_FOREST.location())
         ;
 
-        this.tag(create(SCTags.IS_CHERRY_GROVE))
+        getOrCreateTagBuilder(create(SCTags.IS_CHERRY_GROVE))
                 .addOptional(Biomes.CHERRY_GROVE.location());
 
-        this.tag(create(SCTags.IS_COLD_LAKE))
+        getOrCreateTagBuilder(create(SCTags.IS_COLD_LAKE))
                 .addOptional(Biomes.SNOWY_TAIGA.location())
                 .addOptional(Biomes.SNOWY_BEACH.location())
                 .addOptional(Biomes.SNOWY_PLAINS.location())
@@ -67,45 +71,45 @@ public class DGSCBiomeTagsProvider extends BiomeTagsProvider
                 .addOptional(Biomes.JAGGED_PEAKS.location())
         ;
 
-        this.tag(create(SCTags.IS_COLD_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_COLD_OCEAN))
                 .addOptional(Biomes.COLD_OCEAN.location())
                 .addOptional(Biomes.DEEP_COLD_OCEAN.location())
                 .addOptional(Biomes.FROZEN_OCEAN.location())
                 .addOptional(Biomes.DEEP_FROZEN_OCEAN.location())
         ;
 
-        this.tag(create(SCTags.IS_COLD_RIVER))
+        getOrCreateTagBuilder(create(SCTags.IS_COLD_RIVER))
                 .addOptional(Biomes.FROZEN_RIVER.location())
                 .addOptional(Biomes.SNOWY_BEACH.location())
         ;
 
-        this.tag(create(SCTags.IS_DARK_FOREST))
+        getOrCreateTagBuilder(create(SCTags.IS_DARK_FOREST))
                 .addOptional(Biomes.DARK_FOREST.location())
         ;
 
-        this.tag(create(SCTags.IS_DEEP_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_DEEP_OCEAN))
                 .addOptional(Biomes.DEEP_COLD_OCEAN.location())
                 .addOptional(Biomes.DEEP_FROZEN_OCEAN.location())
                 .addOptional(Biomes.DEEP_LUKEWARM_OCEAN.location())
                 .addOptional(Biomes.DEEP_OCEAN.location())
         ;
 
-        this.tag(create(SCTags.IS_LUKEWARM_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_LUKEWARM_OCEAN))
                 .addOptional(Biomes.LUKEWARM_OCEAN.location())
                 .addOptional(Biomes.DEEP_LUKEWARM_OCEAN.location())
         ;
 
-        this.tag(create(SCTags.IS_MUSHROOM_FIELDS))
+        getOrCreateTagBuilder(create(SCTags.IS_MUSHROOM_FIELDS))
                 .addOptional(Biomes.MUSHROOM_FIELDS.location())
-                .addOptionalTag(Tags.Biomes.IS_MUSHROOM.location())
+                .addOptionalTag(ConventionalBiomeTags.MUSHROOM)
         ;
 
-        this.tag(create(SCTags.IS_NORMAL_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_NORMAL_OCEAN))
                 .addOptional(Biomes.OCEAN.location())
                 .addOptional(Biomes.DEEP_OCEAN.location())
         ;
 
-        this.tag(create(SCTags.IS_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_OCEAN))
                 .addOptionalTag(BiomeTags.IS_OCEAN)
                 .addOptional(U.rl("tfc", "deep_ocean"))
                 .addOptional(U.rl("tfc", "deep_ocean_trench"))
@@ -113,30 +117,30 @@ public class DGSCBiomeTagsProvider extends BiomeTagsProvider
                 .addOptional(U.rl("tfc", "ocean_reef"))
         ;
 
-        this.tag(create(SCTags.IS_RIVER))
+        getOrCreateTagBuilder(create(SCTags.IS_RIVER))
                 .addOptionalTag(BiomeTags.IS_RIVER)
                 .addOptionalTag(U.rl("tfc", "river"))
         ;
 
-        this.tag(create(SCTags.IS_SWAMP))
+        getOrCreateTagBuilder(create(SCTags.IS_SWAMP))
                 .addOptional(Biomes.SWAMP.location())
                 .addOptional(Biomes.MANGROVE_SWAMP.location())
-                .addOptionalTag(Tags.Biomes.IS_SWAMP)
+                .addOptionalTag(ConventionalBiomeTags.SWAMP)
         ;
 
-        this.tag(create(SCTags.IS_WARM_LAKE))
+        getOrCreateTagBuilder(create(SCTags.IS_WARM_LAKE))
                 .addOptionalTag(BiomeTags.IS_SAVANNA)
                 .addOptionalTag(BiomeTags.HAS_DESERT_PYRAMID)
-                .addOptionalTag(Tags.Biomes.IS_DESERT)
+                .addOptionalTag(ConventionalBiomeTags.DESERT)
         ;
 
-        this.tag(create(SCTags.IS_WARM_OCEAN))
+        getOrCreateTagBuilder(create(SCTags.IS_WARM_OCEAN))
                 .addOptional(Biomes.WARM_OCEAN.location())
                 .addOptional(Biomes.LUKEWARM_OCEAN.location())
                 .addOptional(Biomes.DEEP_LUKEWARM_OCEAN.location())
         ;
 
-        this.tag(create(SCTags.IS_WARM_RIVER))
+        getOrCreateTagBuilder(create(SCTags.IS_WARM_RIVER))
                 .addOptional(Biomes.RIVER.location())
         ;
 

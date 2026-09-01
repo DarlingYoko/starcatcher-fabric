@@ -1,36 +1,31 @@
 package com.wdiscute.starcatcher.datagen;
 
-import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.SCTags;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.fishing.DGStarcatcherFishes;
 import com.wdiscute.starcatcher.registry.fishing.FishingPropertiesRegistry;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import net.nikdo53.neobackports.registry.DeferredBlock;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 import static com.wdiscute.starcatcher.registry.SCItems.*;
 import static com.wdiscute.starcatcher.blocks.SCBlocks.*;
 
-public class DGSCItemsTagsProvider extends ItemTagsProvider
+public class DGSCItemsTagsProvider extends FabricTagProvider.ItemTagProvider
 {
 
-    public DGSCItemsTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
-                                 CompletableFuture<TagLookup<Block>> blockTags, @Nullable ExistingFileHelper existingFileHelper)
+    public DGSCItemsTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
+                                 FabricTagProvider.BlockTagProvider blockTags)
     {
-        super(output, lookupProvider, blockTags, Starcatcher.MOD_ID, existingFileHelper);
+        super(output, lookupProvider, blockTags);
     }
 
     @Override
@@ -39,11 +34,11 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
         //fishes, cat_food, foods/raw_fish
         for (var item : BUCKETABLE_FISHES_REGISTRY.getEntries())
         {
-            tag(ItemTags.FISHES).add(item.get());
-            //   tag(ItemTags.CAT_FOOD).add(item.get());
-            //   tag(Tags.Items.FOODS_RAW_FISH).add(item.get());
-            tag(SCTags.BUCKETABLE_FISHES).add(item.get());
-            tag(SCTags.STARCAUGHT_FISHES).add(item.get());
+            getOrCreateTagBuilder(ItemTags.FISHES).add(item.get());
+            //   getOrCreateTagBuilder(ItemTags.CAT_FOOD).add(item.get());
+            //   getOrCreateTagBuilder(Tags.Items.FOODS_RAW_FISH).add(item.get());
+            getOrCreateTagBuilder(SCTags.BUCKETABLE_FISHES).add(item.get());
+            getOrCreateTagBuilder(SCTags.STARCAUGHT_FISHES).add(item.get());
         }
 
         //todo figure out what to do with crabs/eels tags?
@@ -56,17 +51,17 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
             if (!fp.catchInfo().fishEntryType().equals(FishProperties.CatchInfo.FishEntryType.FISH)) return;
             if (fp.catchInfo().alwaysSpawnEntity()) return;
 
-            tag(SCTags.FISHABLE)
+            getOrCreateTagBuilder(SCTags.FISHABLE)
                     .addOptional(fp.catchInfo().fish().getKey().location());
 
             switch (p.getSecond().rarity())
             {
-                case TRASH -> tag(SCTags.TRASH).addOptional(fp.catchInfo().fish().getKey().location());
-                case COMMON -> tag(SCTags.COMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case UNCOMMON -> tag(SCTags.UNCOMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case RARE -> tag(SCTags.RARE_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case EPIC -> tag(SCTags.EPIC_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case LEGENDARY -> tag(SCTags.LEGENDARY_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case TRASH -> getOrCreateTagBuilder(SCTags.TRASH).addOptional(fp.catchInfo().fish().getKey().location());
+                case COMMON -> getOrCreateTagBuilder(SCTags.COMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case UNCOMMON -> getOrCreateTagBuilder(SCTags.UNCOMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case RARE -> getOrCreateTagBuilder(SCTags.RARE_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case EPIC -> getOrCreateTagBuilder(SCTags.EPIC_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case LEGENDARY -> getOrCreateTagBuilder(SCTags.LEGENDARY_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
             }
         });
 
@@ -74,22 +69,22 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
         {
             switch (fp.rarity())
             {
-                case COMMON -> tag(SCTags.COMMON_FISHES).add(fp.catchInfo().fish().value());
-                case UNCOMMON -> tag(SCTags.UNCOMMON_FISHES).add(fp.catchInfo().fish().value());
-                case RARE -> tag(SCTags.RARE_FISHES).add(fp.catchInfo().fish().value());
-                case EPIC -> tag(SCTags.EPIC_FISHES).add(fp.catchInfo().fish().value());
-                case LEGENDARY -> tag(SCTags.LEGENDARY_FISHES).add(fp.catchInfo().fish().value());
+                case COMMON -> getOrCreateTagBuilder(SCTags.COMMON_FISHES).add(fp.catchInfo().fish().value());
+                case UNCOMMON -> getOrCreateTagBuilder(SCTags.UNCOMMON_FISHES).add(fp.catchInfo().fish().value());
+                case RARE -> getOrCreateTagBuilder(SCTags.RARE_FISHES).add(fp.catchInfo().fish().value());
+                case EPIC -> getOrCreateTagBuilder(SCTags.EPIC_FISHES).add(fp.catchInfo().fish().value());
+                case LEGENDARY -> getOrCreateTagBuilder(SCTags.LEGENDARY_FISHES).add(fp.catchInfo().fish().value());
             }
         }
 
         //worms
-        tag(SCTags.WORMS)
+        getOrCreateTagBuilder(SCTags.WORMS)
                 .add(WORM.get())
                 .add(ALMIGHTY_WORM.get())
                 .add(SEEKING_WORM.get());
 
         //baits tag
-        tag(SCTags.BAITS)
+        getOrCreateTagBuilder(SCTags.BAITS)
                 .add(WORM.get())
                 .add(ALMIGHTY_WORM.get())
                 .add(SEEKING_WORM.get())
@@ -116,10 +111,10 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
         ;
 
         //templates tag
-        TEMPLATES_REGISTRY.getEntries().forEach(o -> tag(SCTags.TEMPLATES).add(o.get()));
+        TEMPLATES_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.TEMPLATES).add(o.get()));
 
         //tackle skins
-        tag(SCTags.TACKLE_SKINS)
+        getOrCreateTagBuilder(SCTags.TACKLE_SKINS)
                 .add(PEARL_SMITHING_TEMPLATE.get())
                 .add(KING_SMITHING_TEMPLATE.get())
                 .add(COLORFUL_SMITHING_TEMPLATE.get())
@@ -129,24 +124,24 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
         ;
 
         //Equipment tag
-        RODS_REGISTRY.getEntries().forEach(o -> tag(SCTags.EQUIPMENTS).add(o.get()));
-        //ModItems.HATS_REGISTRY.getEntries().stream().forEach(o -> tag(StarcatcherTags.EQUIPMENTS).add(o.get()));
+        RODS_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.EQUIPMENTS).add(o.get()));
+        //ModItems.HATS_REGISTRY.getEntries().stream().forEach(o -> getOrCreateTagBuilder(StarcatcherTags.EQUIPMENTS).add(o.get()));
 
         //gadgets
-        tag(SCTags.GADGETS).add(FISH_RADAR.get());
+        getOrCreateTagBuilder(SCTags.GADGETS).add(FISH_RADAR.get());
 
         //hooks tag
-        HOOKS_REGISTRY.getEntries().forEach(o -> tag(SCTags.HOOKS).add(o.get()));
-        tag(SCTags.HOOKS).addOptional(rl("tide", "void_hook"));
+        HOOKS_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.HOOKS).add(o.get()));
+        getOrCreateTagBuilder(SCTags.HOOKS).addOptional(rl("tide", "void_hook"));
 
         //bobbers tag
-        BOBBERS_REGISTRY.getEntries().forEach(o -> tag(SCTags.BOBBERS).add(o.get()));
+        BOBBERS_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.BOBBERS).add(o.get()));
 
         //rods and tools/fishing_rod
-        RODS_REGISTRY.getEntries().forEach(o -> tag(SCTags.RODS).add(o.get()));
-        //  RODS_REGISTRY.getEntries().forEach(o -> tag(Tags.Items.TOOLS_FISHING_ROD).add(o.get()));
+        RODS_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.RODS).add(o.get()));
+        //  RODS_REGISTRY.getEntries().forEach(o -> getOrCreateTagBuilder(Tags.Items.TOOLS_FISHING_ROD).add(o.get()));
 
-        tag(SCTags.AQUARIUM_INTERACTIONS)
+        getOrCreateTagBuilder(SCTags.AQUARIUM_INTERACTIONS)
                 .add(Items.DIAMOND_PICKAXE)
                 .add(Items.DIAMOND_SHOVEL)
                 .add(Items.STONE)
@@ -162,18 +157,18 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
         ;
 
         //hats
-        HATS.getEntries().forEach(o -> tag(SCTags.HATS).add(((DeferredBlock<?>) o).asItem()));
+        HATS.getEntries().forEach(o -> getOrCreateTagBuilder(SCTags.HATS).add(((DeferredBlock<?>) o).asItem()));
 
         //equippable hats
-        // tag(ItemTags.EQUIPPABLE_ENCHANTABLE)
+        // getOrCreateTagBuilder(ItemTags.EQUIPPABLE_ENCHANTABLE)
         //         .addTag(SCTags.HATS);
 
-        tag(SCTags.PLACEABLE_IN_DISPLAY)
+        getOrCreateTagBuilder(SCTags.PLACEABLE_IN_DISPLAY)
                 .addTag(SCTags.BUCKETABLE_FISHES)
                 .add(GUIDE.get())
         ;
 
-        tag(SCTags.PLACEABLE_IN_TACKLE_BOX)
+        getOrCreateTagBuilder(SCTags.PLACEABLE_IN_TACKLE_BOX)
                 .addTag(SCTags.BAITS)
                 .addTag(SCTags.HOOKS)
                 .addTag(SCTags.BOBBERS)
@@ -185,13 +180,13 @@ public class DGSCItemsTagsProvider extends ItemTagsProvider
                 .addTag(SCTags.LEGENDARY_FISHES)
         ;
 
-        tag(SCTags.PLACEABLE_IN_TACKLE_BOX_FISH_SLOT)
+        getOrCreateTagBuilder(SCTags.PLACEABLE_IN_TACKLE_BOX_FISH_SLOT)
                 .addTag(ItemTags.FISHES)
         ;
 
 
         //tackle boxes
-        tag(SCTags.TACKLE_BOXES)
+        getOrCreateTagBuilder(SCTags.TACKLE_BOXES)
                 .add(TACKLE_BOX.asItem())
                 .add(TACKLE_BOX_BLACK.asItem())
                 .add(TACKLE_BOX_BLUE.asItem())

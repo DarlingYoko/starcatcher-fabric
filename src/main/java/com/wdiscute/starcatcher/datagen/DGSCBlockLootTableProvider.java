@@ -1,35 +1,24 @@
 package com.wdiscute.starcatcher.datagen;
 
-import com.wdiscute.starcatcher.io.SCDataComponents;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
-import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.nikdo53.neobackports.io.components.DataComponents;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static com.wdiscute.starcatcher.blocks.SCBlocks.*;
 
-public class DGSCBlockLootTableProvider extends BlockLootSubProvider
+public class DGSCBlockLootTableProvider extends FabricBlockLootTableProvider
 {
-    protected DGSCBlockLootTableProvider()
+    protected DGSCBlockLootTableProvider(FabricDataOutput output)
     {
-        super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+        super(output);
     }
 
     @Override
-    protected void generate()
+    public void generate()
     {
         HATS.getEntries().forEach(o -> dropSelf(o.get()));
         TACKLE_BOXES.getEntries().forEach(o -> add(o.get(), noDrop()));

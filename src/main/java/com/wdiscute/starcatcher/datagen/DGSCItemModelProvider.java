@@ -1,185 +1,153 @@
 package com.wdiscute.starcatcher.datagen;
 
 import com.wdiscute.starcatcher.Starcatcher;
-import net.minecraft.data.PackOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.ItemModelGenerators;
+import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 import net.nikdo53.neobackports.registry.DeferredItem;
 
 import static com.wdiscute.starcatcher.registry.SCItems.*;
 import static com.wdiscute.starcatcher.blocks.SCBlocks.*;
 
-public class DGSCItemModelProvider extends ItemModelProvider
+/**
+ * Was Forge's `ItemModelProvider`/`ItemModelBuilder` (`withExistingParent(...).texture(...)`) — no
+ * Fabric equivalent exists for that abstraction; vanilla's own datagen already covers this via
+ * `ItemModelGenerators.generateFlatItem(Item, ModelTemplate)`, which produces the exact same
+ * `item/generated` + `layer0` shape `simpleItem` used to hand-build. See FABRIC_PORT_PLAN.md §9 (P6).
+ *
+ * The block-item ("parent to the block's own model") half of the original file — every
+ * `simpleBlockItem(...)` call — is intentionally NOT reproduced here. This project has no block-state
+ * datagen provider at all (block states/models are hand-authored static resources), so those item
+ * model JSONs were never really "generated" so much as written once and committed; they already exist
+ * under `src/generated/resources`/`src/main/resources` and are loader-neutral static assets per §9/§11.
+ */
+public class DGSCItemModelProvider extends FabricModelProvider
 {
-    public DGSCItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper)
+    public DGSCItemModelProvider(FabricDataOutput output)
     {
-        super(output, Starcatcher.MOD_ID, existingFileHelper);
+        super(output);
     }
 
     @Override
-    protected void registerModels()
+    public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator)
+    {
+    }
+
+    @Override
+    public void generateItemModels(ItemModelGenerators itemModelGenerators)
     {
         //bucket fishes
         for (DeferredHolder<Item, ? extends Item> item : BUCKETABLE_FISHES_REGISTRY.getEntries())
-            simpleItem(item);
+            simpleItem(itemModelGenerators, item);
 
         //non bucket fishes
-        simpleItem(BLACK_EEL);
-        simpleItem(GEODE_EEL);
-        simpleItem(OBSIDIAN_EEL);
-        simpleItem(MOLTEN_SHRIMP);
-        simpleItem(OBSIDIAN_CRAB);
-        simpleItem(SCORCHED_BLOODSUCKER);
-        simpleItem(MOLTEN_DEEPSLATE_CRAB);
-        simpleItem(LAVA_CRAB);
-        simpleItem(CINDER_SQUID);
-        simpleItem(CHORUS_CRAB);
+        simpleItem(itemModelGenerators, BLACK_EEL);
+        simpleItem(itemModelGenerators, GEODE_EEL);
+        simpleItem(itemModelGenerators, OBSIDIAN_EEL);
+        simpleItem(itemModelGenerators, MOLTEN_SHRIMP);
+        simpleItem(itemModelGenerators, OBSIDIAN_CRAB);
+        simpleItem(itemModelGenerators, SCORCHED_BLOODSUCKER);
+        simpleItem(itemModelGenerators, MOLTEN_DEEPSLATE_CRAB);
+        simpleItem(itemModelGenerators, LAVA_CRAB);
+        simpleItem(itemModelGenerators, CINDER_SQUID);
+        simpleItem(itemModelGenerators, CHORUS_CRAB);
 
         //trash
-        simpleItem(BOOT);
-        simpleItem(DRIED_SEAWEED);
-        simpleItem(LAVA_CRAB_CLAW);
-        simpleItem(MOSSY_BOOT);
+        simpleItem(itemModelGenerators, BOOT);
+        simpleItem(itemModelGenerators, DRIED_SEAWEED);
+        simpleItem(itemModelGenerators, LAVA_CRAB_CLAW);
+        simpleItem(itemModelGenerators, MOSSY_BOOT);
 
         //items
-        simpleItem(MISSINGNO);
-        simpleItem(UNKNOWN_FISH);
-        simpleItem(GUIDE);
-        simpleItem(FISH_RADAR);
-        simpleItem(STARCATCHER_TWINE);
-        simpleItem(WATERLOGGED_SATCHEL);
-        simpleItem(FISH_BONES);
-        simpleItem(PEARL);
-        simpleItem(STARCAUGHT_BUCKET);
-        simpleItem(COOKED_STARCAUGHT_FISH);
-        simpleItem(SETTINGS);
+        simpleItem(itemModelGenerators, MISSINGNO);
+        simpleItem(itemModelGenerators, UNKNOWN_FISH);
+        simpleItem(itemModelGenerators, GUIDE);
+        simpleItem(itemModelGenerators, FISH_RADAR);
+        simpleItem(itemModelGenerators, STARCATCHER_TWINE);
+        simpleItem(itemModelGenerators, WATERLOGGED_SATCHEL);
+        simpleItem(itemModelGenerators, FISH_BONES);
+        simpleItem(itemModelGenerators, PEARL);
+        simpleItem(itemModelGenerators, STARCAUGHT_BUCKET);
+        simpleItem(itemModelGenerators, COOKED_STARCAUGHT_FISH);
+        simpleItem(itemModelGenerators, SETTINGS);
 
         //notes & messages
-        simpleItem(LETTER);
-        simpleItem(BOTTLED_LETTER);
+        simpleItem(itemModelGenerators, LETTER);
+        simpleItem(itemModelGenerators, BOTTLED_LETTER);
 
-        simpleItem(MESSAGE_IN_A_BOTTLE);
-        simpleItem(MESSAGE);
+        simpleItem(itemModelGenerators, MESSAGE_IN_A_BOTTLE);
+        simpleItem(itemModelGenerators, MESSAGE);
 
-        simpleItem(BROKEN_BOTTLE);
+        simpleItem(itemModelGenerators, BROKEN_BOTTLE);
 
-        simpleItem(SECRET_NOTE);
-        simpleItem(DRIFTING_WATERLOGGED_BOTTLE);
-        simpleItem(SCALDING_BOTTLE);
-        simpleItem(BURNING_BOTTLE);
-        simpleItem(HOPEFUL_BOTTLE);
-        simpleItem(HOPELESS_BOTTLE);
-        simpleItem(TRUE_BLUE_BOTTLE);
-        simpleItem(WITHERED_BOTTLE);
+        simpleItem(itemModelGenerators, SECRET_NOTE);
+        simpleItem(itemModelGenerators, DRIFTING_WATERLOGGED_BOTTLE);
+        simpleItem(itemModelGenerators, SCALDING_BOTTLE);
+        simpleItem(itemModelGenerators, BURNING_BOTTLE);
+        simpleItem(itemModelGenerators, HOPEFUL_BOTTLE);
+        simpleItem(itemModelGenerators, HOPELESS_BOTTLE);
+        simpleItem(itemModelGenerators, TRUE_BLUE_BOTTLE);
+        simpleItem(itemModelGenerators, WITHERED_BOTTLE);
 
         //hooks
-        simpleItem(HOOK);
-        simpleItem(AMETHYST_HOOK);
-        simpleItem(SHINY_HOOK);
-        simpleItem(GOLD_HOOK);
-        simpleItem(MOSSY_HOOK);
-        simpleItem(STONE_HOOK);
-        simpleItem(SPLIT_HOOK);
-        simpleItem(HEAVY_HOOK);
-        simpleItem(VANILLA_HOOK);
-        simpleItem(COPPER_HOOK);
-        simpleItem(EXPOSED_COPPER_HOOK);
-        simpleItem(WEATHERED_COPPER_HOOK);
-        simpleItem(OXIDISED_COPPER_HOOK);
-        simpleItem(FROZEN_HOOK);
-        simpleItem(ECHOING_HOOK);
+        simpleItem(itemModelGenerators, HOOK);
+        simpleItem(itemModelGenerators, AMETHYST_HOOK);
+        simpleItem(itemModelGenerators, SHINY_HOOK);
+        simpleItem(itemModelGenerators, GOLD_HOOK);
+        simpleItem(itemModelGenerators, MOSSY_HOOK);
+        simpleItem(itemModelGenerators, STONE_HOOK);
+        simpleItem(itemModelGenerators, SPLIT_HOOK);
+        simpleItem(itemModelGenerators, HEAVY_HOOK);
+        simpleItem(itemModelGenerators, VANILLA_HOOK);
+        simpleItem(itemModelGenerators, COPPER_HOOK);
+        simpleItem(itemModelGenerators, EXPOSED_COPPER_HOOK);
+        simpleItem(itemModelGenerators, WEATHERED_COPPER_HOOK);
+        simpleItem(itemModelGenerators, OXIDISED_COPPER_HOOK);
+        simpleItem(itemModelGenerators, FROZEN_HOOK);
+        simpleItem(itemModelGenerators, ECHOING_HOOK);
 
         //bobbers
-        simpleItem(BOBBER);
-        simpleItem(STEADY_BOBBER);
-        simpleItem(CLEAR_BOBBER);
-        simpleItem(AQUA_BOBBER);
-        simpleItem(VANILLA_BOBBER);
-        simpleItem(LEAF_BOBBER);
-        simpleItem(SLIMEY_BOBBER);
+        simpleItem(itemModelGenerators, BOBBER);
+        simpleItem(itemModelGenerators, STEADY_BOBBER);
+        simpleItem(itemModelGenerators, CLEAR_BOBBER);
+        simpleItem(itemModelGenerators, AQUA_BOBBER);
+        simpleItem(itemModelGenerators, VANILLA_BOBBER);
+        simpleItem(itemModelGenerators, LEAF_BOBBER);
+        simpleItem(itemModelGenerators, SLIMEY_BOBBER);
 
         //baits
-        simpleItem(WORM);
-        simpleItem(ALMIGHTY_WORM);
-        simpleItem(SEEKING_WORM);
-        simpleItem(DEV_WORM);
-        simpleItem(GUNPOWDER_BAIT);
-        simpleItem(CHERRY_BAIT);
-        simpleItem(LUSH_BAIT);
-        simpleItem(SCULK_BAIT);
-        simpleItem(DRIPSTONE_BAIT);
-        simpleItem(MURKWATER_BAIT);
-        simpleItem(LEGENDARY_BAIT);
-        simpleItem(METEOROLOGICAL_BAIT);
+        simpleItem(itemModelGenerators, WORM);
+        simpleItem(itemModelGenerators, ALMIGHTY_WORM);
+        simpleItem(itemModelGenerators, SEEKING_WORM);
+        simpleItem(itemModelGenerators, DEV_WORM);
+        simpleItem(itemModelGenerators, GUNPOWDER_BAIT);
+        simpleItem(itemModelGenerators, CHERRY_BAIT);
+        simpleItem(itemModelGenerators, LUSH_BAIT);
+        simpleItem(itemModelGenerators, SCULK_BAIT);
+        simpleItem(itemModelGenerators, DRIPSTONE_BAIT);
+        simpleItem(itemModelGenerators, MURKWATER_BAIT);
+        simpleItem(itemModelGenerators, LEGENDARY_BAIT);
+        simpleItem(itemModelGenerators, METEOROLOGICAL_BAIT);
 
         //templates
-        TEMPLATES_REGISTRY.getEntries().forEach(this::simpleItem);
+        TEMPLATES_REGISTRY.getEntries().forEach(item -> simpleItem(itemModelGenerators, item));
 
         //rods
         //custom model
 
-        simpleItem(DeferredItem.createItem(Starcatcher.rl("clam")));
-        simpleItem(DeferredItem.createItem(Starcatcher.rl("conch")));
+        simpleItem(itemModelGenerators, DeferredItem.createItem(Starcatcher.rl("clam")));
+        simpleItem(itemModelGenerators, DeferredItem.createItem(Starcatcher.rl("conch")));
 
-        //trophies block item
-        simpleBlockItem(TROPHY_COPPER.get());
-        simpleBlockItem(TROPHY_IRON.get());
-        simpleBlockItem(TROPHY_GOLD.get());
-        simpleBlockItem(TROPHY_EMERALD.get());
-        simpleBlockItem(TROPHY_DIAMOND.get());
-        simpleBlockItem(TROPHY_OF_THE_OLDER_ANGLER.get());
-
-        //aquarium
-        simpleBlockItem(AQUARIUM.get());
-
-
-        //hats model, just parents to block
-        simpleBlockItem(FISHERMAN_HAT_WHITE.get());
-        simpleBlockItem(FISHERMAN_HAT_LIME.get());
-        simpleBlockItem(FISHERMAN_HAT_ORANGE.get());
-        simpleBlockItem(FISHERMAN_HAT_RED.get());
-        simpleBlockItem(FISHERMAN_HAT_GRAY.get());
-        simpleBlockItem(FISHERMAN_HAT_LIGHT_GRAY.get());
-        simpleBlockItem(FISHERMAN_HAT_BLACK.get());
-        simpleBlockItem(FISHERMAN_HAT_BROWN.get());
-        simpleBlockItem(FISHERMAN_HAT_YELLOW.get());
-        simpleBlockItem(FISHERMAN_HAT_PINK.get());
-        simpleBlockItem(FISHERMAN_HAT_MAGENTA.get());
-        simpleBlockItem(FISHERMAN_HAT_PURPLE.get());
-        simpleBlockItem(FISHERMAN_HAT_BLUE.get());
-        simpleBlockItem(FISHERMAN_HAT_LIGHT_BLUE.get());
-        simpleBlockItem(FISHERMAN_HAT_CYAN.get());
-        simpleBlockItem(FISHERMAN_HAT_GREEN.get());
-
-        //tacklebox
-        simpleBlockItem(TACKLE_BOX.get());
-        simpleBlockItem(TACKLE_BOX_WHITE.get());
-        simpleBlockItem(TACKLE_BOX_LIME.get());
-        simpleBlockItem(TACKLE_BOX_ORANGE.get());
-        simpleBlockItem(TACKLE_BOX_RED.get());
-        simpleBlockItem(TACKLE_BOX_GRAY.get());
-        simpleBlockItem(TACKLE_BOX_LIGHT_GRAY.get());
-        simpleBlockItem(TACKLE_BOX_BLACK.get());
-        simpleBlockItem(TACKLE_BOX_BROWN.get());
-        simpleBlockItem(TACKLE_BOX_YELLOW.get());
-        simpleBlockItem(TACKLE_BOX_PINK.get());
-        simpleBlockItem(TACKLE_BOX_MAGENTA.get());
-        simpleBlockItem(TACKLE_BOX_PURPLE.get());
-        simpleBlockItem(TACKLE_BOX_BLUE.get());
-        simpleBlockItem(TACKLE_BOX_LIGHT_BLUE.get());
-        simpleBlockItem(TACKLE_BOX_CYAN.get());
-        simpleBlockItem(TACKLE_BOX_GREEN.get());
-
+        //trophies, hats, tackle boxes: block-item models parenting to the block's own model —
+        //already exist as static resources, see class javadoc.
     }
 
-
-
-
-    private ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item)
+    private void simpleItem(ItemModelGenerators itemModelGenerators, DeferredHolder<Item, ? extends Item> item)
     {
-        return withExistingParent(item.getId().getPath(), mcLoc("item/generated")).texture("layer0", modLoc("item/" + item.getId().getPath()));
+        itemModelGenerators.generateFlatItem(item.get(), ModelTemplates.FLAT_ITEM);
     }
 }
