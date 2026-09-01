@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;
 

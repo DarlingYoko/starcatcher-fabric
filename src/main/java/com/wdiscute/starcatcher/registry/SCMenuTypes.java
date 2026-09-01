@@ -7,7 +7,7 @@ import com.wdiscute.starcatcher.tournament.StandMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredHolder;

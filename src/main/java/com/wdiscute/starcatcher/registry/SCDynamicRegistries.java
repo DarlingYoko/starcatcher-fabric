@@ -2,7 +2,7 @@ package com.wdiscute.starcatcher.registry;
 
 import com.wdiscute.starcatcher.Starcatcher;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 
 /**
  * Replaces {@code SCModEvents.addDatapackRegistry} (a {@code DataPackRegistryEvent.NewRegistry}

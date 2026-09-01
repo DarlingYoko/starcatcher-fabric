@@ -5,7 +5,7 @@ import com.wdiscute.starcatcher.io.network.*;
 import com.wdiscute.starcatcher.io.network.tournament.CBActiveTournamentUpdatePayload;
 import com.wdiscute.starcatcher.io.network.tournament.CBClearTournamentPayload;
 import com.wdiscute.starcatcher.io.network.tournament.SBStandTournamentNameChangePayload;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.nikdo53.neobackports.io.networking.PayloadRegistrar;
 
 /**

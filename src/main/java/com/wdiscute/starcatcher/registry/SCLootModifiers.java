@@ -12,7 +12,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 
 /**
  * Forge's {@code IGlobalLootModifier} has no Fabric equivalent (see FABRIC_PORT_PLAN.md §7) —

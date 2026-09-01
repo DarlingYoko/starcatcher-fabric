@@ -16,7 +16,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import net.nikdo53.neobackports.registry.DeferredBlock;

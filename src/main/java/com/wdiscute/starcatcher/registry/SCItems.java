@@ -12,7 +12,7 @@ import com.wdiscute.starcatcher.registry.items.rod.StarcatcherFishingRodItem;
 import com.wdiscute.starcatcher.secretnotes.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredItem;

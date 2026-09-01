@@ -24,7 +24,7 @@ import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
 import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
 import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import net.fabricmc.api.ModInitializer;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

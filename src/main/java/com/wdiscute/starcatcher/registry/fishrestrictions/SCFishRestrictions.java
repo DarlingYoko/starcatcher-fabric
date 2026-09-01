@@ -1,7 +1,7 @@
 package com.wdiscute.starcatcher.registry.fishrestrictions;
 
 import com.wdiscute.starcatcher.Starcatcher;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredHolder;

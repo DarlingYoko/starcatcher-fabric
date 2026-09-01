@@ -9,7 +9,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;

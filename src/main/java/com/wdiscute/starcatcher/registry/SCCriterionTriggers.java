@@ -3,7 +3,7 @@ package com.wdiscute.starcatcher.registry;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.advancement.MinigameCompletedTrigger;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.nikdo53.neobackports.eventbus.IEventBus;
 
 import java.util.function.Supplier;
 
