@@ -2,9 +2,10 @@ package com.wdiscute.starcatcher;
 
 import com.wdiscute.starcatcher.guide.FishingGuideScreen;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.config.ModConfig;
 
 public class SCConfig
 {
@@ -181,4 +182,9 @@ public class SCConfig
 
     static final ForgeConfigSpec SPEC_SERVER = BUILDER_SERVER.build();
 
+    public static void register()
+    {
+        ForgeConfigRegistry.INSTANCE.register(Starcatcher.MOD_ID, ModConfig.Type.CLIENT, SPEC);
+        ForgeConfigRegistry.INSTANCE.register(Starcatcher.MOD_ID, ModConfig.Type.SERVER, SPEC_SERVER);
+    }
 }

@@ -1,5 +1,6 @@
 package com.wdiscute.starcatcher;
 
+import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.event.SCClientEvents;
 import com.wdiscute.starcatcher.event.SCClientForgeEvents;
 import com.wdiscute.starcatcher.event.TooltipEvents;
@@ -14,6 +15,7 @@ public class StarcatcherFabricClient implements ClientModInitializer
     {
         // Renderers, layers, screens, particles, keymaps, item properties, color handlers,
         // tooltip processors — see FABRIC_PORT_PLAN.md §4/§6 (P5).
+        Starcatcher.Client.init();
         SCClientEvents.registerRenderers();
         SCClientEvents.registerLayers();
         SCClientEvents.registerParticleFactories();

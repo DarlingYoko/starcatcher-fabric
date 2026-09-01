@@ -8,7 +8,6 @@ import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.nikdo53.neobackports.io.components.DataComponents;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ItemStack.class)

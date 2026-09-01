@@ -1,56 +1,31 @@
 package com.wdiscute.starcatcher;
 
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Lifecycle;
-import com.wdiscute.libtooltips.ExampleRGBEffect;
 import com.wdiscute.libtooltips.Tooltips;
 import com.wdiscute.starcatcher.registry.FishProperties.SizeAndWeight.Units;
 import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
-import com.wdiscute.starcatcher.registry.fishrestrictions.SCFishRestrictions;
 import com.wdiscute.starcatcher.registry.tackleskin.AbstractTackleSkin;
-import com.wdiscute.starcatcher.registry.tackleskin.SCTackleSkins;
 import com.wdiscute.starcatcher.registry.catchmodifiers.AbstractCatchModifier;
-import com.wdiscute.starcatcher.registry.catchmodifiers.SCCatchModifiers;
-import com.wdiscute.starcatcher.registry.minigamemodifiers.SCMinigameModifiers;
-import com.wdiscute.starcatcher.registry.sweetspotbehaviour.SCSweetSpotsBehaviour;
-import com.wdiscute.starcatcher.blocks.SCBlockEntities;
-import com.wdiscute.starcatcher.blocks.SCBlocks;
 import com.wdiscute.starcatcher.guide.FishCaughtToast;
-import com.wdiscute.starcatcher.io.*;
 import com.wdiscute.starcatcher.registry.minigamemodifiers.AbstractMinigameModifier;
 import com.wdiscute.starcatcher.registry.sweetspotbehaviour.AbstractSweetSpotBehaviour;
-import com.wdiscute.starcatcher.registry.*;
-import com.wdiscute.starcatcher.sellingbin.SCProcessors;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import com.wdiscute.starcatcher.tooltips.SCLegendary;
 import com.wdiscute.starcatcher.tooltips.SCTooltipGradient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLanguageProvider;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
-@Mod(Starcatcher.MOD_ID)
 public class Starcatcher
 {
     public static final String MOD_ID = "starcatcher";
@@ -94,7 +69,7 @@ public class Starcatcher
     //shitty fix for double toast because its caused by nikdos payload sender thingy
     static Holder<Item> lastToast = null;
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void fishCaughtToast(FishProperties fp, boolean newFish, int sizeCM, int weightCM)
     {
         if (newFish && !fp.catchInfo().fish().equals(lastToast)) Minecraft.getInstance().getToasts().addToast(new FishCaughtToast(fp));
@@ -114,46 +89,16 @@ public class Starcatcher
     }
 
 
-    public Starcatcher()
-    {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext modContainer = ModLoadingContext.get();
-
-        SCCreativeModeTabs.register(modEventBus);
-
-        SCItems.register(modEventBus);
-        SCBlocks.register(modEventBus);
-        SCBlockEntities.register(modEventBus);
-        SCDataComponents.register(modEventBus);
-        SCSounds.register(modEventBus);
-        SCEntities.register(modEventBus);
-        SCParticles.register(modEventBus);
-        SCRecipes.register(modEventBus);
-        SCMenuTypes.register(modEventBus);
-        SCDataAttachments.register(modEventBus);
-        SCSweetSpotsBehaviour.register(modEventBus);
-        SCFishRestrictions.register(modEventBus);
-        SCMinigameModifiers.register(modEventBus);
-        SCCatchModifiers.register(modEventBus);
-        SCTackleSkins.register(modEventBus);
-        SCCriterionTriggers.register(modEventBus);
-        SCProcessors.register(modEventBus);
-        SCLootModifiers.register(modEventBus);
-
-        modContainer.registerConfig(ModConfig.Type.CLIENT, SCConfig.SPEC);
-        modContainer.registerConfig(ModConfig.Type.SERVER, SCConfig.SPEC_SERVER);
-
-        DistExecutor.safeRunWhenOn(Dist.CLIENT,
-                () -> Client::init);
-
-//        SCItems.registerExtra();
-    }
-
+    //Registration itself now happens in StarcatcherFabric/StarcatcherFabricClient (the real Fabric
+    //entrypoints, see FABRIC_PORT_PLAN.md §4) — this class only keeps the fields/helpers other files
+    //still read (registries, rl(), fishCaughtToast) and the client-only tooltip processor registration
+    //below, called from StarcatcherFabricClient.onInitializeClient() now that libtooltips (§7bis.1) has
+    //a real Fabric facade.
     public static class Client
     {
+        @Environment(EnvType.CLIENT)
         public static void init()
         {
-
             //register tooltip tag processors
             Tooltips.registerProcessor("scgolden",
                     (t, s, e) -> SCTooltipGradient.process(t,

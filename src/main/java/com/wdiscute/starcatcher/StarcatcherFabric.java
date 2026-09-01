@@ -75,6 +75,9 @@ public class StarcatcherFabric implements ModInitializer
         // Server-side events, §6.
         SCEvents.register();
 
+        // Config (Forge Config API Port, D3) — SCConfig.SPEC/SPEC_SERVER built at class-load time.
+        SCConfig.register();
+
         // Attachments (§5.5) register themselves via the cardinal-components-entity
         // entrypoint (SCEntityComponents), not through this bus.
         // Remaining subsystems (selling-bin processors) come in P4+ as their shim layers land.
