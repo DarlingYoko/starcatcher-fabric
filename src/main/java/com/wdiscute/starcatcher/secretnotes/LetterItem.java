@@ -32,7 +32,7 @@ public class LetterItem extends Item
 {
     public LetterItem()
     {
-        super(new Properties().stacksTo(1).component(SCDataComponents.MESSAGE.get(), Message.empty()));
+        super(new Properties().stacksTo(1));
     }
 
     @Override

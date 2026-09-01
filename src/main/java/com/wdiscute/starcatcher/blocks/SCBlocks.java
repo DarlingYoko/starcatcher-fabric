@@ -108,7 +108,6 @@ public interface SCBlocks
         DeferredBlock<T> toReturn = TACKLE_BOXES.register(name, block);
         SCItems.ITEMS.register(name, () -> new BlockItem(toReturn.get(), new Item.Properties()
                 .stacksTo(1)
-                .component(SCDataComponents.CONTAINER, ItemContainerContents.EMPTY)
         ));
         return toReturn;
     }

@@ -18,7 +18,6 @@ public class HatItem extends BlockItem implements Equipable
     {
         super(block, new Properties()
                 .stacksTo(1)
-                .component(SCDataComponents.CATCH_MODIFIERS, List.of(modifiers))
         );
     }
 
@@ -26,7 +25,6 @@ public class HatItem extends BlockItem implements Equipable
     {
         super(block, new Properties()
                 .stacksTo(1)
-                .component(SCDataComponents.CATCH_MODIFIERS, List.of(SCCatchModifiers.DECREASES_LURE_TIME.getFirst()))
         );
     }
 

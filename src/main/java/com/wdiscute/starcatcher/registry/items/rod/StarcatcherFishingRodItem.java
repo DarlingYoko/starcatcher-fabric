@@ -39,9 +39,6 @@ public class StarcatcherFishingRodItem extends Item implements MenuProvider
                 .rarity(Rarity.EPIC)
                 .fireResistant()
                 .stacksTo(1)
-                .component(SCDataComponents.BOBBER.get(), new SingleStackContainer(new ItemStack(SCItems.BOBBER.get())))
-                .component(SCDataComponents.BAIT.get(), SingleStackContainer.empty())
-                .component(SCDataComponents.HOOK.get(), new SingleStackContainer(new ItemStack(SCItems.HOOK.get())))
         );
     }
 

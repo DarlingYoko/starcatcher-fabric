@@ -21,7 +21,7 @@ public class SecretNote extends Item
 {
     public SecretNote()
     {
-        super(new Properties().stacksTo(1).component(SCDataComponents.SECRET_NOTE, Note.SAMPLE_NOTE));
+        super(new Properties().stacksTo(1));
     }
 
     @Override

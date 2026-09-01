@@ -115,12 +115,20 @@ public class SCDataComponents
     @Nullable
     private static <T> T getDataMapFallback(ItemStack stack, Supplier<DataComponentType<T>> component)
     {
-        if (component == CATCH_MODIFIERS)
+        if (component.equals(CATCH_MODIFIERS))
             return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.CATCH_MODIFIERS, null);
-        if (component == MINIGAME_MODIFIERS)
+        if (component.equals(MINIGAME_MODIFIERS))
             return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.MINIGAME_MODIFIERS, null);
-        if (component == TACKLE_SKIN)
+        if (component.equals(TACKLE_SKIN))
             return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.TACKLE_SKIN, null);
+        //fishing rod starter loadout — real NeoForge bakes these into Item.Properties.component(...) at
+        //construction time (a per-Item-type default DataComponentMap, 1.20.5+ only); vanilla 1.20.1 has no
+        //such mechanism, so a freshly-constructed rod ItemStack has nothing stored under BOBBER/HOOK at all.
+        //Reproduced here instead so every read (regardless of call site) sees the intended starter gear.
+        if (component.equals(BOBBER))
+            return (T) new SingleStackContainer(new ItemStack(com.wdiscute.starcatcher.registry.SCItems.BOBBER.get()));
+        if (component.equals(HOOK))
+            return (T) new SingleStackContainer(new ItemStack(com.wdiscute.starcatcher.registry.SCItems.HOOK.get()));
         return null;
     }
 
