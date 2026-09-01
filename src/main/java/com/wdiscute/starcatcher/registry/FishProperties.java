@@ -40,7 +40,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -53,8 +52,6 @@ import net.minecraft.world.level.storage.loot.entries.LootTableReference;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.fabricmc.loader.api.FabricLoader;
 import net.nikdo53.neobackports.io.StreamCodec;
 import net.nikdo53.neobackports.io.utils.ByteBufCodecs;
@@ -2137,17 +2134,6 @@ public record FishProperties(
                 if (completedTreasure || fbe.modifiers.stream().anyMatch(acm -> acm.forceAwardTreasure(fbe, time, completedTreasure, perfectCatch, hits)))
                 {
                     items.add(fp.loadTreasure(player).catchInfo.treasureIs);
-                }
-
-                //fire ItemFishedEvent for mod compat (e.g. PMMO). Throwaway FishingHook only exists to satisfy the event constructor.
-                if (!items.isEmpty())
-                {
-                    FishingHook fakeHook = new FishingHook(player, level, 0, 0);
-                    fakeHook.setPos(fbe.position());
-                    ItemFishedEvent event = new ItemFishedEvent(items, 0, fakeHook);
-                    MinecraftForge.EVENT_BUS.post(event);
-                    if (event.isCanceled()) items.clear();
-                    fakeHook.discard();
                 }
 
                 //spawn items from list

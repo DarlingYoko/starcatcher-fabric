@@ -72,7 +72,7 @@ public interface StreamCodec<V>
     static <C, T1, T2> StreamCodec<C> composite(
             StreamCodec<T1> codec1, Function<C, T1> getter1,
             StreamCodec<T2> codec2, Function<C, T2> getter2,
-            com.mojang.datafixers.util.Function2<T1, T2, C> factory)
+            java.util.function.BiFunction<T1, T2, C> factory)
     {
         return new StreamCodec<C>()
         {

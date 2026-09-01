@@ -28,13 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import org.jetbrains.annotations.NotNull;
 
@@ -368,13 +361,4 @@ public class TackleBoxBlockEntity extends BlockEntity implements WorldlyContaine
             return null;
     }
 
-    public LazyOptional<ItemStackHandler> capability = LazyOptional.of(() -> new ItemStackHandler(getContainerSize()));
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER){
-            return capability.cast();
-        }
-        return super.getCapability(cap, side);
-    }
 }

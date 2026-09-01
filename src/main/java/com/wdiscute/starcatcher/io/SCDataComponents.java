@@ -105,9 +105,23 @@ public class SCDataComponents
         DataComponentType<T> type = component.get();
         CompoundTag components = stack.getTagElement(STORAGE_KEY);
         String key = type.id().toString();
-        if (components == null || !components.contains(key))
-            return null;
-        return type.codec().parse(NbtOps.INSTANCE, components.get(key)).result().orElse(null);
+        if (components != null && components.contains(key))
+            return type.codec().parse(NbtOps.INSTANCE, components.get(key)).result().orElse(null);
+
+        return getDataMapFallback(stack, component);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private static <T> T getDataMapFallback(ItemStack stack, Supplier<DataComponentType<T>> component)
+    {
+        if (component == CATCH_MODIFIERS)
+            return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.CATCH_MODIFIERS, null);
+        if (component == MINIGAME_MODIFIERS)
+            return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.MINIGAME_MODIFIERS, null);
+        if (component == TACKLE_SKIN)
+            return (T) com.wdiscute.starcatcher.registry.SCDataMaps.getOrDefault(stack, com.wdiscute.starcatcher.registry.SCDataMaps.TACKLE_SKIN, null);
+        return null;
     }
 
     public static <T> boolean has(ItemStack stack, Supplier<DataComponentType<T>> component)

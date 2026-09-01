@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * Formerly the Forge `@Mod.EventBusSubscriber` `DataGenerators.gatherData(GatherDataEvent)` —
  * see FABRIC_PORT_PLAN.md §9 (P6). `DGSCBiomeModifierProvider` was dropped entirely (its whole
- * body was already commented out — it registered zero entries under Forge either) and
- * `DGSCDataMapsProvider` is intentionally not wired in yet: it needs a `DataMapProvider` datagen
- * shim that doesn't exist, and its content depends on the still-unported `com.wdiscute.sellingbin`
- * companion mod (§7bis.3/P8) for currencies/sellable values.
+ * body was already commented out — it registered zero entries under Forge either). `DGSCDataMapsProvider`
+ * is wired in as of P9: its selling-bin-dependent currencies/sellable builders were already dropped
+ * in P8's gate-off, and it now runs against a real in-repo `DataMapProvider` datagen shim
+ * (`net.nikdo53.neobackports.datagen.DataMapProvider`) instead of NeoForge's own.
  */
 public class SCDataGenerator implements DataGeneratorEntrypoint
 {
@@ -40,6 +40,8 @@ public class SCDataGenerator implements DataGeneratorEntrypoint
                 List.of(new LootTableProvider.SubProviderEntry(DGSCBlockLootTableProvider::new, LootContextParamSets.BLOCK))));
 
         pack.addProvider((output, registriesFuture) -> new DGSCRecipeProvider(output));
+
+        pack.addProvider(DGSCDataMapsProvider::new);
     }
 
     @Override

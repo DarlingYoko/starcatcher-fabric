@@ -20,10 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
 import net.nikdo53.neobackports.datagen.DataMapProvider;
-import net.nikdo53.neobackports.datamaps.NeoForgeDataMaps;
-import net.nikdo53.neobackports.datamaps.builtin.Compostable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +36,6 @@ public class DGSCDataMapsProvider extends DataMapProvider
     protected void gather(HolderLookup.Provider provider)
     {
         var aquarium = this.builder(SCDataMaps.AQUARIUM_INTERACTION);
-        var compostable = this.builder(NeoForgeDataMaps.COMPOSTABLES);
         var catchModifiers = this.builder(SCDataMaps.CATCH_MODIFIERS);
         var minigameModifiers = this.builder(SCDataMaps.MINIGAME_MODIFIERS);
         var tackleSkin = this.builder(SCDataMaps.TACKLE_SKIN);
@@ -62,9 +58,8 @@ public class DGSCDataMapsProvider extends DataMapProvider
         aquarium.add(SCTags.BUCKETABLE_FISHES, AquariumBlock.Interaction.PLACE_FISH_CREATIVE, false);
         aquarium.add(Items.BUCKET.builtInRegistryHolder(), AquariumBlock.Interaction.RETRIEVE_FISH, false);
 
-        //compostable
-        compostable.add(SCTags.WORMS, new Compostable(0.65F, false), false);
-        compostable.add(SCTags.BUCKETABLE_FISHES, new Compostable(0.9F, false), false);
+        //compostable (worms/bucketable fishes) — no data map, registered directly onto vanilla's
+        //ComposterBlock.COMPOSTABLES at runtime instead, see SCEvents.registerCompostables()
 
         //Selling-bin sellable-value datagen (currencies/sellable builders) removed here — the
         //selling-bin subsystem is gated off on Fabric for now (no Fabric build of wd's own
@@ -189,17 +184,11 @@ public class DGSCDataMapsProvider extends DataMapProvider
         //treasures.add(SCTags.COMMON_FISHES_FP, new Treasure.ItemStackListTreasureInstance(SCItems.AGAVE_BREAM.value().getDefaultInstance()), false);
         //treasures.add(SCTags.COMMON_FISHES_FP, new Treasure.ItemStackListTreasureInstance(SCItems.AGAVE_BREAM.value().getDefaultInstance()), false);
 
-        FishingPropertiesRegistry.PROPERTIES.forEach(o ->
-        {
-            String namespace = o.getFirst().location().getNamespace();
-
-            //This keeps it from spamming the log
-            if (namespace.equals(Starcatcher.MOD_ID) || namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-                treasures.add(o.getFirst(), Treasure.VANILLA_FISHING_LOOT_TABLE, false);
-            } else {
-                treasures.add(o.getFirst(), Treasure.VANILLA_FISHING_LOOT_TABLE, false, new ModLoadedCondition(namespace));
-            }
-        });
+        //cross-mod fish entries are unconditionally emitted too (same accepted gap as
+        //DGSCFishingPropertiesProvider dropping its ModLoadedCondition gating — an orphaned data
+        //map entry for a fish that isn't actually registered on a given server is simply never
+        //queried, not a crash risk; see that provider's doc comment)
+        FishingPropertiesRegistry.PROPERTIES.forEach(o -> treasures.add(o.getFirst(), Treasure.VANILLA_FISHING_LOOT_TABLE, false));
 
         treasures.add(Starcatcher.rl("azure_crystalback_minnow"), Treasure.AZURE_CRYSTAL_SKIN_SMITHING_TEMPLATE, false);
         treasures.add(Starcatcher.rl("willish"), Treasure.KIMBE_SMITHING_TEMPLATE, false);

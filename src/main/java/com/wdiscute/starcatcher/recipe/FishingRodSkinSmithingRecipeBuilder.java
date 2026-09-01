@@ -3,6 +3,7 @@ package com.wdiscute.starcatcher.recipe;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.registry.SCRecipes;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
@@ -20,7 +21,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.nikdo53.neobackports.NeoBackports;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -83,7 +83,7 @@ public class FishingRodSkinSmithingRecipeBuilder
         public void serializeRecipeData(JsonObject main) {
             JsonElement encoded = FishingRodSkinSmithingRecipe.Serializer.CODEC.codec()
                     .encodeStart(JsonOps.INSTANCE, new FishingRodSkinSmithingRecipe(template, base, addition, result.getDefaultInstance()))
-                    .getOrThrow(false, NeoBackports.LOGGER::error);
+                    .getOrThrow(false, Starcatcher.LOGGER::error);
 
             encoded.getAsJsonObject().entrySet().forEach(entry -> main.add(entry.getKey(), entry.getValue()));
         }

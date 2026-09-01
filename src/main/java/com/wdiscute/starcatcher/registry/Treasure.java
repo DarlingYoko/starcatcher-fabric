@@ -11,13 +11,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraftforge.common.Tags;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,7 +70,7 @@ public class Treasure
             {
                 LootParams lootparams = new LootParams.Builder((ServerLevel) player.level())
                         .withParameter(LootContextParams.ORIGIN, player.position())
-                        .withParameter(LootContextParams.TOOL, player.getMainHandItem().is(Tags.Items.RODS) ? player.getMainHandItem() : player.getOffhandItem())
+                        .withParameter(LootContextParams.TOOL, player.getMainHandItem().getItem() instanceof FishingRodItem ? player.getMainHandItem() : player.getOffhandItem())
                         .withParameter(LootContextParams.THIS_ENTITY, player)
                         .withLuck(player.getLuck())
                         .create(LootContextParamSets.FISHING);

@@ -6,6 +6,8 @@ import com.wdiscute.starcatcher.blocks.Telescope.TelescopeBlockEntity;
 import com.wdiscute.starcatcher.blocks.display.DisplayBlockEntity;
 import com.wdiscute.starcatcher.blocks.stand.StandBlockEntity;
 import com.wdiscute.starcatcher.blocks.tacklebox.TackleBoxBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -63,5 +65,6 @@ public class SCBlockEntities
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
+        ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> InventoryStorage.of(blockEntity, direction), TACKLE_BOX.get());
     }
 }

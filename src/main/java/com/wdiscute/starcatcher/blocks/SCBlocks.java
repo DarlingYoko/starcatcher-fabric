@@ -2,6 +2,7 @@ package com.wdiscute.starcatcher.blocks;
 
 import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.io.SCDataComponents;
 import com.wdiscute.starcatcher.blocks.aquarium.AquariumBlock;
 import com.wdiscute.starcatcher.blocks.Telescope.TelescopeBlock;
 import com.wdiscute.starcatcher.blocks.display.DisplayBlock;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
-import net.nikdo53.neobackports.io.components.DataComponents;
 import net.nikdo53.neobackports.io.components.ItemContainerContents;
 import net.nikdo53.neobackports.registry.DeferredBlock;
 import net.nikdo53.neobackports.registry.DeferredRegisterTyped;
@@ -108,7 +108,7 @@ public interface SCBlocks
         DeferredBlock<T> toReturn = TACKLE_BOXES.register(name, block);
         SCItems.ITEMS.register(name, () -> new BlockItem(toReturn.get(), new Item.Properties()
                 .stacksTo(1)
-                .component(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                .component(SCDataComponents.CONTAINER, ItemContainerContents.EMPTY)
         ));
         return toReturn;
     }
