@@ -114,7 +114,7 @@ public class DGSCDataMapsProvider extends DataMapProvider
                 SCCatchModifiers.BIG_DECREASES_LURE_TIME.getFirst()), false);
 
         //angler's hat (artifacts / reliquified artifacts compat)
-        catchModifiers.add(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("artifacts", "anglers_hat")), List.of(SCCatchModifiers.ANGLERS_HAT.getFirst()), false);
+        catchModifiers.add(ResourceKey.create(Registries.ITEM, new ResourceLocation("artifacts", "anglers_hat")), List.of(SCCatchModifiers.ANGLERS_HAT.getFirst()), false);
 
 
         //hats

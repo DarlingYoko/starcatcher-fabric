@@ -66,11 +66,7 @@ public class DisplayBookModel extends Model
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        this.render(poseStack, buffer, packedLight, packedOverlay, FastColor.ARGB32.color((int) (alpha * 255), (int) (red * 255), (int) (green * 255), (int) (blue * 255)));
-    }
-
-    public void render(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        this.root.render(poseStack, buffer, packedLight, packedOverlay, color);
+        this.root.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     public void setupAnim(float time, float rightPageFlipAmount, float leftPageFlipAmount, float bookOpenAmount) {

@@ -111,7 +111,7 @@ public class TackleBoxBlock extends BaseEntityBlock implements SimpleWaterlogged
             {
                 //todo?
                 //player.awardStat(Stats.OPEN_SHULKER_BOX);
-                player.openMenu(tbbe, pos);
+                player.openMenu(tbbe);
             }
         }
         return InteractionResult.SUCCESS;

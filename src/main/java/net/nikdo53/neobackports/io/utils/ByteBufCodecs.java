@@ -40,7 +40,7 @@ public class ByteBufCodecs
     public static final StreamCodec<UUID> UUID = simple(FriendlyByteBuf::writeUUID, FriendlyByteBuf::readUUID);
     public static final StreamCodec<ResourceLocation> RESOURCE_LOCATION = simple(FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::readResourceLocation);
     public static final StreamCodec<ItemStack> ITEM_STACK = simple(FriendlyByteBuf::writeItem, FriendlyByteBuf::readItem);
-    public static final StreamCodec<Ingredient> INGREDIENT = simple(Ingredient::toNetwork, Ingredient::fromNetwork);
+    public static final StreamCodec<Ingredient> INGREDIENT = simple((buf, ingredient) -> ingredient.toNetwork(buf), Ingredient::fromNetwork);
     public static final StreamCodec<BlockPos> BLOCK_POS = simple(FriendlyByteBuf::writeBlockPos, FriendlyByteBuf::readBlockPos);
 
     private static <V> StreamCodec<V> simple(java.util.function.BiConsumer<FriendlyByteBuf, V> encoder, java.util.function.Function<FriendlyByteBuf, V> decoder)

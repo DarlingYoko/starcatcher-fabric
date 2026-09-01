@@ -64,7 +64,7 @@ public class NetheriteUpgradeSmithingRecipeBuilder
     public record Result(ResourceLocation id, RecipeSerializer<?> type, Ingredient template, Ingredient base, Ingredient addition, Advancement.Builder advancement, ResourceLocation advancementId) implements FinishedRecipe {
         public void serializeRecipeData(JsonObject main) {
             JsonElement encoded = NetheriteUpgradeSmithingRecipe.Serializer.CODEC.codec()
-                    .encodeStart(JsonOps.INSTANCE, new NetheriteUpgradeSmithingRecipe(template, base, addition))
+                    .encodeStart(JsonOps.INSTANCE, rl -> new NetheriteUpgradeSmithingRecipe(rl, template, base, addition))
                     .getOrThrow(false, Starcatcher.LOGGER::error);
 
             encoded.getAsJsonObject().entrySet().forEach(entry -> main.add(entry.getKey(), entry.getValue()));

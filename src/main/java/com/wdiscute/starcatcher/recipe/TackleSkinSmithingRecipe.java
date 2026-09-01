@@ -100,7 +100,7 @@ public record TackleSkinSmithingRecipe(ResourceLocation id, Ingredient template,
     @Override
     public boolean isIncomplete()
     {
-        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::hasNoItems);
+        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::isEmpty);
     }
 
     public static class Serializer implements RecipeSerializer<TackleSkinSmithingRecipe>

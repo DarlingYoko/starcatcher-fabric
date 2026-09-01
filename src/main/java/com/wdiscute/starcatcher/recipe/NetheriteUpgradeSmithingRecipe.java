@@ -104,7 +104,7 @@ public record NetheriteUpgradeSmithingRecipe(ResourceLocation id, Ingredient tem
     @Override
     public boolean isIncomplete()
     {
-        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::hasNoItems);
+        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::isEmpty);
     }
 
     public static class Serializer implements RecipeSerializer<NetheriteUpgradeSmithingRecipe>

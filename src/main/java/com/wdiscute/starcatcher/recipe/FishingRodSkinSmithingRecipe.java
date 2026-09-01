@@ -51,7 +51,11 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipe
 
     public ItemStack assemble(Container input, RegistryAccess registries)
     {
-        ItemStack resultRod = input.getItem(1).transmuteCopy(this.result.getItem(), this.result.getCount());
+        //transmuteCopy(Item, int) is 1.21-only (real vanilla ItemStack has no stack-preserving item-type
+        //swap in 1.20.1) — reproduced by copying the base stack's own tag onto a fresh stack of the
+        //result item type, preserving durability/enchantment NBT the way transmuteCopy would.
+        ItemStack resultRod = new ItemStack(this.result.getItem(), this.result.getCount());
+        if (input.getItem(1).hasTag()) resultRod.setTag(input.getItem(1).getTag().copy());
 
         List<ResourceLocation> catchModifiers = new ArrayList<>(SCDataComponents.getOrDefault(input.getItem(1), SCDataComponents.CATCH_MODIFIERS, List.of()));
         catchModifiers.addAll(SCDataComponents.getOrDefault(input.getItem(0), SCDataComponents.CATCH_MODIFIERS, List.of()));
@@ -109,7 +113,7 @@ public class FishingRodSkinSmithingRecipe implements SmithingRecipe
     @Override
     public boolean isIncomplete()
     {
-        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::hasNoItems);
+        return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::isEmpty);
     }
 
     public static class Serializer implements RecipeSerializer<FishingRodSkinSmithingRecipe>

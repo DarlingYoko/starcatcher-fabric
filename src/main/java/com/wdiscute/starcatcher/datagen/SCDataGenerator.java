@@ -36,8 +36,7 @@ public class SCDataGenerator implements DataGeneratorEntrypoint
         pack.addProvider(DGSCAdvancementProvider::new);
         pack.addProvider(DGSCBiomeTagsProvider::new);
 
-        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(DGSCBlockLootTableProvider::new, LootContextParamSets.BLOCK))));
+        pack.addProvider(DGSCBlockLootTableProvider::new);
 
         pack.addProvider((output, registriesFuture) -> new DGSCRecipeProvider(output));
 

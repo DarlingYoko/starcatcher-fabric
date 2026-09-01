@@ -28,7 +28,7 @@ public class DGSCRecipeProvider extends RecipeProvider
     }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> output)
+    public void buildRecipes(Consumer<FinishedRecipe> output)
     {
         //guide
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, SCItems.GUIDE)
@@ -1003,7 +1003,7 @@ public class DGSCRecipeProvider extends RecipeProvider
 
     }
 
-    protected static void colorBlockWithDye(Consumer<FinishedRecipe> recipeOutput, List<Item> dyes, List<Item> dyeableItems, String group)
+    public static void colorBlockWithDye(Consumer<FinishedRecipe> recipeOutput, List<Item> dyes, List<Item> dyeableItems, String group)
     {
         for (int i = 0; i < dyes.size(); ++i)
         {

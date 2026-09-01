@@ -19,7 +19,7 @@ public class FishItem extends Item
     {
         if(context.getPlayer().isCreative())
         {
-            FishEntity fe = new FishEntity(SCEntities.FISH.get(), context.getLevel());
+            FishEntity fe = new FishEntity(SCEntities.FISH.value(), context.getLevel());
             fe.setFish(context.getItemInHand().copyWithCount(1));
             fe.setPos(context.getClickedPos().relative(context.getClickedFace()).getCenter());
 

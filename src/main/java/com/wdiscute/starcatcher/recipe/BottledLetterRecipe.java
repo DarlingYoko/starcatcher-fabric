@@ -36,7 +36,10 @@ public class BottledLetterRecipe implements CraftingRecipe
         this.category = category;
         this.result = result;
         this.ingredients = ingredients;
-        this.isSimple = ingredients.stream().allMatch(Ingredient::isSimple);
+        //Ingredient.isSimple() doesn't exist in 1.20.1 — vanilla Ingredient here has no complex/compound
+        //variant to distinguish (that's a later NeoForge custom-ingredient concept), so every ingredient
+        //is effectively "simple", matching how real vanilla ShapelessRecipe behaves in this version.
+        this.isSimple = true;
     }
 
     @Override

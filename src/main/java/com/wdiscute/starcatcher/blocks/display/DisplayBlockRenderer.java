@@ -85,7 +85,7 @@ public class DisplayBlockRenderer implements BlockEntityRenderer<DisplayBlockEnt
             this.bookModel.setupAnim(ticks, Mth.clamp(f4, 0.0F, 1.0F), Mth.clamp(f5, 0.0F, 1.0F), f6);
 
             VertexConsumer vertexconsumer = buffer.getBuffer(bookModel.renderType(Starcatcher.rl("textures/entity/book.png")));
-            this.bookModel.render(poseStack, vertexconsumer, packedLight, packedOverlay, -1);
+            this.bookModel.renderToBuffer(poseStack, vertexconsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
             poseStack.popPose();
         }
 

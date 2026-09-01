@@ -65,6 +65,6 @@ public class FrogTackleSkin extends AbstractTackleSkin
     {
         super.onFailedMinigame(player);
         Vec3 p = player.position();
-        player.level().playSound(null, p.x, p.y, p.z, SoundEvents.FROG_DEATH, SoundSource.AMBIENT);
+        player.level().playSound(null, p.x, p.y, p.z, SoundEvents.FROG_DEATH, SoundSource.AMBIENT, 1.0F, 1.0F);
     }
 }

@@ -1886,9 +1886,9 @@ public record FishProperties(
 
         public static boolean isGolden(ItemStack stack)
         {
-            if (stack.has(SCDataComponents.CAUGHT_FISH_INFO.value()))
+            if (SCDataComponents.has(stack, SCDataComponents.CAUGHT_FISH_INFO))
             {
-                CaughtFishInfo caughtFishInfo = stack.get(SCDataComponents.CAUGHT_FISH_INFO.value());
+                CaughtFishInfo caughtFishInfo = SCDataComponents.get(stack, SCDataComponents.CAUGHT_FISH_INFO);
                 return caughtFishInfo != null && caughtFishInfo.golden();
             }
             return false;
@@ -2026,7 +2026,7 @@ public record FishProperties(
             {
                 FishProperties fp = fbe.fpToFish;
 
-                SCCriterionTriggers.MINIGAME_COMPLETED.get().trigger(player, hits, perfectCatch, completedTreasure, time, fp.catchInfo().fish().get().getDefaultInstance());
+                SCCriterionTriggers.MINIGAME_COMPLETED.get().trigger(player, hits, perfectCatch, completedTreasure, time, fp.catchInfo().fish().value().getDefaultInstance());
 
                 //trigger modifiers
                 fbe.modifiers.forEach(m -> m.onSuccessfulMinigameCompletion(player, time, completedTreasure, perfectCatch, hits));
@@ -2068,7 +2068,7 @@ public record FishProperties(
                 if (location.getNamespace().equals("starcatcher"))
                     //if entity is from starcatcher, can only spawn if it's a bucketable fish (aka has a model)
                     canSpawnEntity = SCItems.BUCKETABLE_FISHES_REGISTRY.getEntries().stream().map(
-                            o -> BuiltInRegistries.ITEM.getKey(o.getDelegate().value())
+                            o -> BuiltInRegistries.ITEM.getKey(o.value())
                     ).anyMatch(rl -> rl.equals(fp.catchInfo.fish().unwrapKey().orElseThrow().location()));
                 else
                     //if entity is not from starcatcher, then it can spawn

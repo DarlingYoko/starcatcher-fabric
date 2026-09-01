@@ -237,7 +237,7 @@ public class RarityCountRestriction extends AbstractFishRestriction
 
         Map<ResourceLocation, FishCaughtCounter> fishesCaught = SCDataAttachments.get(player, SCDataAttachments.FISHING_GUIDE).fishesCaught;
         rarityCount.forEach(o -> hover.add(getSingleEntryShortDescription(o, player)
-                .withColor(isRarityCountRequirementMet(o, player, fishesCaught) ? SCColors.GUIDE_GREEN : SCColors.GUIDE_RED)));
+                .withStyle(Style.EMPTY.withColor(isRarityCountRequirementMet(o, player, fishesCaught) ? SCColors.GUIDE_GREEN : SCColors.GUIDE_RED))));
 
         return hover;
     }

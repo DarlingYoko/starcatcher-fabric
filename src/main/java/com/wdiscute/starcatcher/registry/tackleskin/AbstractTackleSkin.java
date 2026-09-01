@@ -29,7 +29,7 @@ public abstract class AbstractTackleSkin
             this.model = new FishingBobModel<>(context.bakeLayer(getLayerLocation()));
             this.renderType = RenderType.entityCutoutNoCull(getTexture());
         }
-        this.model.renderToBuffer(poseStack, buffer.getBuffer(renderType), packedLight, OverlayTexture.NO_OVERLAY, -1);
+        this.model.renderToBuffer(poseStack, buffer.getBuffer(renderType), packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public void onCast(Player player)

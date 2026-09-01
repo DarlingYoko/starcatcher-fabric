@@ -98,7 +98,7 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
             if(abe.getFish().is(SCTags.BUCKETABLE_FISHES))
             {
                 ItemStack itemstack = abe.getFish().copy();
-                FishEntity entity = SCEntities.FISH.get().create(level);
+                FishEntity entity = SCEntities.FISH.value().create(level);
 
                 entity.setFish(itemstack);
 

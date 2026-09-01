@@ -50,7 +50,7 @@ public class SCCreativeModeTabs
     );
 
     public static final Supplier<CreativeModeTab> STARCATCHER = CREATIVE_MODE_TABS.register(
-            "starcatcher", () -> CreativeModeTab.builder().icon(() -> new ItemStack(SCItems.ROD.get()))
+            "starcatcher", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0).icon(() -> new ItemStack(SCItems.ROD.get()))
                     .title(Component.translatable("creativetab.starcatcher.starcatcher"))
                     .displayItems((itemDisplayParameters, output) ->
                     {

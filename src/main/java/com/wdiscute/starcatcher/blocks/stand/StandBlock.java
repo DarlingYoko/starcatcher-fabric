@@ -99,7 +99,7 @@ public class StandBlock extends AbstractMultiBlock implements IPreviewableMultib
                 sbe.tournament.owner = player.getUUID();
                 sbe.tournament.playerScores.add(TournamentPlayerScore.empty(player.getUUID()));
             }
-            player.openMenu(new SimpleMenuProvider(sbe, Component.empty()), center);
+            player.openMenu(new SimpleMenuProvider(sbe, Component.empty()));
         }
 
         return InteractionResult.SUCCESS;

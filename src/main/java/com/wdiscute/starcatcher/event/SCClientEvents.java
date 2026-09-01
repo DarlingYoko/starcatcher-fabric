@@ -49,7 +49,7 @@ public class SCClientEvents
         EntityRendererRegistry.register(SCEntities.FISHING_BOB.get(), FishingBobRenderer::new);
         EntityRendererRegistry.register(SCEntities.BROKEN_BOTTLE.get(), ThrownItemRenderer::new);
         EntityRendererRegistry.register(SCEntities.BOTTLED_LETTER.get(), ThrownItemRenderer::new);
-        EntityRendererRegistry.register(SCEntities.FISH.get(), FishRenderer::new);
+        EntityRendererRegistry.register(SCEntities.FISH.value(), FishRenderer::new);
 
         //Trinkets (curios' Fabric replacement, D5) is a hard dependency, always present
         CuriosEvents.registerRenderers();
