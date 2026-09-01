@@ -5,6 +5,7 @@ import com.wdiscute.starcatcher.fishentity.FishRenderer;
 import com.wdiscute.starcatcher.fishentity.fishmodels.*;
 import com.wdiscute.starcatcher.fishspotter.FishRadarLayer;
 import com.wdiscute.starcatcher.blocks.SCBlockEntities;
+import com.wdiscute.starcatcher.blocks.SCBlocks;
 import com.wdiscute.starcatcher.blocks.aquarium.AquariumRenderer;
 import com.wdiscute.starcatcher.blocks.display.DisplayBlockRenderer;
 import com.wdiscute.starcatcher.blocks.display.DisplayBookModel;
@@ -23,6 +24,7 @@ import com.wdiscute.starcatcher.registry.tackleskin.*;
 import com.wdiscute.starcatcher.registry.items.rod.FishingRodScreen;
 import com.wdiscute.starcatcher.tournament.StandScreen;
 import com.wdiscute.starcatcher.tournament.TournamentOverlay;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
@@ -31,6 +33,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 
 /**
@@ -45,6 +48,13 @@ public class SCClientEvents
         BlockEntityRendererRegistry.register(SCBlockEntities.DISPLAY.get(), DisplayBlockRenderer::new);
         BlockEntityRendererRegistry.register(SCBlockEntities.AQUARIUM.get(), AquariumRenderer::new);
         //BlockEntityRendererRegistry.register(SCBlockEntities.TACKLE_BOX.get(), TackleBoxRenderer::new);
+
+        // aquarium.json declares a Forge/NeoForge-only top-level "render_type": "minecraft:translucent"
+        // model key, which vanilla's (and Fabric's) own model parser silently ignores -- without
+        // this, the block falls back to the default solid render type, so its glass/water quads
+        // render fully opaque instead of alpha-blended (confirmed via runClient: solid black instead
+        // of translucent glass/water).
+        BlockRenderLayerMap.INSTANCE.putBlock(SCBlocks.AQUARIUM.get(), RenderType.translucent());
 
         EntityRendererRegistry.register(SCEntities.FISHING_BOB.get(), FishingBobRenderer::new);
         EntityRendererRegistry.register(SCEntities.BROKEN_BOTTLE.get(), ThrownItemRenderer::new);
