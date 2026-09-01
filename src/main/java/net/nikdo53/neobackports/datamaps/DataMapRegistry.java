@@ -2,13 +2,17 @@ package net.nikdo53.neobackports.datamaps;
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.slf4j.Logger;
@@ -17,9 +21,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Backs {@link DataMapType} — see FABRIC_PORT_PLAN.md §5.6. One reload listener per distinct
@@ -76,6 +83,12 @@ class DataMapRegistry
         }
 
         @Override
+        public Collection<ResourceLocation> getFabricDependencies()
+        {
+            return Set.of(ResourceReloadListenerKeys.TAGS);
+        }
+
+        @Override
         protected Map<DataMapType<?, ?>, Map<ResourceLocation, Object>> prepare(ResourceManager resourceManager, ProfilerFiller profiler)
         {
             Map<DataMapType<?, ?>, Map<ResourceLocation, Object>> result = new HashMap<>();
@@ -97,15 +110,21 @@ class DataMapRegistry
                         {
                             for (var entry : GsonHelper.getAsJsonObject(json, "values").entrySet())
                             {
-                                ResourceLocation entryId = new ResourceLocation(entry.getKey());
                                 var valueJson = entry.getValue();
                                 if (valueJson.isJsonObject() && valueJson.getAsJsonObject().has("value"))
                                     valueJson = valueJson.getAsJsonObject().get("value");
 
                                 var finalValueJson = valueJson;
-                                type.codec().parse(com.mojang.serialization.JsonOps.INSTANCE, finalValueJson)
-                                        .resultOrPartial(error -> LOGGER.error("Couldn't parse data map entry {} in {}: {}", entryId, fileLoc, error))
-                                        .ifPresent(v -> values.put(entryId, v));
+                                Consumer<ResourceLocation> putValue = entryId ->
+                                        type.codec().parse(com.mojang.serialization.JsonOps.INSTANCE, finalValueJson)
+                                                .resultOrPartial(error -> LOGGER.error("Couldn't parse data map entry {} in {}: {}", entryId, fileLoc, error))
+                                                .ifPresent(v -> values.put(entryId, v));
+
+                                String key = entry.getKey();
+                                if (key.startsWith("#"))
+                                    forEachTagMember(key.substring(1), fileLoc, putValue);
+                                else
+                                    putValue.accept(new ResourceLocation(key));
                             }
                         }
 
@@ -125,6 +144,28 @@ class DataMapRegistry
             }
 
             return result;
+        }
+
+        /**
+         * NeoForge data maps let a "values" key be a tag reference ({@code "#namespace:path"}) to
+         * apply the same value to every current member of that tag, instead of one item — used by
+         * e.g. {@code data/starcatcher/data_maps/item/aquarium_interaction.json}'s
+         * {@code "#minecraft:pickaxes"} entry. Requires {@link #getFabricDependencies()}'s TAGS
+         * dependency so the tag is actually populated by the time this reload listener runs.
+         */
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        private void forEachTagMember(String tagLocation, ResourceLocation fileLoc, Consumer<ResourceLocation> putValue)
+        {
+            Registry registry = BuiltInRegistries.REGISTRY.get(registryKey.location());
+            if (registry == null)
+            {
+                LOGGER.error("Unknown registry {} for tag entry #{} in {}", registryKey.location(), tagLocation, fileLoc);
+                return;
+            }
+
+            TagKey tagKey = TagKey.create(registry.key(), new ResourceLocation(tagLocation));
+            for (Object holder : registry.getTagOrEmpty(tagKey))
+                ((Holder<?>) holder).unwrapKey().ifPresent(rk -> putValue.accept(rk.location()));
         }
 
         @SuppressWarnings("unchecked")
