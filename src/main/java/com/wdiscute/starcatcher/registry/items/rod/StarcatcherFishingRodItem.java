@@ -110,17 +110,15 @@ public class StarcatcherFishingRodItem extends Item implements MenuProvider
     }
 
 
-    @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack)
-    {
-        return true;
-    }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack)
-    {
-        return itemStack.copy();
-    }
+    //Known gap: hasCraftingRemainingItem(ItemStack)/getCraftingRemainingItem(ItemStack) are 1.21-only
+    //per-stack overrides (real NeoForge patches Item.getCraftingRemainingItem() to be non-final and
+    //stack-aware). Vanilla 1.20.1's getCraftingRemainingItem() is final and Item-type-level only (via
+    //Item.Properties.craftRemainder(Item)), which can't self-reference this item during its own
+    //construction and can't preserve stack-specific data (durability/components) even if it could.
+    //Reproducing the original "crafting the guide book doesn't consume your equipped rod" behavior
+    //needs a custom Recipe overriding Recipe.getRemainingItems(CraftingContainer) instead of an Item-
+    //level hook — out of scope for this compile pass; the guide recipe (DGSCRecipeProvider) now
+    //consumes the rod like any other shapeless ingredient.
 
     @Override
     public Component getDisplayName()

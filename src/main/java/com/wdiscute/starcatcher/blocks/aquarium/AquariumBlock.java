@@ -140,9 +140,10 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid)
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player)
     {
-        return level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
@@ -185,12 +186,6 @@ public class AquariumBlock extends BaseEntityBlock implements SimpleWaterloggedB
         if (!state.getValue(SOUTH)) shape = Shapes.join(shape, Block.box(-2, -2, 12, 18, 18, 18), BooleanOp.OR);
 
         return shape;
-    }
-
-    @Override
-    public boolean shouldDisplayFluidOverlay(BlockState state, BlockAndTintGetter level, BlockPos pos, FluidState fluidState)
-    {
-        return false;
     }
 
     @Override

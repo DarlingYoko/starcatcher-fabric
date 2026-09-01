@@ -119,9 +119,8 @@ public class AquariumRenderer implements BlockEntityRenderer<AquariumBlockEntity
     }
 
     @Override
-    public AABB getRenderBoundingBox(AquariumBlockEntity aquariumBlockEntity)
+    public boolean shouldRenderOffScreen(AquariumBlockEntity aquariumBlockEntity)
     {
-        BlockPos pos = aquariumBlockEntity.getBlockPos();
-        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0F, pos.getY() + 1.5F, pos.getZ() + 1.0F);
+        return true;
     }
 }

@@ -125,9 +125,8 @@ public class DisplayBlockRenderer implements BlockEntityRenderer<DisplayBlockEnt
     }
 
     @Override
-    public AABB getRenderBoundingBox(DisplayBlockEntity blockEntity)
+    public boolean shouldRenderOffScreen(DisplayBlockEntity blockEntity)
     {
-        BlockPos pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0F, pos.getY() + 1.5F, pos.getZ() + 1.0F);
+        return true;
     }
 }

@@ -37,24 +37,4 @@ public class DGSCBlockLootTableProvider extends FabricBlockLootTableProvider
         dropSelf(CONCH.get());
     }
 
-    @Override
-    protected Iterable<Block> getKnownBlocks()
-    {
-        List<Block> list = new ArrayList<>();
-        list.addAll(HATS.getEntries().stream().map(Holder::value).toList());
-        list.addAll(TACKLE_BOXES.getEntries().stream().map(Holder::value).toList());
-
-        list.add(TROPHY_COPPER.get());
-        list.add(TROPHY_IRON.get());
-        list.add(TROPHY_GOLD.get());
-        list.add(TROPHY_EMERALD.get());
-        list.add(TROPHY_DIAMOND.get());
-
-        list.add(AQUARIUM.get());
-        list.add(DISPLAY.get());
-
-        list.add(CLAM.get());
-        list.add(CONCH.get());
-        return list::iterator;
-    }
 }

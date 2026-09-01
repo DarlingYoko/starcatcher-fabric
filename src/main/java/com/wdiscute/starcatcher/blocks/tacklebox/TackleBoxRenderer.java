@@ -40,10 +40,9 @@ public class TackleBoxRenderer implements BlockEntityRenderer<TackleBoxBlockEnti
     }
 
     @Override
-    public AABB getRenderBoundingBox(TackleBoxBlockEntity tackleBoxBlockEntity)
+    public boolean shouldRenderOffScreen(TackleBoxBlockEntity tackleBoxBlockEntity)
     {
-        BlockPos pos = tackleBoxBlockEntity.getBlockPos();
-        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0F, pos.getY() + 1.5F, pos.getZ() + 1.0F);
+        return true;
     }
 
 
