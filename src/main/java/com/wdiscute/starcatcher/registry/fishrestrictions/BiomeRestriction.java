@@ -102,7 +102,7 @@ public class BiomeRestriction extends AbstractFishRestriction
     public int getFishChance(int currentChance, Level level, FishProperties fp, @NotNull Entity entity, ItemStack rod, Context context)
     {
         Holder<Biome> biome = level.getBiome(entity.blockPosition());
-        ResourceLocation biomeRL = biome.getKey().location();
+        ResourceLocation biomeRL = biome.unwrapKey().orElseThrow().location();
 
         //if biomes or biomesTags then check if biome is in any of them
         if (!biomes.isEmpty() || !biomesTags.isEmpty())

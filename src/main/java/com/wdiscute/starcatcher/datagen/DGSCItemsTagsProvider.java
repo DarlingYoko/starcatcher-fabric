@@ -52,16 +52,16 @@ public class DGSCItemsTagsProvider extends FabricTagProvider.ItemTagProvider
             if (fp.catchInfo().alwaysSpawnEntity()) return;
 
             getOrCreateTagBuilder(SCTags.FISHABLE)
-                    .addOptional(fp.catchInfo().fish().getKey().location());
+                    .addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
 
             switch (p.getSecond().rarity())
             {
-                case TRASH -> getOrCreateTagBuilder(SCTags.TRASH).addOptional(fp.catchInfo().fish().getKey().location());
-                case COMMON -> getOrCreateTagBuilder(SCTags.COMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case UNCOMMON -> getOrCreateTagBuilder(SCTags.UNCOMMON_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case RARE -> getOrCreateTagBuilder(SCTags.RARE_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case EPIC -> getOrCreateTagBuilder(SCTags.EPIC_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
-                case LEGENDARY -> getOrCreateTagBuilder(SCTags.LEGENDARY_FISHES).addOptional(fp.catchInfo().fish().getKey().location());
+                case TRASH -> getOrCreateTagBuilder(SCTags.TRASH).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
+                case COMMON -> getOrCreateTagBuilder(SCTags.COMMON_FISHES).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
+                case UNCOMMON -> getOrCreateTagBuilder(SCTags.UNCOMMON_FISHES).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
+                case RARE -> getOrCreateTagBuilder(SCTags.RARE_FISHES).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
+                case EPIC -> getOrCreateTagBuilder(SCTags.EPIC_FISHES).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
+                case LEGENDARY -> getOrCreateTagBuilder(SCTags.LEGENDARY_FISHES).addOptional(fp.catchInfo().fish().unwrapKey().orElseThrow().location());
             }
         });
 

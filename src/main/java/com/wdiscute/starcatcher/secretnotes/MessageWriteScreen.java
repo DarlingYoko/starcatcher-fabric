@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.secretnotes;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.io.network.SetMessagePayload;
 import net.minecraft.client.Minecraft;
@@ -90,8 +89,7 @@ public class MessageWriteScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(key) && boxes.stream().noneMatch(EditBox::canConsumeInput) && !name.canConsumeInput())
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode) && boxes.stream().noneMatch(EditBox::canConsumeInput) && !name.canConsumeInput())
         {
             this.onClose();
             return true;

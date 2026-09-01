@@ -89,7 +89,7 @@ public class BiomeBias extends AbstractFishRestriction
     {
         Holder<Biome> biome = level.getBiome(entity.blockPosition());
 
-        if (biomes.contains(biome.getKey().location())) return extraChance;
+        if (biomes.contains(biome.unwrapKey().orElseThrow().location())) return extraChance;
 
         if (biomesTags.stream().anyMatch(rl -> biome.is(TagKey.create(Registries.BIOME, rl))))
             return extraChance;

@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.minigame;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -435,7 +434,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int keyModifiers)
     {
-        if (keyCode == SCKeymappings.MINIGAME_HIT.getKey().getValue())
+        if (SCKeymappings.MINIGAME_HIT.matches(keyCode, scanCode))
         {
             isHoldingKey = false;
             holdingTicks = 0;
@@ -466,8 +465,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
     public boolean keyPressed(int keyCode, int scanCode, int keyModifiers)
     {
         //closes when pressing E
-        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey))
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode))
         {
             if (SCConfig.ENABLE_VILLAGER_SOUND.get()
                     && modifiers.stream().noneMatch(AbstractMinigameModifier::skipMissSound)
@@ -479,7 +477,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
         }
 
         //hit input
-        if (SCKeymappings.MINIGAME_HIT.isActiveAndMatches(mouseKey))
+        if (SCKeymappings.MINIGAME_HIT.matches(keyCode, scanCode))
         {
             if (!isHoldingKey) inputPressed();
 

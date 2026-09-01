@@ -63,11 +63,11 @@ public class Nikdo53Modifier extends AbstractMinigameModifier
 
     @Override
     public void onKeyReleased(int key, int scanCode, int keyModifiers) {
-        if (key == getOptions().keyLeft.getKey().getValue()) {
+        if (getOptions().keyLeft.matches(key, scanCode)) {
             isHoldingLeft = false;
         }
 
-        if (key == getOptions().keyRight.getKey().getValue()){
+        if (getOptions().keyRight.matches(key, scanCode)){
             isHoldingRight = false;
         }
 
@@ -79,12 +79,12 @@ public class Nikdo53Modifier extends AbstractMinigameModifier
 
     @Override
     public void onKeyPress(int key, int scanCode, int keyModifiers) {
-        if (key == getOptions().keyLeft.getKey().getValue()) {
+        if (getOptions().keyLeft.matches(key, scanCode)) {
             pointerLayer--;
             isHoldingLeft = true;
         }
 
-       if (key == getOptions().keyRight.getKey().getValue()){
+       if (getOptions().keyRight.matches(key, scanCode)){
            pointerLayer++;
            isHoldingRight = true;
        }

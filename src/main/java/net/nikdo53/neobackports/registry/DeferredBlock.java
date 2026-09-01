@@ -1,14 +1,22 @@
 package net.nikdo53.neobackports.registry;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
 import java.util.function.Supplier;
 
-public class DeferredBlock<T extends Block> extends DeferredHolder<Block, T>
+public class DeferredBlock<T extends Block> extends DeferredHolder<Block, T> implements ItemLike
 {
     DeferredBlock(ResourceKey<Block> key, Supplier<? extends T> factory)
     {
         super(key, factory);
+    }
+
+    @Override
+    public Item asItem()
+    {
+        return get().asItem();
     }
 }

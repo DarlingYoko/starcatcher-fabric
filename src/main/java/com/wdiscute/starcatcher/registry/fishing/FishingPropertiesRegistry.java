@@ -334,9 +334,9 @@ public class FishingPropertiesRegistry
             return ResourceKey.create(Starcatcher.FISH_REGISTRY_KEY, ResourceLocation.tryParse(fp.catchInfo().fish().getRegisteredName()));
 
         return ResourceKey.create(Starcatcher.FISH_REGISTRY_KEY, ResourceLocation.tryParse(
-                fp.catchInfo().fish().getKey().location().getNamespace() + ":" +
+                fp.catchInfo().fish().unwrapKey().orElseThrow().location().getNamespace() + ":" +
                         fp.catchInfo().fishEntryType().name().toLowerCase(Locale.ROOT) + "_" +
-                        fp.catchInfo().fish().getKey().location().getPath()
+                        fp.catchInfo().fish().unwrapKey().orElseThrow().location().getPath()
                 ));
     }
 

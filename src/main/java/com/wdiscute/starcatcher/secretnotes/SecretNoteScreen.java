@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher.secretnotes;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.wdiscute.starcatcher.Starcatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,8 +50,7 @@ public class SecretNoteScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
-        if (this.minecraft.options.keyInventory.isActiveAndMatches(key))
+        if (this.minecraft.options.keyInventory.matches(keyCode, scanCode))
         {
             this.onClose();
             return true;
