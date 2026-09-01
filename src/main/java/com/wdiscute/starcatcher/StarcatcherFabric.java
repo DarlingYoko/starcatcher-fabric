@@ -4,6 +4,7 @@ import com.wdiscute.starcatcher.blocks.SCBlockEntities;
 import com.wdiscute.starcatcher.blocks.SCBlocks;
 import com.wdiscute.starcatcher.event.SCEvents;
 import com.wdiscute.starcatcher.io.SCDataComponents;
+import com.wdiscute.starcatcher.registry.SCCommands;
 import com.wdiscute.starcatcher.registry.SCCreativeModeTabs;
 import com.wdiscute.starcatcher.registry.SCCriterionTriggers;
 import com.wdiscute.starcatcher.registry.SCCustomRegistries;
@@ -36,6 +37,10 @@ public class StarcatcherFabric implements ModInitializer
     public void onInitialize()
     {
         IEventBus bus = IEventBus.INSTANCE;
+
+        // Must run before vanilla's BuiltInRegistries.bootStrap() freezes COMMAND_ARGUMENT_TYPE —
+        // see SCCommands.registerArgumentTypes()'s own doc comment.
+        SCCommands.registerArgumentTypes();
 
         // Dependency order matters: DeferredRegisterTyped.register(bus) flushes synchronously
         // (see FABRIC_PORT_PLAN.md §5.1), and several of these reference the previous ones'

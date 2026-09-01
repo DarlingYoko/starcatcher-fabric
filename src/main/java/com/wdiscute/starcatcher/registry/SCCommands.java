@@ -59,17 +59,21 @@ public class SCCommands
             o -> Component.translatable("commands.starcatcher.modifier_not_found", o)
     );
 
-    static
+    /**
+     * Must be called from {@code onInitialize()} (both sides), NOT lazily on first use — vanilla's
+     * {@code BuiltInRegistries.bootStrap()} freezes {@code COMMAND_ARGUMENT_TYPE} explicitly, once,
+     * well before {@link #register} ever runs (that only happens per-world-load, via
+     * {@code CommandRegistrationCallback}, long after bootstrap). Vanilla's own ArgumentTypeInfos
+     * registry has no public registration method for custom ArgumentTypes (its BY_CLASS lookup, used
+     * to serialize the command tree sent to clients on join, is populated only from its private
+     * bootstrap() call for vanilla's own types) — without this, syncing any command using
+     * EnumArgument throws "Unrecognized argument type EnumArgument" server-side, which disconnects
+     * every joining player with "Invalid player data". EnumArgument is only ever used with
+     * FishProperties.Rarity in this codebase (see the "rarity" argument below), so a single
+     * contextFree singleton registration covers every usage.
+     */
+    public static void registerArgumentTypes()
     {
-        /*
-         * Vanilla's own ArgumentTypeInfos registry has no public registration method for custom
-         * ArgumentTypes (its BY_CLASS lookup, used to serialize the command tree sent to clients on
-         * join, is populated only from its private bootstrap() call for vanilla's own types) — without
-         * this, syncing any command using EnumArgument throws "Unrecognized argument type EnumArgument"
-         * server-side, which disconnects every joining player with "Invalid player data". EnumArgument
-         * is only ever used with FishProperties.Rarity in this codebase (see the "rarity" argument
-         * below), so a single contextFree singleton registration covers every usage.
-         */
         ArgumentTypeRegistry.registerArgumentType(Starcatcher.rl("enum"), EnumArgument.class,
                 SingletonArgumentInfo.contextFree(() -> EnumArgument.enumArgument(FishProperties.Rarity.class)));
     }
