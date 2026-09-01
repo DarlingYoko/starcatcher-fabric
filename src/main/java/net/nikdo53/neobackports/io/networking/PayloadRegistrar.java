@@ -34,31 +34,43 @@ public class PayloadRegistrar
         CODECS.put(type.id(), codec);
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
-            registerClientReceiver(type, codec, handler);
+            ClientReceiver.register(type, codec, handler);
 
         return this;
     }
 
     /**
-     * Split out of {@link #playToClient} so the {@code ClientPlayNetworking}/{@code Minecraft}-typed
-     * lambda body never ends up in {@code playToClient}'s own bytecode: {@code playToClient} runs on
-     * both sides (called unconditionally from common init), so a client-only lambda inlined directly
-     * there would still be present in the class file's constant pool/verification data on a dedicated
-     * server even though the runtime `if` guard means it's never invoked — the JVM verifier resolves
-     * referenced types (e.g. {@code LocalPlayer}, captured via {@code client.player}) at class-load
-     * time regardless of reachability, which crashes server startup with "Cannot load class
-     * net.minecraft.client.player.LocalPlayer in environment type SERVER". Method-level
-     * {@code @Environment} is Fabric Loader's actual stripping unit, so it must be its own method.
+     * A genuinely separate class, not just an {@code @Environment}-annotated method on
+     * {@link PayloadRegistrar} — javac desugars the {@code ClientPlayNetworking.registerGlobalReceiver}
+     * lambda below into its own synthetic method (verified via {@code javap}:
+     * {@code lambda$registerClientReceiver$0(..., Minecraft, ...)}), and that synthetic method does
+     * NOT itself inherit the enclosing method's {@code @Environment} annotation. Fabric Loader's
+     * stripper only strips annotated methods, so the orphaned, un-annotated lambda body (still
+     * {@code Minecraft}/{@code LocalPlayer}-typed) was left behind in {@code PayloadRegistrar}'s own
+     * class file and the JVM verifier choked on IT instead — confirmed via runServer, crashing at the
+     * exact same "Cannot load class net.minecraft.client.player.LocalPlayer in environment type
+     * SERVER" even after extracting a same-class method (see git history on this file).
+     * <p>
+     * With the lambda in its OWN class instead, {@link PayloadRegistrar}'s class file (verified
+     * whenever {@code new PayloadRegistrar(...)} runs, unconditionally on both sides) never contains
+     * any reference to a client-only type at all — {@link #playToClient}'s call to
+     * {@code ClientReceiver.register(...)} only exposes {@code CustomPacketPayload.Type}/
+     * {@code StreamCodec}/{@code BiConsumer} in its descriptor. {@code ClientReceiver} itself is only
+     * ever actually loaded when that call executes, which the runtime environment check in
+     * {@link #playToClient} guarantees never happens on a dedicated server.
      */
     @Environment(EnvType.CLIENT)
-    private static <T extends CustomPacketPayload> void registerClientReceiver(
-            CustomPacketPayload.Type<T> type, StreamCodec<T> codec, BiConsumer<T, IPayloadContext> handler)
+    private static class ClientReceiver
     {
-        ClientPlayNetworking.registerGlobalReceiver(type.id(), (client, listener, buf, sender) ->
+        private static <T extends CustomPacketPayload> void register(
+                CustomPacketPayload.Type<T> type, StreamCodec<T> codec, BiConsumer<T, IPayloadContext> handler)
         {
-            T payload = codec.decode(buf);
-            handler.accept(payload, new PayloadContextImpl(client.player, client));
-        });
+            ClientPlayNetworking.registerGlobalReceiver(type.id(), (client, listener, buf, sender) ->
+            {
+                T payload = codec.decode(buf);
+                handler.accept(payload, new PayloadContextImpl(client.player, client));
+            });
+        }
     }
 
     public <T extends CustomPacketPayload> PayloadRegistrar playToServer(
