@@ -7,9 +7,11 @@ import com.wdiscute.starcatcher.U;
 import com.wdiscute.starcatcher.minigame.ActiveSweetSpot;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import net.minecraft.network.chat.Component;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class AddLeavesSweetspotsModifier extends AbstractMinigameModifier
@@ -48,6 +50,13 @@ public class AddLeavesSweetspotsModifier extends AbstractMinigameModifier
     public DeferredHolder<Supplier<AbstractMinigameModifier>, Supplier<AbstractMinigameModifier>> getRegistryHolder()
     {
         return SCMinigameModifiers.SPAWN_SWEET_SPOTS;
+    }
+
+    @Override
+    public List<Component> getShiftDescription()
+    {
+        return List.of(Component.translatable("tooltip.modifier.starcatcher.add_leaves_spots.shift",
+                Math.round(chancePerTick * 1000) / 10f));
     }
 
 }

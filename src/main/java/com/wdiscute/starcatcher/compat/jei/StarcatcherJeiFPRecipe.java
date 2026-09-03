@@ -9,6 +9,7 @@ import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.Treasure;
 import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -31,6 +32,7 @@ public class StarcatcherJeiFPRecipe extends AbstractRecipeCategory<StarcatcherJe
 {
     private static final ResourceLocation ICON = Starcatcher.rl("textures/gui/emi/emi_guide_icon.png");
     public ItemStack rodIs;
+    private final IDrawableStatic slotDrawable;
 
     public StarcatcherJeiFPRecipe(IGuiHelper guiHelper)
     {
@@ -42,6 +44,7 @@ public class StarcatcherJeiFPRecipe extends AbstractRecipeCategory<StarcatcherJe
                 20
         );
         rodIs = SCItems.ROD.get().getDefaultInstance();
+        slotDrawable = guiHelper.getSlotDrawable();
     }
 
     @Override
@@ -85,12 +88,12 @@ public class StarcatcherJeiFPRecipe extends AbstractRecipeCategory<StarcatcherJe
     public void draw(Recipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
     {
         Font font = Minecraft.getInstance().font;
-        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 4, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        slotDrawable.draw(guiGraphics, 4, 1);
         guiGraphics.blit(StarcatcherJeiPlugin.ARROW, 25, 2, 16, 16, 0, 0, 16, 16, 16, 16);
-        guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 43, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+        slotDrawable.draw(guiGraphics, 43, 1);
 
         if (!recipe.treasure.isEmpty())
-            guiGraphics.blit(StarcatcherJeiPlugin.SLOT_BACKGROUND, 63, 1, 18, 18, 0, 0, 18, 18, 18, 18);
+            slotDrawable.draw(guiGraphics, 63, 1);
 
         bookIcon(guiGraphics, 83, 0, (int) mouseX, (int) mouseY);
 

@@ -81,6 +81,16 @@ public class FishingGuideItem extends Item
             else
                 tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.signed", sign.signature()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
         }
+
+        tooltipComponents.add(Component.translatable(Screen.hasShiftDown() ? "tooltip.starcatcher.hold_shift_active" : "tooltip.starcatcher.hold_shift").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+
+        if (Screen.hasShiftDown())
+        {
+            tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.0").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+            tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.1").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+            tooltipComponents.add(Component.translatable("tooltip.starcatcher.starcatcher_guide.2").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
+        }
+
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 

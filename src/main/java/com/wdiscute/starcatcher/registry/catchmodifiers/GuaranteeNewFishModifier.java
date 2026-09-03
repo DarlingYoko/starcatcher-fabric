@@ -4,6 +4,7 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.U;
 import com.wdiscute.starcatcher.io.attachments.FishingGuideAttachment;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -36,5 +37,14 @@ public class GuaranteeNewFishModifier extends AbstractCatchModifier
             instance.fpToFish = fish;
             instance.rlToFish = level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY_KEY).getKey(fish);
         });
+    }
+
+    @Override
+    public List<Component> getShiftDescription()
+    {
+        String key = chance >= 100f
+                ? "tooltip.modifier.starcatcher.guarantee_new_fish_always.shift"
+                : "tooltip.modifier.starcatcher.guarantee_new_fish_half.shift";
+        return List.of(Component.translatable(key, Math.min(100, Math.round(chance))));
     }
 }

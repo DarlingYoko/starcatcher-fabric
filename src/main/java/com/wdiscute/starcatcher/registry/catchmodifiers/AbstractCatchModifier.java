@@ -2,6 +2,7 @@ package com.wdiscute.starcatcher.registry.catchmodifiers;
 
 import com.wdiscute.starcatcher.bobberentity.FishingBobEntity;
 import com.wdiscute.starcatcher.registry.FishProperties;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +12,16 @@ import java.util.List;
 public abstract class AbstractCatchModifier
 {
     FishingBobEntity instance;
+
+    /**
+     * Extra line(s) shown in item tooltips only while holding shift, e.g. the exact
+     * percentage/value behind an otherwise qualitative tooltip.modifier.* description.
+     * Empty by default - most modifiers don't have a single number worth surfacing.
+     */
+    public List<Component> getShiftDescription()
+    {
+        return List.of();
+    }
 
     //server and client
     public void onAdd(FishingBobEntity fishingBobEntity)

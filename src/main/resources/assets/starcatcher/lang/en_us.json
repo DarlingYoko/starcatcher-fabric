@@ -240,6 +240,9 @@
   "tooltip.starcatcher.humble_rod.0": "A very humble rod found rarely in rivers.",
 
 
+  "tooltip.starcatcher.hold_shift": "▼ [Shift] ▼",
+  "tooltip.starcatcher.hold_shift_active": "▲ [Shift] ▲",
+
   "item.starcatcher.starcatcher_guide": "Starcatcher's Guide",
   "tooltip.starcatcher.starcatcher_guide.0": "An angler's best companion, keeping track",
   "tooltip.starcatcher.starcatcher_guide.1": "of all the fishes you've caught, and",
@@ -270,7 +273,9 @@
 
   "tooltip.modifier.starcatcher.guarantee_golden": "A golden fish will be caught if possible",
   "tooltip.modifier.starcatcher.add_5_golden_chance": "Slightly increases the chances of catching a golden fish",
+  "tooltip.modifier.starcatcher.add_5_golden_chance.shift": "+%s%% golden chance",
   "tooltip.modifier.starcatcher.add_50_golden_chance": "Tremendously increases the chances of catching a golden fish",
+  "tooltip.modifier.starcatcher.add_50_golden_chance.shift": "+%s%% golden chance",
   "tooltip.modifier.starcatcher.cancel_golden": "You can no longer catch golden fishes",
 
   "tooltip.modifier.starcatcher.anglers_hat": "",
@@ -286,6 +291,7 @@
   "tooltip.modifier.starcatcher.spawn_treasure_on_three_hits": "Successfully hitting 3 sweet-spots in a row will summon a treasure chest",
 
   "tooltip.modifier.starcatcher.slower_moving_sweet_spots": "Slows down moving sweet-spots",
+  "tooltip.modifier.starcatcher.slower_moving_sweet_spots.shift": "%s%% sweet-spot speed",
 
   "tooltip.modifier.starcatcher.stop_decay_on_hit": "Prevents the fish from swimming away for a short period after a hit",
 
@@ -298,6 +304,7 @@
   "tooltip.modifier.starcatcher.bigger_green_sweet_spots": "Green sweet-spots will be slightly bigger",
 
   "tooltip.modifier.starcatcher.add_leaves_spots": "Leaf sweetspots will appear at random",
+  "tooltip.modifier.starcatcher.add_leaves_spots.shift": "%s%% chance per tick",
 
   "tooltip.modifier.starcatcher.add_aqua_sweet_spot": "An extra aqua sweet-spot is added",
 
@@ -308,13 +315,20 @@
   "tooltip.modifier.starcatcher.ignore_daytime_and_weather_restrictions": "Ignores fish daytime & weather restrictions",
 
   "tooltip.modifier.starcatcher.decrease_lure_time": "Decreases lure time",
+  "tooltip.modifier.starcatcher.decrease_lure_time.shift": "%s%% lure time",
   "tooltip.modifier.starcatcher.big_decrease_lure_time": "Decreases lure time greatly",
+  "tooltip.modifier.starcatcher.big_decrease_lure_time.shift": "%s%% lure time",
   "tooltip.modifier.starcatcher.increase_lure_time": "Increases lure time",
+  "tooltip.modifier.starcatcher.increase_lure_time.shift": "%s%% lure time",
 
   "tooltip.modifier.starcatcher.faster_handle_speed": "Increases the handle's rotation speed",
+  "tooltip.modifier.starcatcher.faster_handle_speed.shift": "%s%% handle speed",
   "tooltip.modifier.starcatcher.slightly_faster_handle_speed": "Slightly increases the handle's rotation speed",
+  "tooltip.modifier.starcatcher.slightly_faster_handle_speed.shift": "%s%% handle speed",
   "tooltip.modifier.starcatcher.slightly_slower_handle_speed": "Slightly decreases the handle's rotation speed",
+  "tooltip.modifier.starcatcher.slightly_slower_handle_speed.shift": "%s%% handle speed",
   "tooltip.modifier.starcatcher.slower_handle_speed": "Decreases the handle's rotation speed",
+  "tooltip.modifier.starcatcher.slower_handle_speed.shift": "%s%% handle speed",
 
   "tooltip.modifier.starcatcher.vanilla_loot": "Restores vanilla fishing loot",
 
@@ -325,7 +339,9 @@
   "tooltip.modifier.starcatcher.fish_entity": "If available, will catch the live fish instead",
 
   "tooltip.modifier.starcatcher.guarantee_new_fish_always": "If available, an undiscovered fish will bite",
+  "tooltip.modifier.starcatcher.guarantee_new_fish_always.shift": "%s%% chance for an undiscovered fish",
   "tooltip.modifier.starcatcher.guarantee_new_fish_half": "An undiscovered fish is more likely to bite",
+  "tooltip.modifier.starcatcher.guarantee_new_fish_half.shift": "%s%% chance for an undiscovered fish",
 
   "tooltip.modifier.starcatcher.extra_item": "An extra fish will come alongside your catch",
   "tooltip.modifier.starcatcher.extra_two_item": "Two extra fish will come alongside your catch",

@@ -26,6 +26,12 @@
 		],
 		"cardinal-components-entity": [
 			"com.wdiscute.starcatcher.io.attachments.SCEntityComponents"
+		],
+		"jei_mod_plugin": [
+			"com.wdiscute.starcatcher.compat.jei.StarcatcherJeiPlugin"
+		],
+		"emi": [
+			"com.wdiscute.starcatcher.compat.emi.StarcatcherEmiPlugin"
 		]
 	},
 	"mixins": [

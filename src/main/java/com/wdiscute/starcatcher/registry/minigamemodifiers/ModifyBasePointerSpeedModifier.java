@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
+import net.minecraft.network.chat.Component;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ModifyBasePointerSpeedModifier extends AbstractMinigameModifier
@@ -40,6 +42,19 @@ public class ModifyBasePointerSpeedModifier extends AbstractMinigameModifier
     public DeferredHolder<Supplier<AbstractMinigameModifier>, Supplier<AbstractMinigameModifier>> getRegistryHolder()
     {
         return SCMinigameModifiers.SPAWN_SWEET_SPOTS;
+    }
+
+    @Override
+    public List<Component> getShiftDescription()
+    {
+        String key = baseSpeedRatio >= 1.4f
+                ? "tooltip.modifier.starcatcher.faster_handle_speed.shift"
+                : baseSpeedRatio >= 1f
+                ? "tooltip.modifier.starcatcher.slightly_faster_handle_speed.shift"
+                : baseSpeedRatio >= 0.6f
+                ? "tooltip.modifier.starcatcher.slightly_slower_handle_speed.shift"
+                : "tooltip.modifier.starcatcher.slower_handle_speed.shift";
+        return List.of(Component.translatable(key, Math.round(baseSpeedRatio * 100)));
     }
 
 }

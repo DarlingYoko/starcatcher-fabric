@@ -71,6 +71,9 @@ public class CaughtLimitRestriction extends AbstractFishRestriction
     @Override
     public int getFishChance(int currentChance, Level level, FishProperties fp, @NotNull Entity entity, ItemStack rod, Context context)
     {
+        //FISH_ENTITY has no associated player to check a catch count against - see RarityCountRestriction
+        if (context.equals(Context.FISH_ENTITY)) return 0;
+
         if (entity instanceof FishingBobEntity fbe)
         {
             if (getCaughtCounter(fp, fbe.player) >= limit) return -9999;

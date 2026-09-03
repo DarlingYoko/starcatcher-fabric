@@ -38,9 +38,6 @@ import java.util.List;
 public class StarcatcherJeiPlugin implements IModPlugin
 {
     public static final ResourceLocation ARROW = Starcatcher.rl("textures/gui/emi/arrow.png");
-    //TODO(P8): this texture lives in the still-unported sellingbin companion mod's assets
-    //(see FABRIC_PORT_PLAN.md §7bis.3); points at a Starcatcher-namespaced path for now.
-    public static final ResourceLocation SLOT_BACKGROUND = Starcatcher.rl("textures/gui/slot_background.png");
 
     public static List<StarcatcherJeiFPRecipe.Recipe> listRecipes = new ArrayList<>();
 
@@ -50,6 +47,9 @@ public class StarcatcherJeiPlugin implements IModPlugin
 
     public static void displayRecipes(ItemStack is)
     {
+        if (iFocusFactory == null || iRecipesGui == null)
+            return;
+
         IFocus<ItemStack> focus = iFocusFactory.createFocus(RecipeIngredientRole.OUTPUT, VanillaTypes.ITEM_STACK, is);
         iRecipesGui.show(focus);
     }

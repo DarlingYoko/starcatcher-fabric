@@ -101,24 +101,50 @@ public class TooltipEvents
             {
                 minigameModifiersRLs.forEach(o ->
                 {
-                    if (entity.level().registryAccess().registryOrThrow(Starcatcher.MINIGAME_MODIFIERS).get(o) != null)
+                    var supplier = entity.level().registryAccess().registryOrThrow(Starcatcher.MINIGAME_MODIFIERS).get(o);
+                    if (supplier != null)
                     {
                         String s = I18n.get("tooltip.modifier." + o.toLanguageKey());
                         if (!s.isEmpty())
                             modComp.add(Component.literal(" -").append(Component.literal(s))
                                     .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY)));
+
+                        List<Component> shiftDesc = supplier.get().getShiftDescription();
+                        if (!shiftDesc.isEmpty())
+                        {
+                            modComp.add(Component.literal("   ").append(Component.translatable(hasShiftDown ? "tooltip.starcatcher.hold_shift_active" : "tooltip.starcatcher.hold_shift"))
+                                    .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY)));
+
+                            if (hasShiftDown)
+                                shiftDesc.forEach(shiftLine ->
+                                        modComp.add(Component.literal("   ").append(shiftLine)
+                                                .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY))));
+                        }
                     }
                 });
 
                 //add catch modifiers
                 catchModifiersRLs.forEach(o ->
                 {
-                    if (entity.level().registryAccess().registryOrThrow(Starcatcher.CATCH_MODIFIERS).get(o) != null)
+                    var supplier = entity.level().registryAccess().registryOrThrow(Starcatcher.CATCH_MODIFIERS).get(o);
+                    if (supplier != null)
                     {
                         String s = I18n.get("tooltip.modifier." + o.toLanguageKey());
                         if (!s.isEmpty())
                             modComp.add(Component.literal(" -").append(Component.literal(s))
                                     .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY)));
+
+                        List<Component> shiftDesc = supplier.get().getShiftDescription();
+                        if (!shiftDesc.isEmpty())
+                        {
+                            modComp.add(Component.literal("   ").append(Component.translatable(hasShiftDown ? "tooltip.starcatcher.hold_shift_active" : "tooltip.starcatcher.hold_shift"))
+                                    .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY)));
+
+                            if (hasShiftDown)
+                                shiftDesc.forEach(shiftLine ->
+                                        modComp.add(Component.literal("   ").append(shiftLine)
+                                                .withStyle(Style.EMPTY.withColor(SCColors.TOOLTIP_GRAY))));
+                        }
                     }
                 });
 

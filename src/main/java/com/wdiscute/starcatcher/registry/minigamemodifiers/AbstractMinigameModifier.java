@@ -7,6 +7,7 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.minigame.ActiveSweetSpot;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 
@@ -15,6 +16,15 @@ import java.util.function.Supplier;
 
 public abstract class AbstractMinigameModifier
 {
+    /**
+     * Extra line(s) shown in item tooltips only while holding shift, e.g. the exact
+     * percentage/value behind an otherwise qualitative tooltip.modifier.* description.
+     * Empty by default - most modifiers don't have a single number worth surfacing.
+     */
+    public List<Component> getShiftDescription()
+    {
+        return List.of();
+    }
     public static final Codec<AbstractMinigameModifier> MINIGAME_MODIFIER_CODEC = ResourceLocation.CODEC
             .dispatch(mod -> mod.getRegistryHolderOrThrow().getId(),
                     loc ->  Starcatcher.MINIGAME_MODIFIERS_REGISTRY.get(loc).get().getCodecOrThrow().codec());

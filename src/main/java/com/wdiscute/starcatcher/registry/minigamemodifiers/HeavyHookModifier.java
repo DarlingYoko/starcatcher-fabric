@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.minigame.ActiveSweetSpot;
+import net.minecraft.network.chat.Component;
 import net.nikdo53.neobackports.registry.DeferredHolder;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class HeavyHookModifier extends AbstractTimedModifier
@@ -47,5 +49,12 @@ public class HeavyHookModifier extends AbstractTimedModifier
         super.onSpotAdded(ass);
         ass.movingRate /= rate;
         return ass;
+    }
+
+    @Override
+    public List<Component> getShiftDescription()
+    {
+        return List.of(Component.translatable("tooltip.modifier.starcatcher.slower_moving_sweet_spots.shift",
+                Math.round(100f / rate)));
     }
 }

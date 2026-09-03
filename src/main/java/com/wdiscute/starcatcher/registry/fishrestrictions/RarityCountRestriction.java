@@ -123,6 +123,9 @@ public class RarityCountRestriction extends AbstractFishRestriction
     @Override
     public int getFishChance(int currentChance, Level level, FishProperties trophyFp, @NotNull Entity entity1, ItemStack rod, Context context)
     {
+        //FISH_ENTITY has no associated player to check a rarity count against
+        if (context.equals(Context.FISH_ENTITY)) return 0;
+
         Entity entity = entity1 instanceof FishingBobEntity fbe ? fbe.player : entity1;
 
         Map<ResourceLocation, FishCaughtCounter> fishesCaught = SCDataAttachments.get(entity, SCDataAttachments.FISHING_GUIDE).fishesCaught;

@@ -9,6 +9,7 @@ import com.wdiscute.starcatcher.registry.SCItems;
 import com.wdiscute.starcatcher.registry.fishrestrictions.AbstractFishRestriction;
 import com.wdiscute.starcatcher.registry.FishProperties;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -141,5 +142,27 @@ public class FishEntity extends AbstractFish
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(FISH_STACK, ItemStack.EMPTY);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound)
+    {
+        super.addAdditionalSaveData(compound);
+        compound.put("FishStack", getEntityData().get(FISH_STACK).save(new CompoundTag()));
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound)
+    {
+        super.readAdditionalSaveData(compound);
+        if (compound.contains("FishStack"))
+        {
+            ItemStack is = ItemStack.of(compound.getCompound("FishStack"));
+            if (!is.isEmpty())
+            {
+                getEntityData().set(FISH_STACK, is);
+                shouldDropItem = true;
+            }
+        }
     }
 }
